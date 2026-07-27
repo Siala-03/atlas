@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: atlas-core-api
+    runtime: node
+    rootDir: server
+    plan: free
+    region: frankfurt
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && node dist/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: PORT
+        value: 4000
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: PAYMENT_PROVIDER
+        value: mock
