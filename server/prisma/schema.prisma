@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                String      @id
+  name              String
+  brand             String
+  category          String
+  abv               Float
+  volume            String
+  unitsPerCase      Int
+  casePrice         Int
+  stockCases        Int
+  lowStockThreshold Int
+  image             String
+  description       String
+  origin            String
+  orderLines        OrderLine[]
+}
+
+model TradeAccount {
+  id                 String   @id @default(cuid())
+  business           String
+  contactName        String
+  email              String   @unique
+  phone              String
+  licenseNo          String
+  deliveryAddress    String
+  verificationStatus String   @default("Pending review")
+  paymentTerms       String   @default("Net 30 days, subject to approval")
+  createdAt          DateTime @default(now())
+  orders             Order[]
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  reference       String        @unique
+  createdAt       DateTime      @default(now())
+  status          String        @default("Pending")
+  accountId       String?
+  account         TradeAccount? @relation(fields: [accountId], references: [id])
+  business        String
+  contactName     String
+  email           String
+  phone           String
+  licenseNo       String
+  deliveryAddress String
+  deliveryDate    String?
+  notes           String        @default("")
+  internalNotes   String?
+  invoiceStatus   String        @default("To invoice")
+  paymentMethod   String        @default("invoice")
+  confirmedAt     DateTime?
+  packedAt        DateTime?
+  dispatchedAt    DateTime?
+  deliveredAt     DateTime?
+  subtotal        Int
+  vat             Int
+  total           Int
+  lines           OrderLine[]
+  payments        Payment[]
+}
+
+model OrderLine {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  name         String
+  brand        String
+  cases        Int
+  unitsPerCase Int
+  casePrice    Int
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider    String
+  providerRef String   @unique
+  status      String   @default("pending")
+  amount      Int
+  redirectUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
