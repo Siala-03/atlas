@@ -1,3 +1,10 @@
+databases:
+  - name: atlas-db
+    plan: free
+    region: frankfurt
+    databaseName: atlas
+    user: atlas
+
 services:
   - type: web
     name: atlas-core-api
@@ -10,10 +17,27 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: atlas-db
+          property: connectionString
       - key: PORT
         value: 4000
       - key: PUBLIC_APP_URL
-        sync: false
+        value: https://atlas-storefront.onrender.com
       - key: PAYMENT_PROVIDER
         value: mock
+
+  - type: web
+    name: atlas-storefront
+    runtime: static
+    rootDir: .
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://atlas-core-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
