@@ -8,7 +8,9 @@ export function Footer() {
     <footer className="mt-24 border-t border-burgundy-900/40 bg-burgundy-950 text-cream/80">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
         <div className="sm:col-span-2 lg:col-span-1">
-          <Logo className="h-10" />
+          <div className="inline-block rounded-xl bg-cream p-3">
+            <Logo className="h-14" />
+          </div>
           <p className="mt-4 max-w-xs font-serif text-lg italic text-cream/70">
             Stocking your shelves, one sip at a time.
           </p>
