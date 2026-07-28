@@ -17,6 +17,7 @@ import {
   TradeAccount } from
 "../types";
 import { api, ApiError } from "../lib/api";
+import { SEED_PRODUCTS } from "../data/products";
 
 const VAT_RATE = 0.18;
 const CART_KEY = "atlas.cart.v1";
@@ -70,7 +71,7 @@ function loadCart(): CartItem[] {
 }
 
 export function StoreProvider({ children }: {children: ReactNode;}) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cart, setCart] = useState<CartItem[]>(() => loadCart());
   const [loading, setLoading] = useState(true);
@@ -79,11 +80,13 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
   useEffect(() => {
     Promise.all([api.getProducts(), api.getOrders()]).
     then(([fetchedProducts, fetchedOrders]) => {
-      setProducts(fetchedProducts);
+      const nextProducts = fetchedProducts.length > 0 ? fetchedProducts : SEED_PRODUCTS;
+      setProducts(nextProducts);
       setOrders(fetchedOrders);
       setBackendError(null);
     }).
     catch(() => {
+      setProducts(SEED_PRODUCTS);
       setBackendError("Cannot reach the Atlas backend. Make sure the server is running (cd server && npm run dev).");
     }).
     finally(() => setLoading(false));
