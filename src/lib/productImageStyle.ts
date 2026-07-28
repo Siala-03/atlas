@@ -1,4 +1,7 @@
 import type { CSSProperties } from "react";
+import { WHISKY, VODKA, REDWINE, BEER } from "./categoryImages";
+
+const SHARED_STOCK_IMAGES = new Set<string>([WHISKY, VODKA, REDWINE, BEER]);
 
 function hashString(value: string): number {
   let hash = 0;
@@ -9,11 +12,15 @@ function hashString(value: string): number {
 }
 
 /**
- * Only 4 base product photos exist, reused across 12 products. This derives a
- * deterministic (same product always gets the same look), subtle color/tone
- * variation per product id so repeated photos don't render pixel-identical.
+ * A handful of products still share one of the 4 old stock photos. This
+ * derives a deterministic (same product always gets the same look, not
+ * random) color/tone variation per product id so those repeated photos don't
+ * render pixel-identical. Products with their own real photo are returned
+ * untouched — only the shared stock images need differentiating.
  */
-export function getProductImageFilter(productId: string): CSSProperties {
+export function getProductImageFilter(productId: string, imagePath: string): CSSProperties {
+  if (!SHARED_STOCK_IMAGES.has(imagePath)) return {};
+
   const hash = hashString(productId);
   const hue = (hash % 41) - 20;
   const saturate = 80 + hash % 50;

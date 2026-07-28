@@ -54,7 +54,7 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm">
             <li className="flex items-start gap-2">
               <MapPinIcon className="mt-0.5 h-4 w-4 text-amber2-400" />
-              KG 7 Ave, Kigali, Rwanda
+              KG 12 St, Kigali, Rwanda
             </li>
             <li className="flex items-center gap-2">
               <PhoneIcon className="h-4 w-4 text-amber2-400" />

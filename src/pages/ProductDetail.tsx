@@ -85,7 +85,7 @@ export function ProductDetail() {
             <img
               src={product.image}
               alt={product.name}
-              style={getProductImageFilter(product.id)}
+              style={getProductImageFilter(product.id, product.image)}
               className="max-h-[520px] w-auto object-contain" />
 
           </div>

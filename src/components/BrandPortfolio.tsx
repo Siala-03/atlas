@@ -62,7 +62,7 @@ export function BrandPortfolio() {
               <img
               src={product.image}
               alt={product.name}
-              style={getProductImageFilter(product.id)}
+              style={getProductImageFilter(product.id, product.image)}
               className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105" />
 
             </div>

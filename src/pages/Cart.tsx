@@ -55,7 +55,7 @@ export function Cart() {
                     to={`/product/${p.id}`}
                     className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-cream p-2">
                     
-                      <img src={p.image} alt={p.name} style={getProductImageFilter(p.id)} className="h-full w-auto object-contain" />
+                      <img src={p.image} alt={p.name} style={getProductImageFilter(p.id, p.image)} className="h-full w-auto object-contain" />
                     </Link>
                     <div className="flex flex-1 flex-col">
                       <div className="flex items-start justify-between">

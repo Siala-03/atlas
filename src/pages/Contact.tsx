@@ -36,7 +36,7 @@ export function Contact() {
             <ul className="mt-6 space-y-5 text-sm">
               <li className="flex items-start gap-3">
                 <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-burgundy-700" />
-                <span className="text-ink/70">KG 7 Ave, Kigali, Rwanda</span>
+                <span className="text-ink/70">KG 12 St, Kigali, Rwanda</span>
               </li>
               <li className="flex items-center gap-3">
                 <PhoneIcon className="h-5 w-5 shrink-0 text-burgundy-700" />
@@ -113,6 +113,20 @@ export function Contact() {
                 </form>
               }
             </div>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <h2 className="font-serif text-2xl font-semibold text-ink">Find us</h2>
+          <div className="mt-5 overflow-hidden rounded-2xl border border-burgundy-100">
+            <iframe
+              title="Atlas Supplies Ltd location — KG 12 St, Kigali, Rwanda"
+              src="https://www.google.com/maps?q=KG+12+St,+Kigali,+Rwanda&output=embed"
+              className="h-96 w-full"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade" />
+
           </div>
         </div>
       </main>
