@@ -1,17 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRightIcon, ShieldCheckIcon, ScaleIcon, MapPinIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
+import { WHISKY } from "../lib/categoryImages";
 
 const POINTS = [
-{ icon: ShieldCheckIcon, title: "Genuine imports", text: "Traceable supply routes, never grey-market stock." },
-{ icon: ScaleIcon, title: "Trade-verified pricing", text: "Wholesale case pricing, shown up front — no quotes to chase." },
-{ icon: MapPinIcon, title: "Rwanda-based", text: "Built around Kigali dispatch times, local terms, and local trade realities." }];
+{ title: "Genuine imports", text: "Traceable supply routes, never grey-market stock." },
+{ title: "Trade-verified pricing", text: "Wholesale case pricing, shown up front — no quotes to chase." },
+{ title: "Rwanda-based", text: "Built around Kigali dispatch times, local terms, and local trade realities." }];
 
 
 export function WhyAtlas() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div className="relative overflow-hidden rounded-3xl">
+          <img
+            src={WHISKY}
+            alt=""
+            className="aspect-[4/3] w-full object-cover" />
+
+          <div className="absolute inset-0 bg-gradient-to-tr from-burgundy-950/40 via-transparent to-transparent" />
+        </div>
+
         <div>
           <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Why Atlas</p>
           <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">
@@ -22,25 +32,22 @@ export function WhyAtlas() {
             accountable source for spirits, wine and beer — transparent pricing,
             verified stock, and a straightforward path from order to delivery.
           </p>
+
+          <dl className="mt-8 space-y-5 border-t border-burgundy-100 pt-6">
+            {POINTS.map((point) =>
+            <div key={point.title}>
+                <dt className="font-serif text-lg font-semibold text-ink">{point.title}</dt>
+                <dd className="mt-1 text-sm text-ink/60">{point.text}</dd>
+              </div>
+            )}
+          </dl>
+
           <Link
             to="/about"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-burgundy-800 hover:text-burgundy-900">
+            className="mt-7 inline-flex items-center gap-1.5 text-sm font-semibold text-burgundy-800 hover:text-burgundy-900">
 
             More about Atlas <ArrowRightIcon className="h-4 w-4" />
           </Link>
-        </div>
-        <div className="grid gap-5">
-          {POINTS.map((point) =>
-          <div key={point.title} className="flex items-start gap-4 rounded-2xl border border-burgundy-100 bg-white p-5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-800">
-                <point.icon className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-semibold text-ink">{point.title}</p>
-                <p className="mt-1 text-sm text-ink/60">{point.text}</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </section>);

@@ -1,22 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  ArrowRightIcon,
-  TruckIcon,
-  ShieldCheckIcon,
-  PackageIcon,
-  ClockIcon } from
-"lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
-import { StatsBar } from "../components/StatsBar";
 import { BrandPortfolio } from "../components/BrandPortfolio";
-import { BrandLogos } from "../components/BrandLogos";
 import { WhyAtlas } from "../components/WhyAtlas";
 import { HowItWorks } from "../components/HowItWorks";
-import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES } from "../lib/categoryImages";
 import { Category } from "../types";
@@ -34,16 +25,13 @@ const CATEGORIES: {name: Category;blurb: string;}[] = [
 
 
 const PERKS = [
-{ icon: TruckIcon, title: "Next-day delivery", text: "Order by 4pm across the region." },
-{ icon: PackageIcon, title: "Case pricing", text: "True wholesale rates, no minimums." },
-{ icon: ShieldCheckIcon, title: "Trade accounts", text: "Verified licensed buyers only." },
-{ icon: ClockIcon, title: "Live stock", text: "Real-time availability at checkout." }];
+{ title: "Next-day delivery", text: "Order by 4pm across the region." },
+{ title: "Case pricing", text: "True wholesale rates, no minimums." },
+{ title: "Trade accounts", text: "Verified licensed buyers only." },
+{ title: "Live stock", text: "Real-time availability at checkout." }];
 
-
-const CATEGORY_COUNT = new Set(CATEGORIES.map((c) => c.name)).size;
 
 export function Home() {
-  const { products } = useStore();
   const { bestsellerIds, topProducts } = usePopularity(4);
   const featuredHeading = bestsellerIds.size > 0 ? "Popular with trade buyers" : "Featured selection";
 
@@ -87,22 +75,13 @@ export function Home() {
         </div>
       </section>
 
-      <StatsBar productCount={products.length} categoryCount={CATEGORY_COUNT} />
-
-      <BrandLogos />
-
       {/* Perks */}
       <section className="border-b border-burgundy-100 bg-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8">
-          {PERKS.map((p) =>
-          <div key={p.title} className="flex items-start gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-burgundy-50 text-burgundy-800">
-                <p.icon className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-semibold text-ink">{p.title}</p>
-                <p className="text-sm text-ink/60">{p.text}</p>
-              </div>
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-8 divide-burgundy-100 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:divide-x lg:px-8">
+          {PERKS.map((p, index) =>
+          <div key={p.title} className={index > 0 ? "lg:pl-8" : ""}>
+              <p className="font-serif text-lg font-semibold text-ink">{p.title}</p>
+              <p className="mt-1 text-sm text-ink/60">{p.text}</p>
             </div>
           )}
         </div>
