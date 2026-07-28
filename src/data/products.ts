@@ -15,6 +15,16 @@ const PEARLY_BAY_SWEET_RED = "/Pearly-Bay-Sweet-Red.jpg";
 const PEARLY_BAY_SWEET_ROSE = "/Pearly-Bay-Sweet-Rose.jpg";
 const PEARLY_BAY_SWEET_WHITE = "/Pearly-Bay-Sweet-White-1.jpg";
 const PINTA_NEGRA = "/adegamae_pinta_negra.jpg";
+const ABSOLUT_VODKA = "/absolut vodka.jpeg";
+const BACARDI_SUPERIOR = "/barcardi rum.jpg";
+const JOHNNIE_WALKER_BLACK = "/black label whiskey.webp";
+const CHIVAS_REGAL_18 = "/chivas regal whiskey.avif";
+const BUMBU_XO = "/maison villevert bumbu xo rum 70cl.jpeg";
+const SKYY_VODKA = "/skyy vodka.webp";
+const SMIRNOFF_NO21 = "/smirnoff vodka.jpeg";
+const SPIRIT_OF_YORK_RYE = "/spirit york whiskey.jpeg";
+const GLENLIVET_12 = "/the-glenlivet-12-year-old-claymore-whisky-cocktail-scaled-1.avif";
+const SPIRIT_OF_YORK_VODKA = "/vodkaa.jpeg";
 
 export const SEED_PRODUCTS: Product[] = [
 {
@@ -432,4 +442,164 @@ export const SEED_PRODUCTS: Product[] = [
   description:
   "Full-bodied Portuguese red with dark fruit and firm structure. Also available from Adega Mãe in white and rosé on request.",
   origin: "Portugal"
+},
+{
+  id: "p-absolut-vodka",
+  name: "Absolut Vodka",
+  brand: "Absolut",
+  category: "Vodka",
+  abv: 40,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 95000,
+  stockCases: 40,
+  lowStockThreshold: 15,
+  image: ABSOLUT_VODKA,
+  description:
+  "Crafted from Swedish winter wheat and water, distilled since 1879. A globally recognised, no-surprises call vodka.",
+  origin: "Sweden"
+},
+{
+  id: "p-bacardi-superior",
+  name: "Bacardí Superior White Rum",
+  brand: "Bacardí",
+  category: "Rum",
+  abv: 40,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 70000,
+  stockCases: 44,
+  lowStockThreshold: 15,
+  image: BACARDI_SUPERIOR,
+  description:
+  "The original Bacardí carta blanca — light, clean and endlessly mixable. The world's best-known white rum.",
+  origin: "Puerto Rico"
+},
+{
+  id: "p-johnnie-walker-black",
+  name: "Black Label 12 Year",
+  brand: "Johnnie Walker",
+  category: "Whisky",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 140000,
+  stockCases: 30,
+  lowStockThreshold: 12,
+  image: JOHNNIE_WALKER_BLACK,
+  description:
+  "The benchmark blended Scotch — rich, smoky and well-rounded at 12 years old. A recognised name on any back bar.",
+  origin: "Scotland"
+},
+{
+  id: "p-chivas-regal-18",
+  name: "Chivas Regal 18 Year Gold Signature",
+  brand: "Chivas Regal",
+  category: "Whisky",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 260000,
+  stockCases: 16,
+  lowStockThreshold: 8,
+  image: CHIVAS_REGAL_18,
+  description:
+  "Deep, luxurious 18-year-old blended Scotch with notes of dark chocolate and rich fruit. A premium top-shelf pour.",
+  origin: "Scotland"
+},
+{
+  id: "p-bumbu-xo",
+  name: "Bumbu XO Rum",
+  brand: "Bumbu (Maison Villevert)",
+  category: "Rum",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 150000,
+  stockCases: 20,
+  lowStockThreshold: 10,
+  image: BUMBU_XO,
+  description:
+  "Aged rum blend finished with vanilla and spice in a distinctive black ceramic bottle. A striking, premium back-bar addition.",
+  origin: "Barbados"
+},
+{
+  id: "p-skyy-vodka",
+  name: "SKYY Vodka",
+  brand: "SKYY",
+  category: "Vodka",
+  abv: 40,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 85000,
+  stockCases: 36,
+  lowStockThreshold: 15,
+  image: SKYY_VODKA,
+  description:
+  "Quadruple-distilled American vodka with a clean, smooth profile. A dependable, well-priced call vodka.",
+  origin: "USA"
+},
+{
+  id: "p-smirnoff-no21",
+  name: "Smirnoff No. 21 Vodka",
+  brand: "Smirnoff",
+  category: "Vodka",
+  abv: 37.5,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 75000,
+  stockCases: 50,
+  lowStockThreshold: 18,
+  image: SMIRNOFF_NO21,
+  description:
+  "Ten-times filtered for remarkable purity. The world's best-selling vodka and a reliable high-volume mover.",
+  origin: "USA"
+},
+{
+  id: "p-spirit-of-york-rye",
+  name: "Spirit of York Rye Whisky",
+  brand: "Spirit of York",
+  category: "Whisky",
+  abv: 40,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 130000,
+  stockCases: 18,
+  lowStockThreshold: 10,
+  image: SPIRIT_OF_YORK_RYE,
+  description:
+  "A 100% rye whisky in a distinctive twisted bottle. A boutique, conversation-starting choice for premium cocktail lists.",
+  origin: "Canada"
+},
+{
+  id: "p-glenlivet-12",
+  name: "The Glenlivet 12 Year Double Oak",
+  brand: "The Glenlivet",
+  category: "Whisky",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 170000,
+  stockCases: 24,
+  lowStockThreshold: 10,
+  image: GLENLIVET_12,
+  description:
+  "The definitive single malt, matured in American and European oak casks for a smooth, fruit-forward finish.",
+  origin: "Scotland"
+},
+{
+  id: "p-spirit-of-york-vodka",
+  name: "Spirit of York Vodka",
+  brand: "Spirit of York",
+  category: "Vodka",
+  abv: 40,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 100000,
+  stockCases: 22,
+  lowStockThreshold: 10,
+  image: SPIRIT_OF_YORK_VODKA,
+  description:
+  "Small-batch Canadian vodka in the same striking twisted bottle as its rye whisky sibling. A premium, distinctive call.",
+  origin: "Canada"
 }];
