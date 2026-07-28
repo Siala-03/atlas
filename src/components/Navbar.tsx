@@ -11,7 +11,8 @@ const NAV = [
 { to: "/shop", label: "Shop" },
 { to: "/shop?category=Whisky", label: "Spirits" },
 { to: "/shop?category=Wine", label: "Wine" },
-{ to: "/shop?category=Beer", label: "Beer" }];
+{ to: "/shop?category=Beer", label: "Beer" },
+{ to: "/about", label: "About" }];
 
 
 export function Navbar() {

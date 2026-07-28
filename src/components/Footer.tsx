@@ -6,8 +6,8 @@ import { Logo } from "./Logo";
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-burgundy-900/40 bg-burgundy-950 text-cream/80">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4 lg:px-8">
-        <div className="md:col-span-1">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
+        <div className="sm:col-span-2 lg:col-span-1">
           <div className="rounded-xl bg-cream p-3 inline-block">
             <Logo className="h-10" />
           </div>
@@ -34,8 +34,18 @@ export function Footer() {
           </h4>
           <ul className="mt-4 space-y-2 text-sm">
             <li><Link to="/shop" className="hover:text-cream">Wholesale Ordering</Link></li>
-            <li><span className="text-cream/50">Dedicated account support</span></li>
-            <li><span className="text-cream/50">Bulk & recurring orders</span></li>
+            <li><Link to="/trade-account" className="hover:text-cream">Trade Account Info</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-semibold uppercase tracking-widest text-amber2-300">
+            Company
+          </h4>
+          <ul className="mt-4 space-y-2 text-sm">
+            <li><Link to="/about" className="hover:text-cream">About Atlas</Link></li>
+            <li><Link to="/faq" className="hover:text-cream">FAQs</Link></li>
+            <li><Link to="/contact" className="hover:text-cream">Contact Us</Link></li>
           </ul>
         </div>
 

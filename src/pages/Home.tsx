@@ -14,6 +14,8 @@ import { ProductStrip } from "../components/ProductStrip";
 import { StatsBar } from "../components/StatsBar";
 import { BrandPortfolio } from "../components/BrandPortfolio";
 import { BrandLogos } from "../components/BrandLogos";
+import { WhyAtlas } from "../components/WhyAtlas";
+import { HowItWorks } from "../components/HowItWorks";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES } from "../lib/categoryImages";
@@ -105,6 +107,10 @@ export function Home() {
           )}
         </div>
       </section>
+
+      <WhyAtlas />
+
+      <HowItWorks />
 
       {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">

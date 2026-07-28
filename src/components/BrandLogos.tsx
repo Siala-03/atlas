@@ -1,5 +1,7 @@
 import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useStore } from "../store/StoreContext";
+import { slugify } from "../lib/slug";
 
 export function BrandLogos() {
   const { products } = useStore();
@@ -21,11 +23,15 @@ export function BrandLogos() {
         </h2>
         <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
           {brands.map((brand) =>
-          <div key={brand} className="group flex items-center justify-center px-2">
+          <Link
+            key={brand}
+            to={`/brands/${slugify(brand)}`}
+            className="group flex items-center justify-center px-2">
+
               <span className="text-center font-serif text-lg font-semibold uppercase tracking-widest text-ink/35 transition-colors duration-300 group-hover:text-burgundy-800">
                 {brand}
               </span>
-            </div>
+            </Link>
           )}
         </div>
       </div>

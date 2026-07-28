@@ -6,6 +6,11 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Home } from "./pages/Home";
 import { Shop } from "./pages/Shop";
 import { ProductDetail } from "./pages/ProductDetail";
+import { BrandDetail } from "./pages/BrandDetail";
+import { About } from "./pages/About";
+import { Contact } from "./pages/Contact";
+import { TradeAccount } from "./pages/TradeAccount";
+import { FAQ } from "./pages/FAQ";
 import { Cart } from "./pages/Cart";
 import { Checkout } from "./pages/Checkout";
 import { OrderConfirmation } from "./pages/OrderConfirmation";
@@ -29,6 +34,11 @@ export function App() {
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/brands/:slug" element={<BrandDetail />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/trade-account" element={<TradeAccount />} />
+            <Route path="/faq" element={<FAQ />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmed/:id" element={<OrderConfirmation />} />
