@@ -6,6 +6,7 @@ import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
+import { getProductImageFilter } from "../lib/productImageStyle";
 
 export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
@@ -54,7 +55,7 @@ export function Cart() {
                     to={`/product/${p.id}`}
                     className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-cream p-2">
                     
-                      <img src={p.image} alt={p.name} className="h-full w-auto object-contain" />
+                      <img src={p.image} alt={p.name} style={getProductImageFilter(p.id)} className="h-full w-auto object-contain" />
                     </Link>
                     <div className="flex flex-1 flex-col">
                       <div className="flex items-start justify-between">
