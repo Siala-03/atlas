@@ -13,6 +13,7 @@ import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
 import { StatsBar } from "../components/StatsBar";
 import { BrandPortfolio } from "../components/BrandPortfolio";
+import { BrandLogos } from "../components/BrandLogos";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES } from "../lib/categoryImages";
@@ -85,6 +86,8 @@ export function Home() {
       </section>
 
       <StatsBar productCount={products.length} categoryCount={CATEGORY_COUNT} />
+
+      <BrandLogos />
 
       {/* Perks */}
       <section className="border-b border-burgundy-100 bg-white">
