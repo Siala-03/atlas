@@ -17,7 +17,6 @@ import { ProductStrip } from "../components/ProductStrip";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
-import { getProductImageFilter } from "../lib/productImageStyle";
 
 export function ProductDetail() {
   const { id } = useParams();
@@ -85,7 +84,6 @@ export function ProductDetail() {
             <img
               src={product.image}
               alt={product.name}
-              style={getProductImageFilter(product.id, product.image)}
               className="max-h-[520px] w-auto object-contain" />
 
           </div>

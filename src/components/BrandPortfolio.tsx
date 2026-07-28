@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../store/StoreContext";
 import { Category } from "../types";
-import { getProductImageFilter } from "../lib/productImageStyle";
 
 const CATEGORIES: (Category | "All")[] = [
 "All",
@@ -62,7 +61,6 @@ export function BrandPortfolio() {
               <img
               src={product.image}
               alt={product.name}
-              style={getProductImageFilter(product.id, product.image)}
               className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105" />
 
             </div>

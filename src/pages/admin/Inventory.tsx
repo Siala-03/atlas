@@ -10,7 +10,6 @@ import {
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
-import { getProductImageFilter } from "../../lib/productImageStyle";
 import { Product } from "../../types";
 
 export function Inventory() {
@@ -140,7 +139,7 @@ export function Inventory() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cream p-1">
-                          <img src={p.image} alt="" style={getProductImageFilter(p.id, p.image)} className="h-full w-auto object-contain" />
+                          <img src={p.image} alt="" className="h-full w-auto object-contain" />
                         </div>
                         <div>
                           <p className="font-medium text-ink">{p.name}</p>

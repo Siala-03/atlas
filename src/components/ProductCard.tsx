@@ -6,7 +6,6 @@ import { Product } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
 import { BestsellerBadge } from "./BestsellerBadge";
-import { getProductImageFilter } from "../lib/productImageStyle";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
   const { addToCart } = useStore();
@@ -26,7 +25,6 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
         <img
           src={product.image}
           alt={product.name}
-          style={getProductImageFilter(product.id, product.image)}
           className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105" />
 
         <span className="absolute left-3 top-3 rounded-full bg-burgundy-800 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-cream">

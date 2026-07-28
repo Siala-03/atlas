@@ -1,5 +1,4 @@
 import { Product } from "../types";
-import { WHISKY, VODKA, REDWINE, BEER } from "../lib/categoryImages";
 
 const KWV_CABERNET = "/KWV-CLA-CabSauv.jpg";
 const KWV_CHARDONNAY = "/KWV-CLA-Chard-1.jpg";
@@ -25,200 +24,18 @@ const SMIRNOFF_NO21 = "/smirnoff vodka.jpeg";
 const SPIRIT_OF_YORK_RYE = "/spirit york whiskey.jpeg";
 const GLENLIVET_12 = "/the-glenlivet-12-year-old-claymore-whisky-cocktail-scaled-1.avif";
 const SPIRIT_OF_YORK_VODKA = "/vodkaa.jpeg";
+const HEINEKEN_CRATE = "/crate of heineken.avif";
+const TUSKER_CRATE = "/crate of tusker.jpeg";
+const SKOL_CRATE = "/skol crate beer.webp";
+const BEEFEATER_PINK = "/beefeater gin.jpeg";
+const GILBEYS_GIN = "/gilbeys gin.jpeg";
+const HENDRICKS_GIN = "/hendricks gin.jpeg";
+const TANQUERAY_GIN = "/tanqueray gin.jpeg";
+const WILDJAC_GIN = "/wildjac gin.jpg";
+const GORDONS_GIN = "/Gordons gin.jpeg";
+const THE_BOTANIST_GIN = "/The_Botanist_-_70cl gin.webp";
 
 export const SEED_PRODUCTS: Product[] = [
-{
-  id: "p-highland-single-malt",
-  name: "Highland Single Malt 12yr",
-  brand: "Glen Atlas",
-  category: "Whisky",
-  abv: 40,
-  volume: "70cl",
-  unitsPerCase: 6,
-  casePrice: 210000,
-  stockCases: 48,
-  lowStockThreshold: 12,
-  image: WHISKY,
-  description:
-  "A rich, honeyed Highland single malt aged twelve years in oak. Notes of dried fruit, vanilla and gentle spice. A dependable premium listing for any back bar.",
-  origin: "Scotland"
-},
-{
-  id: "p-blended-scotch",
-  name: "Reserve Blended Scotch",
-  brand: "Meridian",
-  category: "Whisky",
-  abv: 40,
-  volume: "70cl",
-  unitsPerCase: 12,
-  casePrice: 185000,
-  stockCases: 9,
-  lowStockThreshold: 12,
-  image: WHISKY,
-  description:
-  "Smooth, versatile blended Scotch built for high-volume pours. Balanced malt-to-grain profile that mixes beautifully.",
-  origin: "Scotland"
-},
-{
-  id: "p-bourbon",
-  name: "Small Batch Bourbon",
-  brand: "Cedar Ridge",
-  category: "Whisky",
-  abv: 45,
-  volume: "70cl",
-  unitsPerCase: 6,
-  casePrice: 175000,
-  stockCases: 30,
-  lowStockThreshold: 8,
-  image: WHISKY,
-  description:
-  "Caramel-forward small batch bourbon with a warm, lingering finish. A fast-moving spirit for cocktail programmes.",
-  origin: "USA"
-},
-{
-  id: "p-premium-vodka",
-  name: "Premium Grain Vodka",
-  brand: "Northwind",
-  category: "Vodka",
-  abv: 40,
-  volume: "70cl",
-  unitsPerCase: 12,
-  casePrice: 145000,
-  stockCases: 64,
-  lowStockThreshold: 15,
-  image: VODKA,
-  description:
-  "Clean, crisp six-times distilled grain vodka. The workhorse of any well — neutral, smooth and endlessly mixable.",
-  origin: "Poland"
-},
-{
-  id: "p-craft-vodka",
-  name: "Craft Wheat Vodka",
-  brand: "Silverbirch",
-  category: "Vodka",
-  abv: 40,
-  volume: "70cl",
-  unitsPerCase: 6,
-  casePrice: 130000,
-  stockCases: 4,
-  lowStockThreshold: 10,
-  image: VODKA,
-  description:
-  "A softer, subtly sweet craft wheat vodka. Ideal as a premium upsell for martinis and signature serves.",
-  origin: "England"
-},
-{
-  id: "p-london-dry-gin",
-  name: "London Dry Gin",
-  brand: "Kingsway",
-  category: "Gin",
-  abv: 43,
-  volume: "70cl",
-  unitsPerCase: 6,
-  casePrice: 155000,
-  stockCases: 26,
-  lowStockThreshold: 8,
-  image: VODKA,
-  description:
-  "Classic juniper-led London Dry with citrus and coriander. A must-stock for the perennial G&T.",
-  origin: "England"
-},
-{
-  id: "p-spiced-rum",
-  name: "Caribbean Spiced Rum",
-  brand: "Tradewind",
-  category: "Rum",
-  abv: 37.5,
-  volume: "70cl",
-  unitsPerCase: 12,
-  casePrice: 150000,
-  stockCases: 21,
-  lowStockThreshold: 10,
-  image: WHISKY,
-  description:
-  "Warm vanilla and baking-spice spiced rum. A crowd-pleaser that drives strong margins in mixed serves.",
-  origin: "Barbados"
-},
-{
-  id: "p-cabernet",
-  name: "Cabernet Sauvignon",
-  brand: "Vallée Rouge",
-  category: "Wine",
-  abv: 13.5,
-  volume: "75cl",
-  unitsPerCase: 6,
-  casePrice: 78000,
-  stockCases: 88,
-  lowStockThreshold: 20,
-  image: REDWINE,
-  description:
-  "Full-bodied Cabernet with blackcurrant, cedar and soft tannins. A reliable by-the-glass red.",
-  origin: "France"
-},
-{
-  id: "p-malbec",
-  name: "Reserve Malbec",
-  brand: "Alta Sierra",
-  category: "Wine",
-  abv: 14,
-  volume: "75cl",
-  unitsPerCase: 6,
-  casePrice: 92000,
-  stockCases: 11,
-  lowStockThreshold: 15,
-  image: REDWINE,
-  description:
-  "Plush Argentinian Malbec bursting with dark plum and cocoa. A popular premium pour.",
-  origin: "Argentina"
-},
-{
-  id: "p-sauvignon-blanc",
-  name: "Sauvignon Blanc",
-  brand: "Bay Cellars",
-  category: "Wine",
-  abv: 12.5,
-  volume: "75cl",
-  unitsPerCase: 6,
-  casePrice: 72000,
-  stockCases: 54,
-  lowStockThreshold: 18,
-  image: REDWINE,
-  description:
-  "Zesty, aromatic Sauvignon Blanc with gooseberry and citrus. High-turnover white for any list.",
-  origin: "New Zealand"
-},
-{
-  id: "p-craft-lager",
-  name: "Craft Lager (Case)",
-  brand: "Harbour Brew Co.",
-  category: "Beer",
-  abv: 4.8,
-  volume: "330ml",
-  unitsPerCase: 24,
-  casePrice: 36000,
-  stockCases: 120,
-  lowStockThreshold: 30,
-  image: BEER,
-  description:
-  "Crisp, sessionable craft lager in 24-bottle cases. The dependable volume seller.",
-  origin: "England"
-},
-{
-  id: "p-ipa",
-  name: "West Coast IPA (Case)",
-  brand: "Harbour Brew Co.",
-  category: "Beer",
-  abv: 5.6,
-  volume: "330ml",
-  unitsPerCase: 24,
-  casePrice: 44000,
-  stockCases: 7,
-  lowStockThreshold: 20,
-  image: BEER,
-  description:
-  "Bold, hop-forward IPA with tropical fruit and pine. A premium craft option that commands a higher pour price.",
-  origin: "England"
-},
 {
   id: "p-kwv-cabernet-sauvignon",
   name: "Classic Collection Cabernet Sauvignon",
@@ -602,4 +419,164 @@ export const SEED_PRODUCTS: Product[] = [
   description:
   "Small-batch Canadian vodka in the same striking twisted bottle as its rye whisky sibling. A premium, distinctive call.",
   origin: "Canada"
+},
+{
+  id: "p-heineken-case",
+  name: "Heineken Lager (Case)",
+  brand: "Heineken",
+  category: "Beer",
+  abv: 5,
+  volume: "25cl",
+  unitsPerCase: 24,
+  casePrice: 42000,
+  stockCases: 60,
+  lowStockThreshold: 20,
+  image: HEINEKEN_CRATE,
+  description:
+  "The world's most recognised green bottle. A crisp, balanced pale lager that moves fast on any back bar.",
+  origin: "Netherlands"
+},
+{
+  id: "p-tusker-case",
+  name: "Tusker Malt Lager (Case)",
+  brand: "Tusker",
+  category: "Beer",
+  abv: 4.5,
+  volume: "50cl",
+  unitsPerCase: 24,
+  casePrice: 30000,
+  stockCases: 48,
+  lowStockThreshold: 18,
+  image: TUSKER_CRATE,
+  description:
+  "East Africa's best-known lager, smooth and malt-forward. A strong regional favourite for on-trade fridges.",
+  origin: "Kenya"
+},
+{
+  id: "p-skol-case",
+  name: "Skol Lager (Case)",
+  brand: "Skol",
+  category: "Beer",
+  abv: 5,
+  volume: "33cl",
+  unitsPerCase: 24,
+  casePrice: 26000,
+  stockCases: 55,
+  lowStockThreshold: 20,
+  image: SKOL_CRATE,
+  description:
+  "Light, easy-drinking mainstream lager. A dependable, value volume seller for high-turnover venues.",
+  origin: "Portugal"
+},
+{
+  id: "p-beefeater-pink",
+  name: "Pink Strawberry Gin",
+  brand: "Beefeater",
+  category: "Gin",
+  abv: 37.5,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 135000,
+  stockCases: 26,
+  lowStockThreshold: 12,
+  image: BEEFEATER_PINK,
+  description:
+  "London Dry Gin infused with natural strawberry flavour. A vibrant, approachable gin for spritzes and easy serves.",
+  origin: "England"
+},
+{
+  id: "p-gilbeys-gin",
+  name: "Special Dry Gin",
+  brand: "Gilbey's",
+  category: "Gin",
+  abv: 40,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 80000,
+  stockCases: 34,
+  lowStockThreshold: 15,
+  image: GILBEYS_GIN,
+  description:
+  "A delicate blend of 12 natural botanicals with a hint of citrus. A dependable, value-priced call gin.",
+  origin: "England"
+},
+{
+  id: "p-hendricks-gin",
+  name: "Hendrick's Gin",
+  brand: "Hendrick's",
+  category: "Gin",
+  abv: 41.4,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 165000,
+  stockCases: 20,
+  lowStockThreshold: 10,
+  image: HENDRICKS_GIN,
+  description:
+  "Infused with rose and cucumber alongside classic botanicals. A distinctive, premium gin with a devoted following.",
+  origin: "Scotland"
+},
+{
+  id: "p-tanqueray-gin",
+  name: "London Dry Gin",
+  brand: "Tanqueray",
+  category: "Gin",
+  abv: 43.1,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 145000,
+  stockCases: 28,
+  lowStockThreshold: 12,
+  image: TANQUERAY_GIN,
+  description:
+  "Bold, juniper-forward London Dry in the iconic green bottle. A classic, high-recognition call gin.",
+  origin: "England"
+},
+{
+  id: "p-wildjac-gin",
+  name: "Natural Dry Gin",
+  brand: "Wildjac",
+  category: "Gin",
+  abv: 37.5,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 120000,
+  stockCases: 15,
+  lowStockThreshold: 8,
+  image: WILDJAC_GIN,
+  description:
+  "Sustainably produced natural dry gin with elderberry, chamomile and juniper. A boutique choice for craft cocktail lists.",
+  origin: "England"
+},
+{
+  id: "p-gordons-london-dry-gin",
+  name: "London Dry Gin",
+  brand: "Gordon's",
+  category: "Gin",
+  abv: 37.5,
+  volume: "70cl",
+  unitsPerCase: 12,
+  casePrice: 132000,
+  stockCases: 26,
+  lowStockThreshold: 10,
+  image: GORDONS_GIN,
+  description:
+  "The world's best-selling London Dry Gin, distilled to a recipe unchanged since 1769. Juniper-forward with a crisp, clean finish — the trade standard for gin cocktails.",
+  origin: "United Kingdom"
+},
+{
+  id: "p-the-botanist-islay-dry-gin",
+  name: "Islay Dry Gin",
+  brand: "The Botanist",
+  category: "Gin",
+  abv: 46,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 210000,
+  stockCases: 12,
+  lowStockThreshold: 6,
+  image: THE_BOTANIST_GIN,
+  description:
+  "Conceived, distilled and hand-crafted on the island of Islay using 22 foraged local botanicals alongside the traditional nine. A premium, distinctive gin for discerning cocktail programmes.",
+  origin: "Scotland"
 }];
