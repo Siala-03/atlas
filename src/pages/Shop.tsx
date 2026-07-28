@@ -7,6 +7,7 @@ import { ProductCard } from "../components/ProductCard";
 import { ProductFilters, EMPTY_FILTERS, FilterState, applyFilters, isFilterActive } from "../components/ProductFilters";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
+import { CATEGORY_HERO_IMAGES } from "../lib/categoryImages";
 import { Category } from "../types";
 
 const CATEGORIES: (Category | "All")[] = [
@@ -40,6 +41,8 @@ export function Shop() {
     setParams(params, { replace: true });
   };
 
+  const heroImage = activeCategory !== "All" ? CATEGORY_HERO_IMAGES[activeCategory] : undefined;
+
   const filtered = useMemo(() => {
     let list = products.filter((p) =>
     activeCategory === "All" ? true : p.category === activeCategory
@@ -70,13 +73,19 @@ export function Shop() {
     <div className="min-h-screen w-full bg-cream">
       <Navbar />
 
-      <div className="border-b border-burgundy-100 bg-burgundy-800">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className={`relative overflow-hidden border-b border-burgundy-100 ${heroImage ? "" : "bg-burgundy-800"}`}>
+        {heroImage &&
+        <>
+            <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-burgundy-950/75" />
+          </>
+        }
+        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <h1 className="font-serif text-4xl font-semibold text-cream sm:text-5xl">
-            The Catalogue
+            {activeCategory === "All" ? "The Catalogue" : activeCategory}
           </h1>
           <p className="mt-2 text-cream/70">
-            Wholesale case pricing · {products.length} products in stock
+            Wholesale case pricing · {filtered.length} products{activeCategory === "All" ? " in stock" : ` in ${activeCategory}`}
           </p>
         </div>
       </div>

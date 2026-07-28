@@ -13,3 +13,13 @@ export const CATEGORY_IMAGES: Record<Category, string> = {
   Wine: REDWINE,
   Beer: BEER
 };
+
+export const VODKA_LINEUP = "/vodkas.webp";
+export const RUM_LINEUP = "/rums .jpg";
+export const WINE_CELLAR = "/c76d1c17-8922-4717-b20e-ae6d0135e87f.jpg";
+
+export const CATEGORY_HERO_IMAGES: Partial<Record<Category, string>> = {
+  Vodka: VODKA_LINEUP,
+  Rum: RUM_LINEUP,
+  Wine: WINE_CELLAR
+};
