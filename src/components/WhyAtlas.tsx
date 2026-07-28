@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon } from "lucide-react";
-import { WHISKY } from "../lib/categoryImages";
+import { VODKA_LINEUP } from "../lib/categoryImages";
 
 const POINTS = [
 { title: "Genuine imports", text: "Traceable supply routes, never grey-market stock." },
@@ -15,7 +15,7 @@ export function WhyAtlas() {
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
         <div className="relative overflow-hidden rounded-3xl">
           <img
-            src={WHISKY}
+            src={VODKA_LINEUP}
             alt=""
             className="aspect-[4/3] w-full object-cover" />
 
