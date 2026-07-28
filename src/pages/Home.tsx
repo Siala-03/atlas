@@ -12,6 +12,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
 import { StatsBar } from "../components/StatsBar";
+import { BrandPortfolio } from "../components/BrandPortfolio";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES } from "../lib/categoryImages";
@@ -141,6 +142,8 @@ export function Home() {
           )}
         </div>
       </section>
+
+      <BrandPortfolio />
 
       <ProductStrip title={featuredHeading} products={topProducts} viewAllHref="/shop" />
 
