@@ -51,10 +51,7 @@ export function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}>
 
-            <span className="inline-flex items-center rounded-full border border-amber2-400/40 bg-amber2-500/10 px-4 py-1.5 text-sm font-medium text-amber2-200">
-              Wholesale alcoholic beverage distribution
-            </span>
-            <h1 className="mt-6 font-serif text-5xl font-semibold leading-tight text-cream sm:text-6xl">
+            <h1 className="font-serif text-5xl font-semibold leading-tight text-cream sm:text-6xl">
               Stocking your shelves, one sip at a time.
             </h1>
             <p className="mt-6 max-w-lg text-lg text-cream/80">
