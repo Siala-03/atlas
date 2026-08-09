@@ -85,7 +85,7 @@ export function Shop() {
             {activeCategory === "All" ? "The Catalogue" : activeCategory}
           </h1>
           <p className="mt-2 text-cream/70">
-            Wholesale case pricing · {filtered.length} products{activeCategory === "All" ? " in stock" : ` in ${activeCategory}`}
+            Case pricing · {filtered.length} products{activeCategory === "All" ? " in stock" : ` in ${activeCategory}`}
           </p>
         </div>
       </div>

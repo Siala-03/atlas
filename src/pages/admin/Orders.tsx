@@ -7,7 +7,7 @@ import { useStore } from "../../store/StoreContext";
 import { formatCurrency, formatDate } from "../../lib/format";
 import { ORDER_STATUSES, OrderStatus } from "../../types";
 
-type SortField = "createdAt" | "total" | "business" | "status";
+type SortField = "createdAt" | "total" | "contactName" | "status";
 type SortDir = "asc" | "desc";
 
 export function Orders() {
@@ -35,7 +35,6 @@ export function Orders() {
       list = list.filter(
         (o) =>
         o.reference.toLowerCase().includes(q) ||
-        o.business.toLowerCase().includes(q) ||
         o.contactName.toLowerCase().includes(q)
       );
     }
@@ -44,8 +43,8 @@ export function Orders() {
       switch (sortField) {
         case "total":
           return (a.total - b.total) * dir;
-        case "business":
-          return a.business.localeCompare(b.business) * dir;
+        case "contactName":
+          return a.contactName.localeCompare(b.contactName) * dir;
         case "status":
           return a.status.localeCompare(b.status) * dir;
         default:
@@ -100,7 +99,7 @@ export function Orders() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search ref, business..."
+            placeholder="Search ref, customer..."
             className="w-full rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
           
         </div>
@@ -112,7 +111,7 @@ export function Orders() {
             <thead className="border-b border-burgundy-100 bg-cream/60 text-xs uppercase tracking-wider text-ink/50">
               <tr>
                 <th className="px-5 py-3">Reference</th>
-                <th className="px-5 py-3"><SortHeader field="business" label="Customer" /></th>
+                <th className="px-5 py-3"><SortHeader field="contactName" label="Customer" /></th>
                 <th className="px-5 py-3"><SortHeader field="createdAt" label="Date" /></th>
                 <th className="px-5 py-3">Items</th>
                 <th className="px-5 py-3"><SortHeader field="total" label="Total" /></th>
@@ -138,8 +137,8 @@ export function Orders() {
                       </Link>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="font-medium text-ink">{o.business}</p>
-                      <p className="text-xs text-ink/50">{o.contactName}</p>
+                      <p className="font-medium text-ink">{o.contactName}</p>
+                      <p className="text-xs text-ink/50">{o.email}</p>
                     </td>
                     <td className="px-5 py-4 text-ink/70">{formatDate(o.createdAt)}</td>
                     <td className="px-5 py-4 text-ink/70">

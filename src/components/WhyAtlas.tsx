@@ -5,8 +5,8 @@ import { VODKA_LINEUP } from "../lib/categoryImages";
 
 const POINTS = [
 { title: "Genuine imports", text: "Traceable supply routes, never grey-market stock." },
-{ title: "Trade-verified pricing", text: "Wholesale case pricing, shown up front — no quotes to chase." },
-{ title: "Rwanda-based", text: "Built around Kigali dispatch times, local terms, and local trade realities." }];
+{ title: "Straightforward pricing", text: "Case pricing, shown up front — no quotes to chase." },
+{ title: "Rwanda-based", text: "Built around Kigali dispatch times and local delivery realities." }];
 
 
 export function WhyAtlas() {
@@ -25,7 +25,7 @@ export function WhyAtlas() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Why Atlas</p>
           <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">
-            Built for licensed trade buyers, not casual shoppers.
+            Genuine stock, straightforward pricing, delivered.
           </h2>
           <p className="mt-4 max-w-lg text-ink/60">
             Atlas Supplies Ltd exists to give bars, restaurants and retailers a single,

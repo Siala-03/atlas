@@ -26,14 +26,14 @@ const CATEGORIES: {name: Category;blurb: string;}[] = [
 
 const PERKS = [
 { title: "Next-day delivery", text: "Order by 4pm across the region." },
-{ title: "Case pricing", text: "True wholesale rates, no minimums." },
-{ title: "Trade accounts", text: "Verified licensed buyers only." },
+{ title: "Case pricing", text: "Straightforward rates, no minimums." },
+{ title: "Secure payment", text: "Pay by card or MTN MoMo." },
 { title: "Live stock", text: "Real-time availability at checkout." }];
 
 
 export function Home() {
   const { bestsellerIds, topProducts } = usePopularity(4);
-  const featuredHeading = bestsellerIds.size > 0 ? "Popular with trade buyers" : "Featured selection";
+  const featuredHeading = bestsellerIds.size > 0 ? "Popular right now" : "Featured selection";
 
   return (
     <div className="min-h-screen w-full bg-cream">
@@ -55,9 +55,8 @@ export function Home() {
               Stocking your shelves, one sip at a time.
             </h1>
             <p className="mt-6 max-w-lg text-lg text-cream/80">
-              Atlas Supplies Ltd delivers premium spirits, wine and beer to bars,
-              restaurants and retailers — at genuine wholesale case pricing with
-              next-day delivery.
+              Atlas Supplies Ltd delivers premium spirits, wine and beer straight
+              to your door — genuine case pricing with next-day delivery.
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
               <Link
@@ -136,11 +135,10 @@ export function Home() {
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-3xl bg-burgundy-800 px-8 py-14 text-center sm:px-16">
           <h2 className="font-serif text-4xl font-semibold text-cream">
-            Open a trade account today
+            Order today
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-cream/80">
-            Get access to full wholesale pricing, dedicated account support and
-            flexible delivery scheduling.
+            Genuine case pricing, secure payment and flexible delivery scheduling.
           </p>
           <Link
             to="/shop"

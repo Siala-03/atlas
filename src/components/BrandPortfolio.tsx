@@ -30,7 +30,7 @@ export function BrandPortfolio() {
         <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Our portfolio</p>
         <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">Partners we work with</h2>
         <p className="mt-3 text-ink/60">
-          A trusted selection of spirits, wine and beer brands — stocked, genuine and ready for wholesale ordering.
+          A trusted selection of spirits, wine and beer brands — stocked, genuine and ready to order.
         </p>
       </div>
 

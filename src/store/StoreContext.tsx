@@ -13,21 +13,18 @@ import {
   OrderStatus,
   Payment,
   PaymentMethod,
-  Product,
-  TradeAccount } from
+  Product } from
 "../types";
-import { api, ApiError } from "../lib/api";
+import { api } from "../lib/api";
 import { SEED_PRODUCTS } from "../data/products";
 
 const VAT_RATE = 0.18;
 const CART_KEY = "atlas.cart.v1";
 
 export interface CheckoutDetails {
-  business: string;
   contactName: string;
   email: string;
   phone: string;
-  licenseNo: string;
   deliveryAddress: string;
   deliveryDate: string;
   notes: string;
@@ -46,9 +43,7 @@ interface StoreContextValue {
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   getProduct: (id: string) => Product | undefined;
-  getAccount: (id: string) => Promise<TradeAccount | undefined>;
-  saveTradeAccount: (details: CheckoutDetails, accountId?: string) => Promise<TradeAccount>;
-  placeOrder: (details: CheckoutDetails, accountId?: string, paymentMethod?: PaymentMethod) => Promise<Order>;
+  placeOrder: (details: CheckoutDetails, paymentMethod?: PaymentMethod) => Promise<Order>;
   reorderOrder: (orderId: string) => Promise<{ addedCases: number; unavailable: string[] }>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   updateOrderInternalNotes: (orderId: string, notes: string) => Promise<void>;
@@ -96,15 +91,6 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
 
   const getProduct = (id: string) => products.find((product) => product.id === id);
 
-  const getAccount = async (id: string): Promise<TradeAccount | undefined> => {
-    try {
-      return await api.getAccount(id);
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 404) return undefined;
-      throw error;
-    }
-  };
-
   const addToCart = (productId: string, cases: number) => {
     setCart((previous) => {
       const existing = previous.find((item) => item.productId === productId);
@@ -138,16 +124,11 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     [cart, products]
   );
 
-  const saveTradeAccount = async (details: CheckoutDetails, accountId?: string): Promise<TradeAccount> => {
-    return api.saveTradeAccount(details, accountId);
-  };
-
   const placeOrder = async (
   details: CheckoutDetails,
-  accountId?: string,
-  paymentMethod: PaymentMethod = "invoice")
+  paymentMethod: PaymentMethod = "card")
   : Promise<Order> => {
-    const order = await api.placeOrder({ details, accountId, cart, paymentMethod });
+    const order = await api.placeOrder({ details, cart, paymentMethod });
     setOrders((previous) => [order, ...previous]);
     clearCart();
     // Stock was decremented authoritatively on the server; refetch to stay in sync
@@ -193,7 +174,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
   return (
     <StoreContext.Provider value={{
       products, orders, cart, cartCount, cartSubtotal, loading, backendError, addToCart, updateCartQty,
-      removeFromCart, clearCart, getProduct, getAccount, saveTradeAccount, placeOrder,
+      removeFromCart, clearCart, getProduct, placeOrder,
       reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateInvoiceStatus,
       updateProduct, restockProduct, initiatePayment, getPaymentStatus
     }}>

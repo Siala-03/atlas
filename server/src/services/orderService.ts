@@ -10,17 +10,15 @@ type CartItem = z.infer<typeof CartItemSchema>;
 
 const ORDER_INCLUDE = { lines: true, payments: { orderBy: { createdAt: "desc" as const } } };
 
-export function listOrders(filters: { status?: string; invoiceStatus?: string; accountId?: string; search?: string }) {
+export function listOrders(filters: { status?: string; invoiceStatus?: string; search?: string }) {
   return prisma.order.findMany({
     where: {
       status: filters.status || undefined,
       invoiceStatus: filters.invoiceStatus || undefined,
-      accountId: filters.accountId || undefined,
       ...(filters.search ?
       {
         OR: [
         { reference: { contains: filters.search } },
-        { business: { contains: filters.search } },
         { contactName: { contains: filters.search } }]
 
       } :
@@ -39,11 +37,10 @@ export async function getOrder(id: string) {
 
 export async function createOrder(params: {
   details: CheckoutDetails;
-  accountId?: string;
   cart: CartItem[];
-  paymentMethod: "invoice" | "card" | "momo";
+  paymentMethod: "card" | "momo";
 }) {
-  const { details, accountId, cart, paymentMethod } = params;
+  const { details, cart, paymentMethod } = params;
 
   return prisma.$transaction(async (tx) => {
     const lines: { productId: string; name: string; brand: string; cases: number; unitsPerCase: number; casePrice: number }[] = [];
@@ -74,12 +71,9 @@ export async function createOrder(params: {
       data: {
         reference: generateReference(),
         status: "Pending",
-        accountId: accountId || undefined,
-        business: details.business,
         contactName: details.contactName,
         email: details.email,
         phone: details.phone,
-        licenseNo: details.licenseNo,
         deliveryAddress: details.deliveryAddress,
         deliveryDate: details.deliveryDate || undefined,
         notes: details.notes || "",

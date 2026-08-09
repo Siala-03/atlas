@@ -1,61 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Building2Icon, CalendarDaysIcon, CreditCardIcon, FileTextIcon, LockIcon, ArrowLeftIcon, SmartphoneIcon } from "lucide-react";
+import { CalendarDaysIcon, CreditCardIcon, LockIcon, ArrowLeftIcon, SmartphoneIcon, UserIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
-import { startCustomerSession, getCustomerAccountId } from "../lib/customerAuth";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
 import { PaymentMethod } from "../types";
 
 const EMPTY: CheckoutDetails = {
-  business: "",
   contactName: "",
   email: "",
   phone: "",
-  licenseNo: "",
   deliveryAddress: "",
   deliveryDate: "",
   notes: ""
 };
 
 export function Checkout() {
-  const { cart, getProduct, cartSubtotal, placeOrder, getAccount, saveTradeAccount, initiatePayment } = useStore();
+  const { cart, getProduct, cartSubtotal, placeOrder, initiatePayment } = useStore();
   const navigate = useNavigate();
-  const [accountId, setAccountId] = useState(() => getCustomerAccountId() ?? "");
   const [form, setForm] = useState<CheckoutDetails>(EMPTY);
-  const [saveAccount, setSaveAccount] = useState(true);
-  const [isTradeBuyer, setIsTradeBuyer] = useState(() => !!getCustomerAccountId());
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(() => getCustomerAccountId() ? "invoice" : "card");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutDetails, boolean>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
   const vat = cartSubtotal * VAT_RATE;
   const total = cartSubtotal + vat;
-
-  useEffect(() => {
-    if (!accountId) return;
-    let cancelled = false;
-    getAccount(accountId).then((account) => {
-      if (cancelled || !account) return;
-      setForm((previous) => ({
-        ...previous,
-        business: account.business,
-        contactName: account.contactName,
-        email: account.email,
-        phone: account.phone,
-        licenseNo: account.licenseNo,
-        deliveryAddress: account.deliveryAddress
-      }));
-    });
-    return () => {cancelled = true;};
-  }, [accountId, getAccount]);
-
-  useEffect(() => {
-    if (!isTradeBuyer && paymentMethod === "invoice") setPaymentMethod("card");
-  }, [isTradeBuyer, paymentMethod]);
 
   if (cart.length === 0) {
     return (
@@ -91,10 +63,7 @@ export function Checkout() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const account = saveAccount ? await saveTradeAccount(form, accountId || undefined) : undefined;
-      if (account) startCustomerSession(account.id);
-      const resolvedAccountId = account?.id || accountId || undefined;
-      const order = await placeOrder(form, resolvedAccountId, paymentMethod);
+      const order = await placeOrder(form, paymentMethod);
 
       if (paymentMethod === "card") {
         const { redirectUrl } = await initiatePayment(order.id);
@@ -145,68 +114,24 @@ export function Checkout() {
           <ArrowLeftIcon className="h-4 w-4" /> Back to order
         </Link>
         <h1 className="mt-4 font-serif text-4xl font-semibold text-ink">Checkout</h1>
-        <p className="mt-2 text-ink/60">
-          {isTradeBuyer ?
-          "Your order is held for stock and licence confirmation before invoicing." :
-          "Complete your details below to place your order."}
-        </p>
+        <p className="mt-2 text-ink/60">Complete your details below to place your order.</p>
 
         <form onSubmit={submit} className="mt-8 grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
             <section className="rounded-2xl border border-burgundy-100 bg-white p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">
-                    {isTradeBuyer ? "Trade account" : "Your details"}
-                  </p>
-                  <h2 className="mt-1 font-serif text-2xl font-semibold text-ink">Buyer details</h2>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Your details</p>
+                  <h2 className="mt-1 font-serif text-2xl font-semibold text-ink">Contact & delivery</h2>
                 </div>
-                <Building2Icon className="h-6 w-6 text-burgundy-700" />
+                <UserIcon className="h-6 w-6 text-burgundy-700" />
               </div>
-
-              {accountId &&
-              <div className="mt-5 rounded-xl bg-burgundy-50 px-4 py-3 text-sm text-ink/70">
-                  Using your saved trade account details below. Not you?{" "}
-                  <button
-                  type="button"
-                  onClick={() => { setAccountId(""); setForm(EMPTY); }}
-                  className="font-semibold text-burgundy-800 underline hover:text-burgundy-900">
-
-                    Start a new account
-                  </button>
-                </div>
-              }
-
-              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl bg-burgundy-50 p-4 text-sm text-ink/70">
-                <input
-                  type="checkbox"
-                  checked={isTradeBuyer}
-                  onChange={(event) => setIsTradeBuyer(event.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
-
-                <span><strong className="text-ink">I'm ordering as a registered trade/wholesale account.</strong> Unlocks Net-30 invoice terms. Leave unchecked for a regular retail order.</span>
-              </label>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                {field("business", "Business name (optional)")}
-                {field("contactName", "Contact name")}
+                {field("contactName", "Full name")}
                 {field("email", "Email", { type: "email" })}
                 {field("phone", "Phone", { type: "tel" })}
-                {field("licenseNo", "Trading licence no. (optional)")}
               </div>
-              <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl bg-burgundy-50 p-4 text-sm text-ink/70">
-                <input
-                  type="checkbox"
-                  checked={saveAccount}
-                  onChange={(event) => setSaveAccount(event.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
-
-                <span>
-                  {isTradeBuyer ?
-                  <><strong className="text-ink">Save my trade account.</strong> We’ll retain your account details and order history for faster repeat ordering. New accounts are subject to licence review.</> :
-                  <><strong className="text-ink">Save my details.</strong> We’ll retain your details and order history for faster repeat ordering.</>}
-                </span>
-              </label>
             </section>
 
             <section className="rounded-2xl border border-burgundy-100 bg-white p-6">
@@ -217,20 +142,6 @@ export function Checkout() {
                 </div>
               </div>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {isTradeBuyer &&
-                <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm transition-colors ${paymentMethod === "invoice" ? "border-burgundy-500 bg-burgundy-50" : "border-burgundy-200 bg-white hover:bg-burgundy-50/50"}`}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    checked={paymentMethod === "invoice"}
-                    onChange={() => setPaymentMethod("invoice")}
-                    className="mt-0.5 h-4 w-4 border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
-                  <span>
-                    <span className="flex items-center gap-1.5 font-semibold text-ink"><FileTextIcon className="h-4 w-4" /> Trade invoice</span>
-                    <span className="mt-1 block text-ink/60">Net 30 days, subject to account approval. No payment taken now.</span>
-                  </span>
-                </label>
-                }
                 <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm transition-colors ${paymentMethod === "card" ? "border-burgundy-500 bg-burgundy-50" : "border-burgundy-200 bg-white hover:bg-burgundy-50/50"}`}>
                   <input
                     type="radio"
@@ -318,15 +229,12 @@ export function Checkout() {
               <LockIcon className="h-4 w-4" />
               {submitting ?
               "Placing order…" :
-              paymentMethod === "card" ? "Continue to payment" :
-              paymentMethod === "momo" ? "Place order & pay with MoMo" : "Submit trade order"}
+              paymentMethod === "card" ? "Continue to payment" : "Place order & pay with MoMo"}
             </button>
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/50">
               {paymentMethod === "card" ?
               "You'll be redirected to complete a secure card payment." :
-              paymentMethod === "momo" ?
-              "Your order is placed, then your phone dialer opens with our MoMo code and total pre-filled." :
-              "No payment is taken now. We’ll verify stock and your account, then issue an invoice."}
+              "Your order is placed, then your phone dialer opens with our MoMo code and total pre-filled."}
             </p>
           </aside>
         </form>

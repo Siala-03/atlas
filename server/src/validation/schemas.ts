@@ -3,14 +3,12 @@ import { z } from "zod";
 export const CATEGORIES = ["Whisky", "Vodka", "Wine", "Beer", "Gin", "Rum"] as const;
 export const ORDER_STATUSES = ["Pending", "Confirmed", "Packed", "Dispatched", "Delivered", "Cancelled"] as const;
 export const INVOICE_STATUSES = ["To invoice", "Invoiced", "Paid"] as const;
-export const PAYMENT_METHODS = ["invoice", "card", "momo"] as const;
+export const PAYMENT_METHODS = ["card", "momo"] as const;
 
 export const CheckoutDetailsSchema = z.object({
-  business: z.string().optional().default(""),
   contactName: z.string().min(1),
   email: z.string().email(),
   phone: z.string().min(1),
-  licenseNo: z.string().optional().default(""),
   deliveryAddress: z.string().min(1),
   deliveryDate: z.string().optional(),
   notes: z.string().optional().default("")
@@ -23,9 +21,8 @@ export const CartItemSchema = z.object({
 
 export const CreateOrderSchema = z.object({
   details: CheckoutDetailsSchema,
-  accountId: z.string().optional(),
   cart: z.array(CartItemSchema).min(1),
-  paymentMethod: z.enum(PAYMENT_METHODS).default("invoice")
+  paymentMethod: z.enum(PAYMENT_METHODS).default("card")
 });
 
 export const ProductPatchSchema = z.object({

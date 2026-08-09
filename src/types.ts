@@ -21,19 +21,6 @@ export interface CartItem {
   cases: number;
 }
 
-export interface TradeAccount {
-  id: string;
-  business: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  licenseNo: string;
-  deliveryAddress: string;
-  verificationStatus: "Pending review" | "Verified";
-  paymentTerms: string;
-  createdAt: string;
-}
-
 export type OrderStatus =
 "Pending" |
 "Confirmed" |
@@ -44,7 +31,7 @@ export type OrderStatus =
 
 export type InvoiceStatus = "To invoice" | "Invoiced" | "Paid";
 
-export type PaymentMethod = "invoice" | "card" | "momo";
+export type PaymentMethod = "card" | "momo";
 
 export type PaymentStatus = "pending" | "paid" | "failed";
 
@@ -74,12 +61,9 @@ export interface Order {
   reference: string;
   createdAt: string;
   status: OrderStatus;
-  accountId?: string;
-  business: string;
   contactName: string;
   email: string;
   phone: string;
-  licenseNo: string;
   deliveryAddress: string;
   deliveryDate?: string;
   notes: string;

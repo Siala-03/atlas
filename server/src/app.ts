@@ -3,7 +3,6 @@ import express from "express";
 import { errorHandler } from "./middleware/errorHandler";
 import { healthRouter } from "./routes/health.routes";
 import { productsRouter } from "./routes/products.routes";
-import { accountsRouter } from "./routes/accounts.routes";
 import { ordersRouter } from "./routes/orders.routes";
 import { paymentsRouter } from "./routes/payments.routes";
 
@@ -15,7 +14,6 @@ export function createApp() {
 
   app.use(healthRouter);
   app.use("/api", productsRouter);
-  app.use("/api", accountsRouter);
   app.use("/api", ordersRouter);
   app.use("/api", paymentsRouter);
 

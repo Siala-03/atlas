@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { ShoppingCartIcon, MenuIcon, XIcon, UserRoundIcon } from "lucide-react";
+import { ShoppingCartIcon, MenuIcon, XIcon } from "lucide-react";
 import { Logo } from "./Logo";
-import { getCustomerAccountId } from "../lib/customerAuth";
 import { useStore } from "../store/StoreContext";
-import { TradeAccount } from "../types";
 
 const NAV = [
 { to: "/", label: "Home" },
@@ -17,18 +15,9 @@ const NAV = [
 
 
 export function Navbar() {
-  const { cartCount, getAccount } = useStore();
+  const { cartCount } = useStore();
   const [open, setOpen] = useState(false);
-  const [account, setAccount] = useState<TradeAccount | undefined>(undefined);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const accountId = getCustomerAccountId();
-    if (!accountId) return;
-    let cancelled = false;
-    getAccount(accountId).then((result) => { if (!cancelled) setAccount(result); });
-    return () => {cancelled = true;};
-  }, [getAccount]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-burgundy-100 bg-cream/95 backdrop-blur">
@@ -57,13 +46,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            to={account ? "/my-orders" : "/account"}
-            className="hidden items-center gap-2 rounded-full border border-burgundy-200 px-3.5 py-2 text-sm font-medium text-burgundy-800 transition-colors hover:bg-burgundy-50 sm:inline-flex">
-            
-            <UserRoundIcon className="h-4 w-4" />
-            {account ? "My orders" : "Trade account"}
-          </Link>
           <button
             onClick={() => navigate("/cart")}
             className="relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-burgundy-800 text-cream transition-colors hover:bg-burgundy-900"
@@ -99,9 +81,6 @@ export function Navbar() {
                 {item.label}
               </Link>
           )}
-            <Link to={account ? "/my-orders" : "/account"} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-burgundy-800 hover:bg-burgundy-50">
-              {account ? "My orders" : "Trade account"}
-            </Link>
           </nav>
         </div>
       }

@@ -5,8 +5,7 @@ import {
   InvoiceStatus,
   PaymentMethod,
   Payment,
-  Product,
-  TradeAccount } from
+  Product } from
 "../types";
 import type { CheckoutDetails } from "../store/StoreContext";
 
@@ -47,14 +46,9 @@ export const api = {
   restockProduct: (id: string, cases: number) =>
   request<Product>(`/products/${id}/restock`, { method: "POST", body: JSON.stringify({ cases }) }),
 
-  getAccount: (id: string) => request<TradeAccount>(`/accounts/${id}`),
-
-  saveTradeAccount: (details: CheckoutDetails, accountId?: string) =>
-  request<TradeAccount>("/accounts", { method: "PUT", body: JSON.stringify({ details, accountId }) }),
-
   getOrders: () => request<Order[]>("/orders"),
 
-  placeOrder: (params: { details: CheckoutDetails; accountId?: string; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
+  placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
   request<Order>("/orders", { method: "POST", body: JSON.stringify(params) }),
 
   updateOrderStatus: (id: string, status: OrderStatus) =>

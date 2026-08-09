@@ -9,15 +9,11 @@ import { ProductDetail } from "./pages/ProductDetail";
 import { BrandDetail } from "./pages/BrandDetail";
 import { About } from "./pages/About";
 import { Contact } from "./pages/Contact";
-import { TradeAccount } from "./pages/TradeAccount";
 import { FAQ } from "./pages/FAQ";
 import { Cart } from "./pages/Cart";
 import { Checkout } from "./pages/Checkout";
 import { OrderConfirmation } from "./pages/OrderConfirmation";
 import { MockPayment } from "./pages/MockPayment";
-import { CustomerOrders } from "./pages/CustomerOrders";
-import { CustomerOrderDetail } from "./pages/CustomerOrderDetail";
-import { AccountSettings } from "./pages/AccountSettings";
 import { PortalLogin } from "./pages/PortalLogin";
 import { NotFound } from "./pages/NotFound";
 import { Dashboard } from "./pages/admin/Dashboard";
@@ -37,15 +33,11 @@ export function App() {
             <Route path="/brands/:slug" element={<BrandDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/trade-account" element={<TradeAccount />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmed/:id" element={<OrderConfirmation />} />
             <Route path="/mock-payment/:providerRef" element={<MockPayment />} />
-            <Route path="/my-orders" element={<CustomerOrders />} />
-            <Route path="/my-orders/:id" element={<CustomerOrderDetail />} />
-            <Route path="/account" element={<AccountSettings />} />
 
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route element={<PortalGuard />}>

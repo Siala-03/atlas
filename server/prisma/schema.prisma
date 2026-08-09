@@ -25,38 +25,20 @@ model Product {
   orderLines        OrderLine[]
 }
 
-model TradeAccount {
-  id                 String   @id @default(cuid())
-  business           String
-  contactName        String
-  email              String   @unique
-  phone              String
-  licenseNo          String
-  deliveryAddress    String
-  verificationStatus String   @default("Pending review")
-  paymentTerms       String   @default("Net 30 days, subject to approval")
-  createdAt          DateTime @default(now())
-  orders             Order[]
-}
-
 model Order {
-  id              String        @id @default(cuid())
-  reference       String        @unique
-  createdAt       DateTime      @default(now())
-  status          String        @default("Pending")
-  accountId       String?
-  account         TradeAccount? @relation(fields: [accountId], references: [id])
-  business        String
+  id              String      @id @default(cuid())
+  reference       String      @unique
+  createdAt       DateTime    @default(now())
+  status          String      @default("Pending")
   contactName     String
   email           String
   phone           String
-  licenseNo       String
   deliveryAddress String
   deliveryDate    String?
-  notes           String        @default("")
+  notes           String      @default("")
   internalNotes   String?
-  invoiceStatus   String        @default("To invoice")
-  paymentMethod   String        @default("invoice")
+  invoiceStatus   String      @default("To invoice")
+  paymentMethod   String      @default("card")
   confirmedAt     DateTime?
   packedAt        DateTime?
   dispatchedAt    DateTime?

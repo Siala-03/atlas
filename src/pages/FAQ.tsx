@@ -10,15 +10,11 @@ const FAQS: { question: string; answer: string }[] = [
 },
 {
   question: "How does delivery work?",
-  answer: "Orders placed before 4pm are typically dispatched the next working day within Kigali and surrounding regions. A delivery date is confirmed by the Atlas team once your order and licence are verified."
+  answer: "Orders placed before 4pm are typically dispatched the next working day within Kigali and surrounding regions. A delivery date is confirmed by the Atlas team once your order is verified."
 },
 {
-  question: "Can I pay by card instead of invoice?",
-  answer: "Yes — at checkout you can choose to pay immediately by card via Pesapal, or settle by trade invoice on Net 30 terms. The choice is yours on every order."
-},
-{
-  question: "How long does trade account verification take?",
-  answer: "Most accounts are verified within one business day of your first order. You can browse and add to cart at any time — verification only affects when your first order is dispatched."
+  question: "How do I pay?",
+  answer: "At checkout you can pay immediately by card via Pesapal, or with MTN MoMo. Payment is confirmed before your order is dispatched."
 },
 {
   question: "What if an item is out of stock?",

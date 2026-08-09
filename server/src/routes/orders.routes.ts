@@ -11,11 +11,10 @@ import {
 export const ordersRouter = Router();
 
 ordersRouter.get("/orders", asyncHandler(async (req, res) => {
-  const { status, invoiceStatus, accountId, search } = req.query;
+  const { status, invoiceStatus, search } = req.query;
   res.json(await orderService.listOrders({
     status: typeof status === "string" ? status : undefined,
     invoiceStatus: typeof invoiceStatus === "string" ? invoiceStatus : undefined,
-    accountId: typeof accountId === "string" ? accountId : undefined,
     search: typeof search === "string" ? search : undefined
   }));
 }));

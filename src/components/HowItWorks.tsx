@@ -1,10 +1,10 @@
 import React from "react";
 
 const STEPS = [
-{ title: "Browse the catalogue", text: "Live stock and trade case pricing on every product." },
+{ title: "Browse the catalogue", text: "Live stock and case pricing on every product." },
 { title: "Add to your order", text: "Build your case order at your own pace, no minimums." },
-{ title: "Checkout your way", text: "Settle by trade invoice on Net 30 terms, or pay now by card." },
-{ title: "Delivery confirmed", text: "We verify stock and licence, then confirm your delivery date." }];
+{ title: "Checkout your way", text: "Pay securely by card or MTN MoMo." },
+{ title: "Delivery confirmed", text: "We confirm stock and your delivery date." }];
 
 
 export function HowItWorks() {

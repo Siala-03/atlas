@@ -53,7 +53,7 @@ export function ProductTabs({ product }: {product: Product;}) {
         {active === "Delivery info" &&
         <div className="space-y-3 text-sm leading-relaxed text-ink/70">
             <p>Orders placed before 4pm are typically dispatched the next working day within Kigali and surrounding regions.</p>
-            <p>There's no minimum order value for trade accounts, though case pricing applies from a single case upward.</p>
+            <p>There's no minimum order value, though case pricing applies from a single case upward.</p>
             <p>Stock and delivery dates are confirmed by the Atlas team after checkout, before invoicing or card capture.</p>
           </div>
         }

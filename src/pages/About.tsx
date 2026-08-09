@@ -9,14 +9,14 @@ const HERO = "/c76d1c17-8922-4717-b20e-ae6d0135e87f.jpg";
 
 const VALUES = [
 { title: "Genuine imports", text: "Every case is sourced through verified, traceable supply routes — no grey-market stock." },
-{ title: "Trade-verified pricing", text: "Case pricing built for licensed bars, restaurants and retailers, not adjusted after the fact." },
-{ title: "Rwanda-based", text: "Built in Kigali, around the realities of local trade — stock, delivery windows, terms that fit." },
+{ title: "Straightforward pricing", text: "Case pricing shown up front, not adjusted after the fact." },
+{ title: "Rwanda-based", text: "Built in Kigali, around real stock, delivery windows and local realities." },
 { title: "Reliable delivery", text: "Orders are confirmed against real stock before dispatch, so what's promised is what arrives." }];
 
 
 const STEPS = [
-{ title: "You order", text: "Browse trade case pricing and check out — by invoice or by card." },
-{ title: "We verify", text: "Licence and stock confirmed before anything leaves the warehouse." },
+{ title: "You order", text: "Browse case pricing and check out — by card or MTN MoMo." },
+{ title: "We confirm", text: "Stock confirmed before anything leaves the warehouse." },
 { title: "You receive", text: "Delivery scheduled and confirmed, not left to guesswork." }];
 
 
@@ -44,20 +44,19 @@ export function About() {
         <section className="grid gap-10 lg:grid-cols-5">
           <blockquote className="lg:col-span-2">
             <p className="font-serif text-3xl italic leading-snug text-burgundy-800">
-              "Licensed venues deserve one accountable supplier — not a patchwork
+              "Everyone deserves one accountable supplier — not a patchwork
               of informal sourcing."
             </p>
           </blockquote>
           <div className="lg:col-span-3">
             <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Our story</p>
             <p className="mt-3 leading-relaxed text-ink/70">
-              Licensed venues across Rwanda have long had to choose between slow,
-              informal supply chains and pricing that doesn't reflect real wholesale
+              Buyers across Rwanda have long had to choose between slow,
+              informal supply chains and pricing that doesn't reflect real
               volume. Atlas Supplies Ltd was built to close that gap — a single,
               accountable distributor of spirits, wine and beer, offering
               transparent case pricing, verified stock levels, and a straightforward
-              path from order to delivery, whether you're settling by trade invoice
-              or paying by card.
+              path from order to delivery, paying securely by card or MTN MoMo.
             </p>
           </div>
         </section>
@@ -113,9 +112,9 @@ export function About() {
         <section className="mt-20 overflow-hidden rounded-3xl bg-burgundy-800">
           <div className="grid gap-8 sm:grid-cols-2 sm:items-center">
             <div className="px-8 py-14 sm:px-12">
-              <h2 className="font-serif text-3xl font-semibold text-cream">Ready to open a trade account?</h2>
+              <h2 className="font-serif text-3xl font-semibold text-cream">Ready to order?</h2>
               <p className="mt-3 max-w-md text-cream/80">
-                Browse the catalogue and check out — your first order doubles as your account application.
+                Browse the catalogue and check out in minutes.
               </p>
               <Link
                 to="/shop"

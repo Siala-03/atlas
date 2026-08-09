@@ -6,7 +6,7 @@ import { Logo } from "./Logo";
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-burgundy-900/40 bg-burgundy-950 text-cream/80">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="inline-block rounded-xl bg-cream p-3">
             <Logo className="h-14" />
@@ -25,16 +25,6 @@ export function Footer() {
             <li><Link to="/shop?category=Vodka" className="hover:text-cream">Vodka & Gin</Link></li>
             <li><Link to="/shop?category=Wine" className="hover:text-cream">Wine</Link></li>
             <li><Link to="/shop?category=Beer" className="hover:text-cream">Beer</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-sm font-semibold uppercase tracking-widest text-amber2-300">
-            Trade
-          </h4>
-          <ul className="mt-4 space-y-2 text-sm">
-            <li><Link to="/shop" className="hover:text-cream">Wholesale Ordering</Link></li>
-            <li><Link to="/trade-account" className="hover:text-cream">Trade Account Info</Link></li>
           </ul>
         </div>
 
@@ -71,7 +61,7 @@ export function Footer() {
       </div>
       <div className="border-t border-cream/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-cream/50 sm:flex-row sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} Atlas Supplies Ltd. Trade customers only. 18+.</p>
+          <p>© {new Date().getFullYear()} Atlas Supplies Ltd. 18+.</p>
           <p>Please drink responsibly.</p>
         </div>
       </div>

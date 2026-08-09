@@ -54,7 +54,7 @@ export function BrandDetail() {
           </p>
           <h1 className="mt-2 font-serif text-4xl font-semibold text-ink sm:text-5xl">{brand}</h1>
           <p className="mt-3 max-w-2xl text-ink/60">
-            {brandProducts.length} {brandProducts.length === 1 ? "product" : "products"} from {brand}, stocked and ready for wholesale ordering.
+            {brandProducts.length} {brandProducts.length === 1 ? "product" : "products"} from {brand}, stocked and ready to order.
           </p>
         </div>
 

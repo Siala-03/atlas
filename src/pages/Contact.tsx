@@ -4,7 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 
 export function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", business: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
 
   const set = (key: keyof typeof form, value: string) =>
@@ -24,7 +24,7 @@ export function Contact() {
           <p className="text-sm font-semibold uppercase tracking-widest text-amber2-300">Get in touch</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold text-cream sm:text-5xl">Contact Atlas</h1>
           <p className="mt-4 max-w-2xl text-cream/80">
-            Questions about trade accounts, bulk pricing or an existing order — reach us directly, or send a message below.
+            Questions about an order, delivery or anything else — reach us directly, or send a message below.
           </p>
         </div>
       </div>
@@ -72,14 +72,6 @@ export function Contact() {
                       required
                       value={form.name}
                       onChange={(e) => set("name", e.target.value)}
-                      className="w-full rounded-xl border border-burgundy-200 bg-white px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
-
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-ink/70">Business name (optional)</label>
-                      <input
-                      value={form.business}
-                      onChange={(e) => set("business", e.target.value)}
                       className="w-full rounded-xl border border-burgundy-200 bg-white px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
 
                     </div>
