@@ -1,3 +1,4 @@
+import { Payment } from "@prisma/client";
 import { prisma } from "../db";
 import { NotFoundError } from "../errors";
 import { paymentProvider } from "../payments/providerRegistry";
@@ -9,7 +10,10 @@ export async function initiatePayment(orderId: string) {
   const { redirectUrl, providerRef } = await paymentProvider.initiate({
     orderId: order.id,
     reference: order.reference,
-    amount: order.total
+    amount: order.total,
+    email: order.email,
+    phone: order.phone,
+    contactName: order.contactName
   });
 
   const payment = await prisma.payment.create({
@@ -45,5 +49,29 @@ export async function recordCallback(providerRef: string, outcome: "success" | "
 }
 
 export async function getPaymentForOrder(orderId: string) {
-  return prisma.payment.findFirst({ where: { orderId }, orderBy: { createdAt: "desc" } });
+  const payment = await prisma.payment.findFirst({ where: { orderId }, orderBy: { createdAt: "desc" } });
+  if (!payment || payment.status !== "pending") return payment;
+  return applyVerification(payment);
+}
+
+export async function recordProviderVerification(providerRef: string) {
+  const payment = await prisma.payment.findUnique({ where: { providerRef } });
+  if (!payment) return;
+  await applyVerification(payment);
+}
+
+async function applyVerification(payment: Payment): Promise<Payment> {
+  const { status } = await paymentProvider.verify(payment.providerRef);
+  if (status === payment.status) return payment;
+
+  const updated = await prisma.payment.update({ where: { id: payment.id }, data: { status } });
+
+  if (status === "paid") {
+    await prisma.order.update({
+      where: { id: payment.orderId },
+      data: { invoiceStatus: "Paid" }
+    });
+  }
+
+  return updated;
 }

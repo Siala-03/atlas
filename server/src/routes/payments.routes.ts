@@ -18,3 +18,20 @@ paymentsRouter.post("/payments/mock-callback", asyncHandler(async (req, res) => 
 paymentsRouter.get("/payments/order/:orderId", asyncHandler(async (req, res) => {
   res.json(await paymentService.getPaymentForOrder(req.params.orderId));
 }));
+
+paymentsRouter.get("/payments/pesapal/ipn", asyncHandler(async (req, res) => {
+  const orderTrackingId = String(req.query.OrderTrackingId ?? "");
+  const orderMerchantReference = String(req.query.OrderMerchantReference ?? "");
+  const orderNotificationType = String(req.query.OrderNotificationType ?? "IPNCHANGE");
+
+  if (orderTrackingId) {
+    await paymentService.recordProviderVerification(orderTrackingId);
+  }
+
+  res.json({
+    orderNotificationType,
+    orderTrackingId,
+    orderMerchantReference,
+    status: 200
+  });
+}));

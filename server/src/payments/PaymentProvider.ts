@@ -9,6 +9,13 @@ export interface PaymentStatusResult {
 
 export interface PaymentProvider {
   readonly name: string;
-  initiate(params: { orderId: string; reference: string; amount: number }): Promise<PaymentInitiationResult>;
+  initiate(params: {
+    orderId: string;
+    reference: string;
+    amount: number;
+    email: string;
+    phone: string;
+    contactName: string;
+  }): Promise<PaymentInitiationResult>;
   verify(providerRef: string): Promise<PaymentStatusResult>;
 }
