@@ -1,11 +1,12 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { TrashIcon, MinusIcon, PlusIcon, ArrowRightIcon } from "lucide-react";
+import { TrashIcon, MinusIcon, PlusIcon, ArrowRightIcon, SmartphoneIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
+import { buildMomoUssdLink } from "../lib/momo";
 
 export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
@@ -134,8 +135,14 @@ export function Cart() {
               
                 Proceed to checkout <ArrowRightIcon className="h-5 w-5" />
               </Link>
+              <a
+              href={buildMomoUssdLink(total)}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-burgundy-800 py-4 font-semibold text-burgundy-800 transition-colors hover:bg-burgundy-50">
+
+                <SmartphoneIcon className="h-5 w-5" /> Pay {formatCurrency(total)} with MTN MoMo
+              </a>
               <p className="mt-3 text-center text-xs text-ink/50">
-                Delivery scheduled after order confirmation.
+                MoMo opens your phone dialer with the code pre-filled — tap call to confirm. Delivery scheduled after order confirmation.
               </p>
             </div>
           </div>

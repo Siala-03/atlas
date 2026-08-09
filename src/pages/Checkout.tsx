@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Building2Icon, CalendarDaysIcon, CreditCardIcon, FileTextIcon, LockIcon, ArrowLeftIcon } from "lucide-react";
+import { Building2Icon, CalendarDaysIcon, CreditCardIcon, FileTextIcon, LockIcon, ArrowLeftIcon, SmartphoneIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { startCustomerSession, getCustomerAccountId } from "../lib/customerAuth";
 import { formatCurrency } from "../lib/format";
+import { buildMomoUssdLink } from "../lib/momo";
 import { PaymentMethod } from "../types";
 
 const EMPTY: CheckoutDetails = {
@@ -94,6 +95,9 @@ export function Checkout() {
         const { redirectUrl } = await initiatePayment(order.id);
         window.location.assign(redirectUrl);
         return;
+      }
+      if (paymentMethod === "momo") {
+        window.location.assign(buildMomoUssdLink(total));
       }
       navigate(`/order-confirmed/${order.id}`);
     } catch (error) {
@@ -212,6 +216,18 @@ export function Checkout() {
                     <span className="mt-1 block text-ink/60">Visa, via Pesapal. You'll be redirected to complete payment securely.</span>
                   </span>
                 </label>
+                <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm transition-colors ${paymentMethod === "momo" ? "border-burgundy-500 bg-burgundy-50" : "border-burgundy-200 bg-white hover:bg-burgundy-50/50"}`}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === "momo"}
+                    onChange={() => setPaymentMethod("momo")}
+                    className="mt-0.5 h-4 w-4 border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
+                  <span>
+                    <span className="flex items-center gap-1.5 font-semibold text-ink"><SmartphoneIcon className="h-4 w-4" /> Pay with MTN MoMo</span>
+                    <span className="mt-1 block text-ink/60">Opens your phone dialer with our MoMo code and your total pre-filled. Tap call to confirm.</span>
+                  </span>
+                </label>
               </div>
             </section>
 
@@ -275,11 +291,14 @@ export function Checkout() {
               <LockIcon className="h-4 w-4" />
               {submitting ?
               "Placing order…" :
-              paymentMethod === "card" ? "Continue to payment" : "Submit trade order"}
+              paymentMethod === "card" ? "Continue to payment" :
+              paymentMethod === "momo" ? "Place order & pay with MoMo" : "Submit trade order"}
             </button>
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/50">
               {paymentMethod === "card" ?
               "You'll be redirected to complete a secure card payment." :
+              paymentMethod === "momo" ?
+              "Your order is placed, then your phone dialer opens with our MoMo code and total pre-filled." :
               "No payment is taken now. We’ll verify stock and your account, then issue an invoice."}
             </p>
           </aside>

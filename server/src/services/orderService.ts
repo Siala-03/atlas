@@ -41,7 +41,7 @@ export async function createOrder(params: {
   details: CheckoutDetails;
   accountId?: string;
   cart: CartItem[];
-  paymentMethod: "invoice" | "card";
+  paymentMethod: "invoice" | "card" | "momo";
 }) {
   const { details, accountId, cart, paymentMethod } = params;
 

@@ -44,7 +44,7 @@ export type OrderStatus =
 
 export type InvoiceStatus = "To invoice" | "Invoiced" | "Paid";
 
-export type PaymentMethod = "invoice" | "card";
+export type PaymentMethod = "invoice" | "card" | "momo";
 
 export type PaymentStatus = "pending" | "paid" | "failed";
 
