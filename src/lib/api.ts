@@ -40,7 +40,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   getProducts: () => request<Product[]>("/products"),
 
-  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockCases" | "lowStockThreshold">>) =>
+  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold">>) =>
   request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
 
   restockProduct: (id: string, cases: number) =>
@@ -61,7 +61,7 @@ export const api = {
   request<Order>(`/orders/${id}/invoice-status`, { method: "PATCH", body: JSON.stringify({ invoiceStatus }) }),
 
   reorder: (id: string) =>
-  request<{ cart: CartItem[]; addedCases: number; unavailable: string[] }>(`/orders/${id}/reorder`, { method: "POST" }),
+  request<{ cart: CartItem[]; addedUnits: number; unavailable: string[] }>(`/orders/${id}/reorder`, { method: "POST" }),
 
   initiatePayment: (orderId: string) =>
   request<{ paymentId: string; redirectUrl: string; providerRef: string }>("/payments/initiate", {

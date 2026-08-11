@@ -27,7 +27,7 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
   const navigate = useNavigate();
   const pendingCount = orders.filter((o) => o.status === "Pending").length;
   const lowStock = products.filter(
-    (p) => p.stockCases <= p.lowStockThreshold
+    (p) => p.stockUnits <= p.lowStockThreshold
   ).length;
 
   const nav =

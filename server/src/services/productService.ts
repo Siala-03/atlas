@@ -11,12 +11,12 @@ export async function getProduct(id: string) {
   return product;
 }
 
-export async function patchProduct(id: string, patch: { casePrice?: number; stockCases?: number; lowStockThreshold?: number }) {
+export async function patchProduct(id: string, patch: { casePrice?: number; stockUnits?: number; lowStockThreshold?: number }) {
   await getProduct(id);
   return prisma.product.update({ where: { id }, data: patch });
 }
 
 export async function restockProduct(id: string, cases: number) {
-  await getProduct(id);
-  return prisma.product.update({ where: { id }, data: { stockCases: { increment: cases } } });
+  const product = await getProduct(id);
+  return prisma.product.update({ where: { id }, data: { stockUnits: { increment: cases * product.unitsPerCase } } });
 }

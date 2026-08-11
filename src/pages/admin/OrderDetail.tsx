@@ -48,7 +48,7 @@ export function OrderDetail() {
     return <AdminLayout><h1 className="font-serif text-3xl text-ink">Order not found</h1><Link to="/portal/orders" className="mt-4 inline-block text-burgundy-800 underline">Back to orders</Link></AdminLayout>;
   }
 
-  const totalCases = order.lines.reduce((sum, line) => sum + line.cases, 0);
+  const totalUnits = order.lines.reduce((sum, line) => sum + (line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity), 0);
 
   const changeStatus = async (status: typeof ORDER_STATUSES[number]) => {
     setUpdatingStatus(true);
@@ -106,8 +106,8 @@ export function OrderDetail() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-burgundy-100 bg-white p-6 lg:col-span-2">
-          <div className="flex items-center justify-between"><h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalCases} cases</h2><span className="text-sm text-ink/50">{order.lines.reduce((sum, line) => sum + line.cases * line.unitsPerCase, 0)} total units</span></div>
-          <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={line.productId} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.cases} case(s)</p><p className="text-xs text-ink/50">{formatCurrency(line.casePrice * line.cases)}</p></div></div>)}</div>
+          <div className="flex items-center justify-between"><h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalUnits} pieces</h2></div>
+          <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div>)}</div>
           <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">VAT ({Math.round((order.vat / (order.subtotal || 1)) * 100)}%)</dt><dd>{formatCurrency(order.vat)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
         </section>
 

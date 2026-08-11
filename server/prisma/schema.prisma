@@ -17,7 +17,7 @@ model Product {
   volume            String
   unitsPerCase      Int
   casePrice         Int
-  stockCases        Int
+  stockUnits        Int
   lowStockThreshold Int
   image             String
   description       String
@@ -58,9 +58,11 @@ model OrderLine {
   product      Product @relation(fields: [productId], references: [id])
   name         String
   brand        String
-  cases        Int
+  mode         String
+  quantity     Int
   unitsPerCase Int
   casePrice    Int
+  unitPrice    Int
 }
 
 model Payment {

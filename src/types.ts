@@ -1,5 +1,7 @@
 export type Category = "Whisky" | "Vodka" | "Wine" | "Beer" | "Gin" | "Rum";
 
+export type ShoppingMode = "individual" | "business";
+
 export interface Product {
   id: string;
   name: string;
@@ -9,16 +11,21 @@ export interface Product {
   volume: string;
   unitsPerCase: number;
   casePrice: number;
-  stockCases: number;
+  stockUnits: number;
   lowStockThreshold: number;
   image: string;
   description: string;
   origin: string;
 }
 
+export function unitPrice(product: Pick<Product, "casePrice" | "unitsPerCase">): number {
+  return Math.round(product.casePrice / product.unitsPerCase);
+}
+
 export interface CartItem {
   productId: string;
-  cases: number;
+  mode: ShoppingMode;
+  quantity: number;
 }
 
 export type OrderStatus =
@@ -51,9 +58,11 @@ export interface OrderLine {
   productId: string;
   name: string;
   brand: string;
-  cases: number;
+  mode: ShoppingMode;
+  quantity: number;
   unitsPerCase: number;
   casePrice: number;
+  unitPrice: number;
 }
 
 export interface Order {

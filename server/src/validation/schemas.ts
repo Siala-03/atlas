@@ -14,9 +14,12 @@ export const CheckoutDetailsSchema = z.object({
   notes: z.string().optional().default("")
 });
 
+export const SHOPPING_MODES = ["individual", "business"] as const;
+
 export const CartItemSchema = z.object({
   productId: z.string().min(1),
-  cases: z.number().int().positive()
+  mode: z.enum(SHOPPING_MODES),
+  quantity: z.number().int().positive()
 });
 
 export const CreateOrderSchema = z.object({
@@ -27,7 +30,7 @@ export const CreateOrderSchema = z.object({
 
 export const ProductPatchSchema = z.object({
   casePrice: z.number().int().nonnegative().optional(),
-  stockCases: z.number().int().nonnegative().optional(),
+  stockUnits: z.number().int().nonnegative().optional(),
   lowStockThreshold: z.number().int().nonnegative().optional()
 });
 

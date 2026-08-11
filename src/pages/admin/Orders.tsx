@@ -142,7 +142,7 @@ export function Orders() {
                     </td>
                     <td className="px-5 py-4 text-ink/70">{formatDate(o.createdAt)}</td>
                     <td className="px-5 py-4 text-ink/70">
-                      {o.lines.reduce((s, l) => s + l.cases, 0)} cases
+                      {o.lines.reduce((s, l) => s + (l.mode === "business" ? l.quantity * l.unitsPerCase : l.quantity), 0)} pieces
                     </td>
                     <td className="px-5 py-4 font-semibold text-ink">
                       {formatCurrency(o.total)}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ShoppingCartIcon, MenuIcon, XIcon } from "lucide-react";
 import { Logo } from "./Logo";
+import { ShopModeToggle } from "./ShopModeToggle";
 import { useStore } from "../store/StoreContext";
 
 const NAV = [
@@ -45,7 +46,8 @@ export function Navbar() {
           )}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <ShopModeToggle className="hidden sm:inline-flex" />
           <button
             onClick={() => navigate("/cart")}
             className="relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-burgundy-800 text-cream transition-colors hover:bg-burgundy-900"
@@ -71,6 +73,7 @@ export function Navbar() {
       {open &&
       <div className="border-t border-burgundy-100 bg-cream lg:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col px-4 py-3">
+            <div className="px-3 py-2 sm:hidden"><ShopModeToggle /></div>
             {NAV.map((item) =>
           <Link
             key={item.label}

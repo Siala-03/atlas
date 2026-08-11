@@ -2,26 +2,32 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PlusIcon } from "lucide-react";
-import { Product } from "../types";
+import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
 import { BestsellerBadge } from "./BestsellerBadge";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
-  const { addToCart } = useStore();
-  const low = product.stockCases <= product.lowStockThreshold;
-  const out = product.stockCases === 0;
+  const { addToCart, shoppingMode } = useStore();
+  const out = product.stockUnits === 0;
+  const low = !out && product.stockUnits <= product.lowStockThreshold;
+
+  const isBusiness = shoppingMode === "business";
+  const price = isBusiness ? product.casePrice : unitPrice(product);
+  const availableToAdd = isBusiness ?
+  Math.floor(product.stockUnits / product.unitsPerCase) === 0 :
+  false;
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white shadow-sm">
-      
+
       <Link
         to={`/product/${product.id}`}
         className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-cream p-6">
-        
+
         <img
           src={product.image}
           alt={product.name}
@@ -60,15 +66,15 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
         <div className="mt-auto flex items-end justify-between pt-4">
           <div>
             <p className="font-serif text-2xl font-semibold text-burgundy-800">
-              {formatCurrency(product.casePrice)}
+              {formatCurrency(price)}
             </p>
-            <p className="text-xs text-ink/50">per case</p>
+            <p className="text-xs text-ink/50">{isBusiness ? "per case" : "per piece"}</p>
           </div>
           <button
-            onClick={() => addToCart(product.id, 1)}
-            disabled={out}
+            onClick={() => addToCart(product.id, shoppingMode, 1)}
+            disabled={out || availableToAdd}
             className="inline-flex items-center gap-1.5 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500">
-            
+
             <PlusIcon className="h-4 w-4" />
             Add
           </button>

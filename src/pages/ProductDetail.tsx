@@ -17,15 +17,18 @@ import { ProductStrip } from "../components/ProductStrip";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
+import { unitPrice } from "../types";
+import { ShopModeToggle } from "../components/ShopModeToggle";
 
 export function ProductDetail() {
   const { id } = useParams();
-  const { getProduct, addToCart, products } = useStore();
+  const { getProduct, addToCart, products, shoppingMode } = useStore();
   const { bestsellerIds } = usePopularity();
   const navigate = useNavigate();
   const product = id ? getProduct(id) : undefined;
-  const [cases, setCases] = useState(1);
+  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const isBusiness = shoppingMode === "business";
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -49,11 +52,14 @@ export function ProductDetail() {
 
   }
 
-  const out = product.stockCases === 0;
-  const totalUnits = product.unitsPerCase * cases;
+  const out = product.stockUnits === 0;
+  const availableCases = Math.floor(product.stockUnits / product.unitsPerCase);
+  const maxQuantity = isBusiness ? Math.max(availableCases, 1) : Math.max(product.stockUnits, 1);
+  const price = isBusiness ? product.casePrice : unitPrice(product);
+  const lineTotal = price * quantity;
 
   const handleAdd = () => {
-    addToCart(product.id, cases);
+    addToCart(product.id, shoppingMode, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
@@ -116,13 +122,16 @@ export function ProductDetail() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-6">
+              <ShopModeToggle className="mb-5" />
               <div className="flex items-end justify-between">
                 <div>
                   <p className="font-serif text-4xl font-semibold text-burgundy-800">
-                    {formatCurrency(product.casePrice)}
+                    {formatCurrency(price)}
                   </p>
                   <p className="text-sm text-ink/50">
-                    per case · {formatCurrency(product.casePrice / product.unitsPerCase)}/unit
+                    {isBusiness ?
+                    `per case of ${product.unitsPerCase} · ${formatCurrency(unitPrice(product))}/piece` :
+                    `per piece · ${formatCurrency(product.casePrice)}/case of ${product.unitsPerCase}`}
                   </p>
                 </div>
                 <div className="text-right">
@@ -131,7 +140,7 @@ export function ProductDetail() {
 
 
                   <span className="text-sm font-medium text-emerald-700">
-                      {product.stockCases} cases available
+                      {isBusiness ? `${availableCases} cases available` : `${product.stockUnits} pieces available`}
                     </span>
                   }
                 </div>
@@ -140,22 +149,24 @@ export function ProductDetail() {
               <div className="mt-6 flex items-center gap-4">
                 <div className="flex items-center rounded-full border border-burgundy-200">
                   <button
-                    onClick={() => setCases((c) => Math.max(1, c - 1))}
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="flex h-11 w-11 items-center justify-center text-burgundy-800 hover:bg-burgundy-50 rounded-l-full"
                     aria-label="Decrease">
 
                     <MinusIcon className="h-4 w-4" />
                   </button>
-                  <span className="w-12 text-center font-semibold text-ink">{cases}</span>
+                  <span className="w-12 text-center font-semibold text-ink">{quantity}</span>
                   <button
-                    onClick={() => setCases((c) => Math.min(product.stockCases || 99, c + 1))}
+                    onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
                     className="flex h-11 w-11 items-center justify-center text-burgundy-800 hover:bg-burgundy-50 rounded-r-full"
                     aria-label="Increase">
 
                     <PlusIcon className="h-4 w-4" />
                   </button>
                 </div>
-                <span className="text-sm text-ink/50">= {totalUnits} bottles</span>
+                <span className="text-sm text-ink/50">
+                  {isBusiness ? `= ${quantity * product.unitsPerCase} pieces` : `${quantity} piece${quantity > 1 ? "s" : ""}`}
+                </span>
               </div>
 
               <button
@@ -170,8 +181,8 @@ export function ProductDetail() {
 
 
                 <>
-                    <ShoppingCartIcon className="h-5 w-5" /> Add {cases} case
-                    {cases > 1 ? "s" : ""} · {formatCurrency(product.casePrice * cases)}
+                    <ShoppingCartIcon className="h-5 w-5" /> Add {quantity} {isBusiness ? "case" : "piece"}
+                    {quantity > 1 ? "s" : ""} · {formatCurrency(lineTotal)}
                   </>
                 }
               </button>

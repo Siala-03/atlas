@@ -17,9 +17,9 @@ export function Inventory() {
   const [query, setQuery] = useState("");
   const [onlyLow, setOnlyLow] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<{casePrice: string;stockCases: string;lowStockThreshold: string;}>({
+  const [draft, setDraft] = useState<{casePrice: string;stockUnits: string;lowStockThreshold: string;}>({
     casePrice: "",
-    stockCases: "",
+    stockUnits: "",
     lowStockThreshold: ""
   });
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export function Inventory() {
         p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
       );
     }
-    if (onlyLow) list = list.filter((p) => p.stockCases <= p.lowStockThreshold);
+    if (onlyLow) list = list.filter((p) => p.stockUnits <= p.lowStockThreshold);
     return list;
   }, [products, query, onlyLow]);
 
@@ -43,7 +43,7 @@ export function Inventory() {
     setEditId(p.id);
     setDraft({
       casePrice: String(p.casePrice),
-      stockCases: String(p.stockCases),
+      stockUnits: String(p.stockUnits),
       lowStockThreshold: String(p.lowStockThreshold)
     });
   };
@@ -54,7 +54,7 @@ export function Inventory() {
     try {
       await updateProduct(id, {
         casePrice: parseFloat(draft.casePrice) || 0,
-        stockCases: parseInt(draft.stockCases, 10) || 0,
+        stockUnits: parseInt(draft.stockUnits, 10) || 0,
         lowStockThreshold: parseInt(draft.lowStockThreshold, 10) || 0
       });
       setEditId(null);
@@ -78,10 +78,10 @@ export function Inventory() {
   };
 
   const totalStockValue = products.reduce(
-    (s, p) => s + p.casePrice * p.stockCases,
+    (s, p) => s + p.casePrice * p.stockUnits,
     0
   );
-  const lowCount = products.filter((p) => p.stockCases <= p.lowStockThreshold).
+  const lowCount = products.filter((p) => p.stockUnits <= p.lowStockThreshold).
   length;
 
   return (
@@ -123,7 +123,7 @@ export function Inventory() {
                 <th className="px-5 py-3">Product</th>
                 <th className="px-5 py-3">Category</th>
                 <th className="px-5 py-3">Case price</th>
-                <th className="px-5 py-3">Stock (cases)</th>
+                <th className="px-5 py-3">Stock (pieces)</th>
                 <th className="px-5 py-3">Low at</th>
                 <th className="px-5 py-3">Status</th>
                 <th className="px-5 py-3 text-right">Actions</th>
@@ -132,8 +132,8 @@ export function Inventory() {
             <tbody className="divide-y divide-burgundy-50">
               {rows.map((p) => {
                 const editing = editId === p.id;
-                const low = p.stockCases <= p.lowStockThreshold;
-                const out = p.stockCases === 0;
+                const low = p.stockUnits <= p.lowStockThreshold;
+                const out = p.stockUnits === 0;
                 return (
                   <tr key={p.id} className="align-middle hover:bg-cream/50">
                     <td className="px-5 py-4">
@@ -164,14 +164,14 @@ export function Inventory() {
                     <td className="px-5 py-4">
                       {editing ?
                       <input
-                        value={draft.stockCases}
+                        value={draft.stockUnits}
                         onChange={(e) =>
-                        setDraft((d) => ({ ...d, stockCases: e.target.value }))
+                        setDraft((d) => ({ ...d, stockUnits: e.target.value }))
                         }
                         className="w-20 rounded-lg border border-burgundy-300 px-2 py-1 text-sm outline-none focus:border-burgundy-500" /> :
 
 
-                      <span className="font-medium">{p.stockCases}</span>
+                      <span className="font-medium">{p.stockUnits}</span>
                       }
                     </td>
                     <td className="px-5 py-4">
@@ -231,7 +231,7 @@ export function Inventory() {
                             disabled={restockingId === p.id}
                             className="inline-flex items-center gap-1 rounded-lg border border-burgundy-200 px-2.5 py-2 text-xs font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
 
-                              <PlusIcon className="h-3.5 w-3.5" /> +12
+                              <PlusIcon className="h-3.5 w-3.5" /> +12 cases
                             </button>
                             <button
                             onClick={() => startEdit(p)}

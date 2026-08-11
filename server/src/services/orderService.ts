@@ -43,15 +43,26 @@ export async function createOrder(params: {
   const { details, cart, paymentMethod } = params;
 
   return prisma.$transaction(async (tx) => {
-    const lines: { productId: string; name: string; brand: string; cases: number; unitsPerCase: number; casePrice: number }[] = [];
+    const lines: {
+      productId: string;
+      name: string;
+      brand: string;
+      mode: string;
+      quantity: number;
+      unitsPerCase: number;
+      casePrice: number;
+      unitPrice: number;
+    }[] = [];
 
     for (const item of cart) {
       const product = await tx.product.findUnique({ where: { id: item.productId } });
       if (!product) throw new StockConflictError([item.productId]);
 
+      const unitsNeeded = item.mode === "business" ? item.quantity * product.unitsPerCase : item.quantity;
+
       const result = await tx.product.updateMany({
-        where: { id: item.productId, stockCases: { gte: item.cases } },
-        data: { stockCases: { decrement: item.cases } }
+        where: { id: item.productId, stockUnits: { gte: unitsNeeded } },
+        data: { stockUnits: { decrement: unitsNeeded } }
       });
       if (result.count === 0) throw new StockConflictError([product.name]);
 
@@ -59,9 +70,11 @@ export async function createOrder(params: {
         productId: product.id,
         name: product.name,
         brand: product.brand,
-        cases: item.cases,
+        mode: item.mode,
+        quantity: item.quantity,
         unitsPerCase: product.unitsPerCase,
-        casePrice: product.casePrice
+        casePrice: product.casePrice,
+        unitPrice: Math.round(product.casePrice / product.unitsPerCase)
       });
     }
 
@@ -125,13 +138,19 @@ export async function reorder(id: string) {
 
   for (const line of order.lines) {
     const product = await prisma.product.findUnique({ where: { id: line.productId } });
-    if (!product || product.stockCases === 0) {
+    if (!product || product.stockUnits === 0) {
       unavailable.push(line.name);
       continue;
     }
-    cart.push({ productId: line.productId, cases: Math.min(line.cases, product.stockCases) });
+    const requestedUnits = line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity;
+    const availableUnits = Math.min(requestedUnits, product.stockUnits);
+    const quantity = line.mode === "business" ? Math.max(1, Math.floor(availableUnits / line.unitsPerCase)) : availableUnits;
+    cart.push({ productId: line.productId, mode: line.mode as "individual" | "business", quantity });
   }
 
-  const addedCases = cart.reduce((sum, item) => sum + item.cases, 0);
-  return { cart, addedCases, unavailable };
+  const addedUnits = cart.reduce((sum, item) => {
+    const unitsPerCase = order.lines.find((l) => l.productId === item.productId)?.unitsPerCase ?? 1;
+    return sum + (item.mode === "business" ? item.quantity * unitsPerCase : item.quantity);
+  }, 0);
+  return { cart, addedUnits, unavailable };
 }

@@ -6,7 +6,7 @@ import { Footer } from "../components/Footer";
 import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
-import { PaymentMethod } from "../types";
+import { PaymentMethod, unitPrice } from "../types";
 
 const EMPTY: CheckoutDetails = {
   contactName: "",
@@ -208,12 +208,16 @@ export function Checkout() {
             <ul className="mt-5 space-y-3">
               {cart.map((item) => {
                 const product = getProduct(item.productId);
-                return product ?
-                <li key={item.productId} className="flex justify-between gap-4 text-sm">
-                    <span className="text-ink/70">{product.name} <span className="text-ink/40">× {item.cases}</span></span>
-                    <span className="shrink-0 font-medium">{formatCurrency(product.casePrice * item.cases)}</span>
-                  </li> :
-                null;
+                if (!product) return null;
+                const isBusiness = item.mode === "business";
+                const price = isBusiness ? product.casePrice : unitPrice(product);
+                return (
+                <li key={`${item.productId}-${item.mode}`} className="flex justify-between gap-4 text-sm">
+                    <span className="text-ink/70">
+                      {product.name} <span className="text-ink/40">× {item.quantity} {isBusiness ? "case" : "piece"}{item.quantity > 1 ? "s" : ""}</span>
+                    </span>
+                    <span className="shrink-0 font-medium">{formatCurrency(price * item.quantity)}</span>
+                  </li>);
               })}
             </ul>
             <dl className="mt-5 space-y-2 border-t border-burgundy-100 pt-4 text-sm">

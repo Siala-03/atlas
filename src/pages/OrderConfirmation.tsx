@@ -84,11 +84,11 @@ export function OrderConfirmation() {
 
           <ul className="mt-4 space-y-3">
             {order.lines.map((l) =>
-            <li key={l.productId} className="flex justify-between text-sm">
+            <li key={`${l.productId}-${l.mode}`} className="flex justify-between text-sm">
                 <span className="text-ink/70">
-                  {l.name} <span className="text-ink/40">× {l.cases} case(s)</span>
+                  {l.name} <span className="text-ink/40">× {l.quantity} {l.mode === "business" ? "case" : "piece"}{l.quantity > 1 ? "s" : ""}</span>
                 </span>
-                <span className="font-medium">{formatCurrency(l.casePrice * l.cases)}</span>
+                <span className="font-medium">{formatCurrency((l.mode === "business" ? l.casePrice : l.unitPrice) * l.quantity)}</span>
               </li>
             )}
           </ul>

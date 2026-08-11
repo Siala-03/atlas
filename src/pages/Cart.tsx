@@ -7,6 +7,7 @@ import { ProductStrip } from "../components/ProductStrip";
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
+import { unitPrice } from "../types";
 
 export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
@@ -46,15 +47,18 @@ export function Cart() {
               {cart.map((item) => {
               const p = getProduct(item.productId);
               if (!p) return null;
+              const isBusiness = item.mode === "business";
+              const price = isBusiness ? p.casePrice : unitPrice(p);
+              const unitLabel = isBusiness ? "case" : "piece";
               return (
                 <div
-                  key={item.productId}
+                  key={`${item.productId}-${item.mode}`}
                   className="flex gap-4 rounded-2xl border border-burgundy-100 bg-white p-4">
-                  
+
                     <Link
                     to={`/product/${p.id}`}
                     className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-cream p-2">
-                    
+
                       <img src={p.image} alt={p.name} className="h-full w-auto object-contain" />
                     </Link>
                     <div className="flex flex-1 flex-col">
@@ -66,43 +70,46 @@ export function Cart() {
                           <Link
                           to={`/product/${p.id}`}
                           className="font-serif text-lg font-semibold text-ink hover:text-burgundy-800">
-                          
+
                             {p.name}
                           </Link>
                           <p className="text-xs text-ink/50">
-                            {formatCurrency(p.casePrice)}/case · {p.unitsPerCase} per case
+                            {formatCurrency(price)}/{unitLabel}{isBusiness ? ` · ${p.unitsPerCase} per case` : ""}
                           </p>
                         </div>
                         <button
-                        onClick={() => removeFromCart(p.id)}
+                        onClick={() => removeFromCart(p.id, item.mode)}
                         className="rounded-lg p-2 text-ink/40 hover:bg-red-50 hover:text-red-600"
                         aria-label="Remove">
-                        
+
                           <TrashIcon className="h-4 w-4" />
                         </button>
                       </div>
                       <div className="mt-auto flex items-center justify-between pt-3">
-                        <div className="flex items-center rounded-full border border-burgundy-200">
-                          <button
-                          onClick={() => updateCartQty(p.id, item.cases - 1)}
-                          className="flex h-9 w-9 items-center justify-center rounded-l-full text-burgundy-800 hover:bg-burgundy-50"
-                          aria-label="Decrease">
-                          
-                            <MinusIcon className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="w-10 text-center text-sm font-semibold">
-                            {item.cases}
-                          </span>
-                          <button
-                          onClick={() => updateCartQty(p.id, item.cases + 1)}
-                          className="flex h-9 w-9 items-center justify-center rounded-r-full text-burgundy-800 hover:bg-burgundy-50"
-                          aria-label="Increase">
-                          
-                            <PlusIcon className="h-3.5 w-3.5" />
-                          </button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center rounded-full border border-burgundy-200">
+                            <button
+                            onClick={() => updateCartQty(p.id, item.mode, item.quantity - 1)}
+                            className="flex h-9 w-9 items-center justify-center rounded-l-full text-burgundy-800 hover:bg-burgundy-50"
+                            aria-label="Decrease">
+
+                              <MinusIcon className="h-3.5 w-3.5" />
+                            </button>
+                            <span className="w-10 text-center text-sm font-semibold">
+                              {item.quantity}
+                            </span>
+                            <button
+                            onClick={() => updateCartQty(p.id, item.mode, item.quantity + 1)}
+                            className="flex h-9 w-9 items-center justify-center rounded-r-full text-burgundy-800 hover:bg-burgundy-50"
+                            aria-label="Increase">
+
+                              <PlusIcon className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <span className="text-xs uppercase tracking-wide text-ink/40">{unitLabel}{item.quantity > 1 ? "s" : ""}</span>
                         </div>
                         <p className="font-serif text-xl font-semibold text-burgundy-800">
-                          {formatCurrency(p.casePrice * item.cases)}
+                          {formatCurrency(price * item.quantity)}
                         </p>
                       </div>
                     </div>

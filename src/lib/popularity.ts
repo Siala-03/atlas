@@ -3,7 +3,7 @@ import { Order, Product } from "../types";
 import { useStore } from "../store/StoreContext";
 
 export interface PopularityStats {
-  casesSold: number;
+  unitsSold: number;
   orderCount: number;
 }
 
@@ -12,8 +12,8 @@ export function computePopularity(orders: Order[]): Map<string, PopularityStats>
   for (const order of orders) {
     if (order.status === "Cancelled") continue;
     for (const line of order.lines) {
-      const current = stats.get(line.productId) ?? { casesSold: 0, orderCount: 0 };
-      current.casesSold += line.cases;
+      const current = stats.get(line.productId) ?? { unitsSold: 0, orderCount: 0 };
+      current.unitsSold += line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity;
       current.orderCount += 1;
       stats.set(line.productId, current);
     }
@@ -27,7 +27,7 @@ export function usePopularity(topN = 4) {
   return useMemo(() => {
     const stats = computePopularity(orders);
     const ranked = products.
-    map((product) => ({ product, sold: stats.get(product.id)?.casesSold })).
+    map((product) => ({ product, sold: stats.get(product.id)?.unitsSold })).
     filter((entry): entry is {product: Product;sold: number;} => entry.sold !== undefined).
     sort((a, b) => b.sold - a.sold).
     map((entry) => entry.product);

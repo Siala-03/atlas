@@ -13,13 +13,20 @@ import {
   OrderStatus,
   Payment,
   PaymentMethod,
-  Product } from
+  Product,
+  ShoppingMode,
+  unitPrice } from
 "../types";
 import { api } from "../lib/api";
 import { SEED_PRODUCTS } from "../data/products";
 
 const VAT_RATE = 0.18;
-const CART_KEY = "atlas.cart.v1";
+const CART_KEY = "atlas.cart.v2";
+const MODE_KEY = "atlas.shoppingMode.v1";
+
+function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase">, item: CartItem): number {
+  return item.mode === "business" ? product.casePrice * item.quantity : unitPrice(product) * item.quantity;
+}
 
 export interface CheckoutDetails {
   contactName: string;
@@ -36,19 +43,21 @@ interface StoreContextValue {
   cart: CartItem[];
   cartCount: number;
   cartSubtotal: number;
+  shoppingMode: ShoppingMode;
+  setShoppingMode: (mode: ShoppingMode) => void;
   loading: boolean;
   backendError: string | null;
-  addToCart: (productId: string, cases: number) => void;
-  updateCartQty: (productId: string, cases: number) => void;
-  removeFromCart: (productId: string) => void;
+  addToCart: (productId: string, mode: ShoppingMode, quantity: number) => void;
+  updateCartQty: (productId: string, mode: ShoppingMode, quantity: number) => void;
+  removeFromCart: (productId: string, mode: ShoppingMode) => void;
   clearCart: () => void;
   getProduct: (id: string) => Product | undefined;
   placeOrder: (details: CheckoutDetails, paymentMethod?: PaymentMethod) => Promise<Order>;
-  reorderOrder: (orderId: string) => Promise<{ addedCases: number; unavailable: string[] }>;
+  reorderOrder: (orderId: string) => Promise<{ addedUnits: number; unavailable: string[] }>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   updateOrderInternalNotes: (orderId: string, notes: string) => Promise<void>;
   updateInvoiceStatus: (orderId: string, status: InvoiceStatus) => Promise<void>;
-  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockCases" | "lowStockThreshold">>) => Promise<void>;
+  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold">>) => Promise<void>;
   restockProduct: (id: string, cases: number) => Promise<void>;
   initiatePayment: (orderId: string) => Promise<{ redirectUrl: string; providerRef: string }>;
   getPaymentStatus: (orderId: string) => Promise<Payment | null>;
@@ -65,12 +74,27 @@ function loadCart(): CartItem[] {
   }
 }
 
+function loadMode(): ShoppingMode {
+  try {
+    const raw = localStorage.getItem(MODE_KEY);
+    return raw === "business" ? "business" : "individual";
+  } catch {
+    return "individual";
+  }
+}
+
 export function StoreProvider({ children }: {children: ReactNode;}) {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cart, setCart] = useState<CartItem[]>(() => loadCart());
+  const [shoppingMode, setShoppingModeState] = useState<ShoppingMode>(() => loadMode());
   const [loading, setLoading] = useState(true);
   const [backendError, setBackendError] = useState<string | null>(null);
+
+  const setShoppingMode = (mode: ShoppingMode) => {
+    setShoppingModeState(mode);
+    localStorage.setItem(MODE_KEY, mode);
+  };
 
   useEffect(() => {
     Promise.all([api.getProducts(), api.getOrders()]).
@@ -91,36 +115,41 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
 
   const getProduct = (id: string) => products.find((product) => product.id === id);
 
-  const addToCart = (productId: string, cases: number) => {
+  const addToCart = (productId: string, mode: ShoppingMode, quantity: number) => {
     setCart((previous) => {
-      const existing = previous.find((item) => item.productId === productId);
+      const existing = previous.find((item) => item.productId === productId && item.mode === mode);
       if (existing) {
         return previous.map((item) =>
-        item.productId === productId ? { ...item, cases: item.cases + cases } : item
+        item.productId === productId && item.mode === mode ?
+        { ...item, quantity: item.quantity + quantity } :
+        item
         );
       }
-      return [...previous, { productId, cases }];
+      return [...previous, { productId, mode, quantity }];
     });
   };
 
-  const removeFromCart = (productId: string) =>
-  setCart((previous) => previous.filter((item) => item.productId !== productId));
+  const removeFromCart = (productId: string, mode: ShoppingMode) =>
+  setCart((previous) => previous.filter((item) => !(item.productId === productId && item.mode === mode)));
 
-  const updateCartQty = (productId: string, cases: number) => {
-    if (cases <= 0) {
-      removeFromCart(productId);
+  const updateCartQty = (productId: string, mode: ShoppingMode, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId, mode);
       return;
     }
     setCart((previous) =>
-    previous.map((item) => item.productId === productId ? { ...item, cases } : item)
+    previous.map((item) => item.productId === productId && item.mode === mode ? { ...item, quantity } : item)
     );
   };
 
   const clearCart = () => setCart([]);
 
-  const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.cases, 0), [cart]);
+  const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
   const cartSubtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + (getProduct(item.productId)?.casePrice ?? 0) * item.cases, 0),
+    () => cart.reduce((sum, item) => {
+      const product = getProduct(item.productId);
+      return sum + (product ? lineUnitTotal(product, item) : 0);
+    }, 0),
     [cart, products]
   );
 
@@ -140,7 +169,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
   const reorderOrder = async (orderId: string) => {
     const result = await api.reorder(orderId);
     setCart(result.cart);
-    return { addedCases: result.addedCases, unavailable: result.unavailable };
+    return { addedUnits: result.addedUnits, unavailable: result.unavailable };
   };
 
   const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
@@ -158,7 +187,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     setOrders((previous) => previous.map((item) => item.id === orderId ? order : item));
   };
 
-  const updateProduct = async (id: string, patch: Partial<Pick<Product, "casePrice" | "stockCases" | "lowStockThreshold">>) => {
+  const updateProduct = async (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold">>) => {
     const product = await api.updateProduct(id, patch);
     setProducts((previous) => previous.map((item) => item.id === id ? product : item));
   };
@@ -173,7 +202,8 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
 
   return (
     <StoreContext.Provider value={{
-      products, orders, cart, cartCount, cartSubtotal, loading, backendError, addToCart, updateCartQty,
+      products, orders, cart, cartCount, cartSubtotal, shoppingMode, setShoppingMode,
+      loading, backendError, addToCart, updateCartQty,
       removeFromCart, clearCart, getProduct, placeOrder,
       reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateInvoiceStatus,
       updateProduct, restockProduct, initiatePayment, getPaymentStatus
