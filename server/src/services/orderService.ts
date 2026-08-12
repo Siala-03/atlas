@@ -59,7 +59,7 @@ export async function createOrder(params: {
       const product = await tx.product.findUnique({ where: { id: item.productId } });
       if (!product) throw new StockConflictError([item.productId]);
 
-      const mode = isCaseOnly(product.category) ? "business" : item.mode;
+      const mode = isCaseOnly(product.category) ? "business" : "individual";
       const unitsNeeded = mode === "business" ? item.quantity * product.unitsPerCase : item.quantity;
 
       const result = await tx.product.updateMany({
