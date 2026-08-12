@@ -1,8 +1,10 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StoreProvider } from "./store/StoreContext";
+import { ToastProvider } from "./store/ToastContext";
 import { PortalGuard } from "./components/PortalGuard";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { CartDrawer } from "./components/CartDrawer";
 import { Home } from "./pages/Home";
 import { Shop } from "./pages/Shop";
 import { ProductDetail } from "./pages/ProductDetail";
@@ -25,7 +27,9 @@ export function App() {
   return (
     <ErrorBoundary>
       <StoreProvider>
+        <ToastProvider>
         <BrowserRouter>
+          <CartDrawer />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
@@ -50,6 +54,7 @@ export function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </ToastProvider>
       </StoreProvider>
     </ErrorBoundary>);
 

@@ -45,6 +45,9 @@ interface StoreContextValue {
   cartSubtotal: number;
   shoppingMode: ShoppingMode;
   setShoppingMode: (mode: ShoppingMode) => void;
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
   loading: boolean;
   backendError: string | null;
   addToCart: (productId: string, mode: ShoppingMode, quantity: number) => void;
@@ -90,6 +93,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [cart, setCart] = useState<CartItem[]>(() => loadCart());
   const [shoppingMode, setShoppingModeState] = useState<ShoppingMode>(() => loadMode());
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [backendError, setBackendError] = useState<string | null>(null);
 
@@ -97,6 +101,9 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     setShoppingModeState(mode);
     localStorage.setItem(MODE_KEY, mode);
   };
+
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
 
   useEffect(() => {
     api.getProducts().
@@ -220,6 +227,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
   return (
     <StoreContext.Provider value={{
       products, orders, cart, cartCount, cartSubtotal, shoppingMode, setShoppingMode,
+      isCartOpen, openCart, closeCart,
       loading, backendError, addToCart, updateCartQty,
       removeFromCart, clearCart, getProduct, loadOrders, fetchOrder, placeOrder,
       reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateInvoiceStatus,

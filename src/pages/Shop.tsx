@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { SearchIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
@@ -27,7 +27,13 @@ export function Shop() {
   const { bestsellerIds } = usePopularity();
   const [params, setParams] = useSearchParams();
   const activeCategory = params.get("category") as Category | null ?? "All";
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => params.get("q") ?? "");
+
+  useEffect(() => {
+    const urlQuery = params.get("q") ?? "";
+    setQuery((current) => current === urlQuery ? current : urlQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.get("q")]);
   const [sort, setSort] = useState<SortKey>("featured");
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [showFilters, setShowFilters] = useState(false);

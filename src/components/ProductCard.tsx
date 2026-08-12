@@ -5,14 +5,18 @@ import { PlusIcon } from "lucide-react";
 import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
+import { useToast } from "../store/ToastContext";
+import { isCaseOnly } from "../lib/productRules";
 import { BestsellerBadge } from "./BestsellerBadge";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
-  const { addToCart, shoppingMode } = useStore();
+  const { addToCart, shoppingMode, openCart } = useStore();
+  const { showToast } = useToast();
   const out = product.stockUnits === 0;
   const low = !out && product.stockUnits <= product.lowStockThreshold;
 
-  const isBusiness = shoppingMode === "business";
+  const caseOnly = isCaseOnly(product.category);
+  const isBusiness = caseOnly || shoppingMode === "business";
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const availableToAdd = isBusiness ?
   Math.floor(product.stockUnits / product.unitsPerCase) === 0 :
@@ -68,10 +72,14 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
             <p className="font-serif text-2xl font-semibold text-burgundy-800">
               {formatCurrency(price)}
             </p>
-            <p className="text-xs text-ink/50">{isBusiness ? "per case" : "per piece"}</p>
+            <p className="text-xs text-ink/50">{isBusiness ? "per case" : "per piece"}{caseOnly ? " · sold by the case" : ""}</p>
           </div>
           <button
-            onClick={() => addToCart(product.id, shoppingMode, 1)}
+            onClick={() => {
+              addToCart(product.id, isBusiness ? "business" : "individual", 1);
+              showToast(`Added ${product.name} to cart`);
+              openCart();
+            }}
             disabled={out || availableToAdd}
             className="inline-flex items-center gap-1.5 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500">
 

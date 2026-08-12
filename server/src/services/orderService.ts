@@ -2,6 +2,7 @@ import { prisma } from "../db";
 import { NotFoundError, StockConflictError } from "../errors";
 import { computeTotals } from "../lib/money";
 import { generateReference } from "../lib/reference";
+import { isCaseOnly } from "../lib/productRules";
 import { z } from "zod";
 import { CartItemSchema, CheckoutDetailsSchema } from "../validation/schemas";
 
@@ -58,7 +59,8 @@ export async function createOrder(params: {
       const product = await tx.product.findUnique({ where: { id: item.productId } });
       if (!product) throw new StockConflictError([item.productId]);
 
-      const unitsNeeded = item.mode === "business" ? item.quantity * product.unitsPerCase : item.quantity;
+      const mode = isCaseOnly(product.category) ? "business" : item.mode;
+      const unitsNeeded = mode === "business" ? item.quantity * product.unitsPerCase : item.quantity;
 
       const result = await tx.product.updateMany({
         where: { id: item.productId, stockUnits: { gte: unitsNeeded } },
@@ -70,7 +72,7 @@ export async function createOrder(params: {
         productId: product.id,
         name: product.name,
         brand: product.brand,
-        mode: item.mode,
+        mode,
         quantity: item.quantity,
         unitsPerCase: product.unitsPerCase,
         casePrice: product.casePrice,

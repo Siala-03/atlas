@@ -15,20 +15,24 @@ import { TrustBadges } from "../components/TrustBadges";
 import { BestsellerBadge } from "../components/BestsellerBadge";
 import { ProductStrip } from "../components/ProductStrip";
 import { useStore } from "../store/StoreContext";
+import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
+import { isCaseOnly } from "../lib/productRules";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 
 export function ProductDetail() {
   const { id } = useParams();
-  const { getProduct, addToCart, products, shoppingMode } = useStore();
+  const { getProduct, addToCart, products, shoppingMode, openCart } = useStore();
+  const { showToast } = useToast();
   const { bestsellerIds } = usePopularity();
   const navigate = useNavigate();
   const product = id ? getProduct(id) : undefined;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const isBusiness = shoppingMode === "business";
+  const caseOnly = product ? isCaseOnly(product.category) : false;
+  const isBusiness = caseOnly || shoppingMode === "business";
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -59,8 +63,10 @@ export function ProductDetail() {
   const lineTotal = price * quantity;
 
   const handleAdd = () => {
-    addToCart(product.id, shoppingMode, quantity);
+    addToCart(product.id, isBusiness ? "business" : "individual", quantity);
     setAdded(true);
+    showToast(`Added ${product.name} to cart`);
+    openCart();
     setTimeout(() => setAdded(false), 1800);
   };
 
@@ -122,7 +128,13 @@ export function ProductDetail() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-6">
+              {caseOnly ?
+              <p className="mb-5 inline-flex items-center rounded-full border border-burgundy-200 bg-burgundy-50 px-3.5 py-1.5 text-xs font-semibold text-burgundy-800">
+                  Sold by the case only
+                </p> :
+
               <ShopModeToggle className="mb-5" />
+              }
               <div className="flex items-end justify-between">
                 <div>
                   <p className="font-serif text-4xl font-semibold text-burgundy-800">
