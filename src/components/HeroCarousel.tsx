@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { Product, unitPrice } from "../types";
-import { formatCurrency } from "../lib/format";
-import { useStore } from "../store/StoreContext";
+import { Product } from "../types";
 
 const AUTO_ADVANCE_MS = 4500;
 
 export function HeroCarousel({ products }: {products: Product[];}) {
-  const { shoppingMode } = useStore();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -23,59 +18,29 @@ export function HeroCarousel({ products }: {products: Product[];}) {
 
   if (products.length === 0) return null;
 
-  const product = products[index % products.length];
-  const isBusiness = shoppingMode === "business";
-  const price = isBusiness ? product.casePrice : unitPrice(product);
-
-  const go = (delta: number) => setIndex((i) => (i + delta + products.length) % products.length);
-
   return (
     <div
-      className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-3xl bg-burgundy-900/40"
+      className="absolute inset-0 overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}>
 
-      <AnimatePresence mode="wait">
-        <motion.div
+      <AnimatePresence mode="sync">
+        {products.map((product, i) =>
+        i === index % products.length &&
+        <motion.img
           key={product.id}
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -24 }}
-          transition={{ duration: 0.4 }}
-          className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center sm:p-10">
+          src={product.image}
+          alt={product.name}
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.9, ease: "easeInOut" }}
+          className="absolute inset-0 h-full w-full object-contain object-center p-8 drop-shadow-2xl sm:p-16" />
 
-          <Link to={`/product/${product.id}`} className="flex h-40 items-center justify-center sm:h-56">
-            <img src={product.image} alt={product.name} className="h-full w-auto object-contain drop-shadow-2xl" />
-          </Link>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber2-300">{product.brand}</p>
-            <Link to={`/product/${product.id}`} className="mt-1 block font-serif text-2xl font-semibold text-cream hover:text-amber2-200 sm:text-3xl">
-              {product.name}
-            </Link>
-            <p className="mt-2 font-serif text-xl font-semibold text-amber2-300">
-              {formatCurrency(price)}
-              <span className="ml-1 text-sm font-normal text-cream/60">{isBusiness ? "/case" : "/piece"}</span>
-            </p>
-          </div>
-        </motion.div>
+        )}
       </AnimatePresence>
 
-      <button
-        onClick={() => go(-1)}
-        aria-label="Previous product"
-        className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-cream/10 text-cream backdrop-blur transition-colors hover:bg-cream/20">
-
-        <ChevronLeftIcon className="h-5 w-5" />
-      </button>
-      <button
-        onClick={() => go(1)}
-        aria-label="Next product"
-        className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-cream/10 text-cream backdrop-blur transition-colors hover:bg-cream/20">
-
-        <ChevronRightIcon className="h-5 w-5" />
-      </button>
-
-      <div className="flex items-center justify-center gap-1.5 pb-4">
+      <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
         {products.map((p, i) =>
         <button
           key={p.id}
@@ -84,7 +49,7 @@ export function HeroCarousel({ products }: {products: Product[];}) {
           className={`h-1.5 rounded-full transition-all ${
           i === index % products.length ?
           "w-6 bg-amber2-400" :
-          "w-1.5 bg-cream/30 hover:bg-cream/50"}`
+          "w-1.5 bg-cream/40 hover:bg-cream/60"}`
           } />
 
         )}
