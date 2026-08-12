@@ -122,23 +122,30 @@ export function Navbar() {
         }
       </AnimatePresence>
 
-      {open &&
-      <div className="border-t border-burgundy-100 bg-cream lg:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col px-4 py-3">
-            <div className="px-3 py-2 sm:hidden"><ShopModeToggle /></div>
-            {NAV.map((item) =>
-          <Link
-            key={item.label}
-            to={item.to}
-            onClick={() => setOpen(false)}
-            className="rounded-lg px-3 py-3 text-sm font-medium text-ink/80 hover:bg-burgundy-50">
+      <AnimatePresence>
+        {open &&
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="overflow-hidden border-t border-burgundy-100 bg-cream lg:hidden">
 
-                {item.label}
-              </Link>
-          )}
-          </nav>
-        </div>
-      }
+            <nav className="mx-auto flex max-w-7xl flex-col px-4 py-3">
+              <div className="px-3 py-2 sm:hidden"><ShopModeToggle /></div>
+              {NAV.map((item) =>
+            <Link
+              key={item.label}
+              to={item.to}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3 text-sm font-medium text-ink/80 hover:bg-burgundy-50">
+
+                  {item.label}
+                </Link>
+            )}
+            </nav>
+          </motion.div>
+        }
+      </AnimatePresence>
     </header>);
 
 }

@@ -9,6 +9,7 @@ import { BrandPortfolio } from "../components/BrandPortfolio";
 import { WhyAtlas } from "../components/WhyAtlas";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 import { HeroCarousel } from "../components/HeroCarousel";
+import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES } from "../lib/categoryImages";
@@ -59,13 +60,15 @@ export function Home() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <ShopModeToggle />
-              <Link
+              <motion.div whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.03 }}>
+                <Link
                 to="/shop"
                 className="inline-flex items-center gap-2 rounded-full bg-amber2-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-amber2-600">
 
-                Shop now
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
+                  Shop now
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
 
@@ -77,59 +80,78 @@ export function Home() {
 
       {/* Perks strip */}
       <section className="border-b border-burgundy-100 bg-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 sm:grid-cols-3 sm:px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={staggerContainer}
+          className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 sm:grid-cols-3 sm:px-6 lg:px-8">
+
           {PERKS.map((p) =>
-          <div key={p.title} className="flex items-center gap-3">
+          <motion.div key={p.title} variants={staggerItem} className="flex items-center gap-3">
               <p.icon className="h-5 w-5 shrink-0 text-burgundy-700" />
               <div>
                 <p className="text-sm font-semibold text-ink">{p.title}</p>
                 <p className="text-xs text-ink/55">{p.text}</p>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </section>
 
       {/* Category quick-nav */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={staggerContainer}
+          className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+
           {CATEGORIES.map((c) =>
-          <Link
-            key={c.name}
-            to={`/shop?category=${c.name}`}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md">
+          <motion.div key={c.name} variants={staggerItem}>
+              <Link
+              to={`/shop?category=${c.name}`}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md">
 
-              <div className="relative aspect-square overflow-hidden bg-cream">
-                <img
-                src={CATEGORY_IMAGES[c.name]}
-                alt=""
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="relative aspect-square overflow-hidden bg-cream">
+                  <img
+                  src={CATEGORY_IMAGES[c.name]}
+                  alt=""
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-burgundy-950/70 via-burgundy-950/5 to-transparent" />
-                <p className="absolute bottom-2 left-3 font-serif text-sm font-semibold text-cream sm:text-base">{c.name}</p>
-              </div>
-            </Link>
+                  <div className="absolute inset-0 bg-gradient-to-t from-burgundy-950/70 via-burgundy-950/5 to-transparent" />
+                  <p className="absolute bottom-2 left-3 font-serif text-sm font-semibold text-cream sm:text-base">{c.name}</p>
+                </div>
+              </Link>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </section>
 
-      <ProductStrip title={featuredHeading} products={topProducts} viewAllHref="/shop" />
+      <Reveal>
+        <ProductStrip title={featuredHeading} products={topProducts} viewAllHref="/shop" />
+      </Reveal>
 
       {wineProducts.length > 0 &&
-      <ProductStrip title="Wine selection" products={wineProducts} viewAllHref="/shop?category=Wine" />
+      <Reveal>
+          <ProductStrip title="Wine selection" products={wineProducts} viewAllHref="/shop?category=Wine" />
+        </Reveal>
       }
 
       {beerProducts.length > 0 &&
-      <ProductStrip title="Beer & crates" products={beerProducts} viewAllHref="/shop?category=Beer" />
+      <Reveal>
+          <ProductStrip title="Beer & crates" products={beerProducts} viewAllHref="/shop?category=Beer" />
+        </Reveal>
       }
 
-      <BrandPortfolio />
+      <Reveal><BrandPortfolio /></Reveal>
 
-      <WhyAtlas />
+      <Reveal><WhyAtlas /></Reveal>
 
       {/* CTA */}
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-3xl bg-burgundy-800 px-8 py-14 text-center sm:px-16">
+        <Reveal className="overflow-hidden rounded-3xl bg-burgundy-800 px-8 py-14 text-center sm:px-16">
           <h2 className="font-serif text-4xl font-semibold text-cream">
             Order today
           </h2>
@@ -138,13 +160,15 @@ export function Home() {
             "Buy by the case with straightforward pricing, no minimums." :
             "Buy exactly what you need, by the piece."}
           </p>
-          <Link
+          <motion.div whileTap={{ scale: 0.96 }} className="inline-block">
+            <Link
             to="/shop"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber2-500 px-8 py-3.5 font-semibold text-white transition-colors hover:bg-amber2-600">
 
-            Start ordering <ArrowRightIcon className="h-5 w-5" />
-          </Link>
-        </div>
+              Start ordering <ArrowRightIcon className="h-5 w-5" />
+            </Link>
+          </motion.div>
+        </Reveal>
       </section>
 
       <Footer />

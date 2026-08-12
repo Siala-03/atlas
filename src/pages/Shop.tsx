@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { SearchIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductCard } from "../components/ProductCard";
 import { ProductFilters, EMPTY_FILTERS, FilterState, applyFilters, isFilterActive } from "../components/ProductFilters";
+import { staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_HERO_IMAGES } from "../lib/categoryImages";
@@ -176,11 +178,19 @@ export function Shop() {
                 <p className="mt-2 text-ink/60">Try a different category, search term or filter.</p>
               </div> :
 
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={staggerContainer}
+              className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+
                 {filtered.map((p) =>
-              <ProductCard key={p.id} product={p} isBestseller={bestsellerIds.has(p.id)} />
+              <motion.div key={p.id} variants={staggerItem}>
+                    <ProductCard product={p} isBestseller={bestsellerIds.has(p.id)} />
+                  </motion.div>
               )}
-              </div>
+              </motion.div>
             }
           </div>
         </div>

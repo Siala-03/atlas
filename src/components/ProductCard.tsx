@@ -74,7 +74,8 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
             </p>
             <p className="text-xs text-ink/50">{caseOnly ? "per case · sold by the case only" : "per bottle"}</p>
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
             onClick={() => {
               addToCart(product.id, isBusiness ? "business" : "individual", 1);
               showToast(`Added ${product.name} to cart`);
@@ -85,7 +86,7 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
 
             <PlusIcon className="h-4 w-4" />
             Add
-          </button>
+          </motion.button>
         </div>
       </div>
     </motion.div>);
