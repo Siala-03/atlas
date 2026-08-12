@@ -27,15 +27,30 @@ export function HeroCarousel({ products }: {products: Product[];}) {
       <AnimatePresence mode="sync">
         {products.map((product, i) =>
         i === index % products.length &&
-        <motion.img
+        <motion.div
           key={product.id}
-          src={product.image}
-          alt={product.name}
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.97 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.9, ease: "easeInOut" }}
-          className="absolute inset-0 h-full w-full object-contain object-center p-8 drop-shadow-2xl sm:p-16" />
+          className="absolute inset-0">
+
+            <img
+            src={product.image}
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full scale-125 object-cover object-center opacity-40 blur-3xl" />
+
+            <motion.img
+            src={product.image}
+            alt={product.name}
+            initial={{ scale: 1.04 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.97 }}
+            transition={{ duration: 0.9, ease: "easeInOut" }}
+            className="absolute inset-0 h-full w-full object-contain object-center p-8 drop-shadow-2xl sm:p-16" />
+
+          </motion.div>
 
         )}
       </AnimatePresence>
