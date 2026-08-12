@@ -35,7 +35,7 @@ export const ProductPatchSchema = z.object({
 });
 
 export const RestockSchema = z.object({
-  cases: z.number().int().positive()
+  units: z.number().int().positive()
 });
 
 export const OrderStatusSchema = z.object({

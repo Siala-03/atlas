@@ -53,8 +53,8 @@ export const api = {
   updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold">>) =>
   request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
 
-  restockProduct: (id: string, cases: number) =>
-  request<Product>(`/products/${id}/restock`, { method: "POST", body: JSON.stringify({ cases }) }),
+  restockProduct: (id: string, units: number) =>
+  request<Product>(`/products/${id}/restock`, { method: "POST", body: JSON.stringify({ units }) }),
 
   getOrders: () => request<Order[]>("/orders"),
 

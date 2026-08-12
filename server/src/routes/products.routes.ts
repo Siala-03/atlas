@@ -20,6 +20,6 @@ productsRouter.patch("/products/:id", requireAdmin, asyncHandler(async (req, res
 }));
 
 productsRouter.post("/products/:id/restock", requireAdmin, asyncHandler(async (req, res) => {
-  const { cases } = RestockSchema.parse(req.body);
-  res.json(await productService.restockProduct(req.params.id, cases));
+  const { units } = RestockSchema.parse(req.body);
+  res.json(await productService.restockProduct(req.params.id, units));
 }));

@@ -16,7 +16,7 @@ export async function patchProduct(id: string, patch: { casePrice?: number; stoc
   return prisma.product.update({ where: { id }, data: patch });
 }
 
-export async function restockProduct(id: string, cases: number) {
-  const product = await getProduct(id);
-  return prisma.product.update({ where: { id }, data: { stockUnits: { increment: cases * product.unitsPerCase } } });
+export async function restockProduct(id: string, units: number) {
+  await getProduct(id);
+  return prisma.product.update({ where: { id }, data: { stockUnits: { increment: units } } });
 }

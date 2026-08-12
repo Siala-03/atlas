@@ -63,7 +63,7 @@ interface StoreContextValue {
   updateOrderInternalNotes: (orderId: string, notes: string) => Promise<void>;
   updateInvoiceStatus: (orderId: string, status: InvoiceStatus) => Promise<void>;
   updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold">>) => Promise<void>;
-  restockProduct: (id: string, cases: number) => Promise<void>;
+  restockProduct: (id: string, units: number) => Promise<void>;
   initiatePayment: (orderId: string) => Promise<{ redirectUrl: string; providerRef: string }>;
   getPaymentStatus: (orderId: string) => Promise<Payment | null>;
 }
@@ -216,8 +216,8 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     setProducts((previous) => previous.map((item) => item.id === id ? product : item));
   };
 
-  const restockProduct = async (id: string, cases: number) => {
-    const product = await api.restockProduct(id, cases);
+  const restockProduct = async (id: string, units: number) => {
+    const product = await api.restockProduct(id, units);
     setProducts((previous) => previous.map((item) => item.id === id ? product : item));
   };
 
