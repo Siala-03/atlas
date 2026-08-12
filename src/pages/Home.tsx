@@ -43,15 +43,13 @@ export function Home() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-[520px] overflow-hidden bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-burgundy-800 sm:min-h-[620px] lg:min-h-[720px]">
-        <HeroCarousel products={carouselProducts} />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-burgundy-950/95 via-burgundy-950/40 to-burgundy-950/60" />
-
-        <div className="relative mx-auto flex h-full min-h-[520px] max-w-7xl items-end px-4 pb-14 pt-24 sm:min-h-[620px] sm:px-6 lg:min-h-[720px] lg:px-8 lg:pb-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-burgundy-800">
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}>
+            transition={{ duration: 0.5 }}
+            className="flex min-h-[220px] flex-col justify-center lg:min-h-[560px]">
 
             <h1 className="font-serif text-4xl font-semibold leading-tight text-cream sm:text-5xl">
               Premium drinks, delivered to your door.
@@ -70,6 +68,10 @@ export function Home() {
               </Link>
             </div>
           </motion.div>
+
+          <div className="h-[360px] py-8 sm:h-[440px] lg:h-[560px] lg:py-12">
+            <HeroCarousel products={carouselProducts} />
+          </div>
         </div>
       </section>
 
