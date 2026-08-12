@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowRightIcon, LockKeyholeIcon, ShieldCheckIcon } from "lucide-react";
 import { Logo } from "../components/Logo";
 import { startPortalSession } from "../lib/portalAuth";
+import { api, ApiError } from "../lib/api";
 
 interface LocationState {
   from?: string;
@@ -11,20 +12,29 @@ interface LocationState {
 export function PortalLogin() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      setError("Enter your operations email and password.");
+    if (!password.trim()) {
+      setError("Enter your operations password.");
       return;
     }
 
-    startPortalSession();
-    const state = location.state as LocationState | null;
-    navigate(state?.from ?? "/portal", { replace: true });
+    setSubmitting(true);
+    setError("");
+    try {
+      const { token } = await api.portalLogin(password);
+      startPortalSession(token);
+      const state = location.state as LocationState | null;
+      navigate(state?.from ?? "/portal", { replace: true });
+    } catch (err) {
+      setError(err instanceof ApiError && err.status === 401 ? "Incorrect password." : "Could not sign in. Try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -45,24 +55,10 @@ export function PortalLogin() {
             Atlas Operations
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-ink/60">
-            Sign in to manage incoming trade orders, fulfilment and warehouse stock.
+            Sign in to manage incoming orders, fulfilment and warehouse stock.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-4" noValidate>
-            <div>
-              <label htmlFor="portal-email" className="mb-1.5 block text-sm font-medium text-ink/70">
-                Operations email
-              </label>
-              <input
-                id="portal-email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
-                className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none transition focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-100"
-                placeholder="you@atlassupplies.rw" />
-              
-            </div>
             <div>
               <label htmlFor="portal-password" className="mb-1.5 block text-sm font-medium text-ink/70">
                 Password
@@ -75,15 +71,16 @@ export function PortalLogin() {
                 autoComplete="current-password"
                 className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none transition focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-100"
                 placeholder="••••••••" />
-              
+
             </div>
             {error && <p className="text-sm font-medium text-red-600">{error}</p>}
             <button
               type="submit"
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-burgundy-800 py-3.5 font-semibold text-cream transition-colors hover:bg-burgundy-900">
-              
+              disabled={submitting}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-burgundy-800 py-3.5 font-semibold text-cream transition-colors hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:bg-burgundy-800/60">
+
               <LockKeyholeIcon className="h-4 w-4" />
-              Sign in to operations
+              {submitting ? "Signing in…" : "Sign in to operations"}
               <ArrowRightIcon className="h-4 w-4" />
             </button>
           </form>

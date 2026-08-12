@@ -11,6 +11,6 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     res.status(err.status).json({ error: err.message, details: err.details });
     return;
   }
-  console.error(err);
+  console.error(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ->`, err);
   res.status(500).json({ error: "Internal server error" });
 }

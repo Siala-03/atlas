@@ -8,12 +8,11 @@ import { ProductStrip } from "../components/ProductStrip";
 import { BrandPortfolio } from "../components/BrandPortfolio";
 import { WhyAtlas } from "../components/WhyAtlas";
 import { ShopModeToggle } from "../components/ShopModeToggle";
+import { HeroCarousel } from "../components/HeroCarousel";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES } from "../lib/categoryImages";
 import { Category } from "../types";
-
-const HERO = "/c76d1c17-8922-4717-b20e-ae6d0135e87f.jpg";
 
 const CATEGORIES: {name: Category;blurb: string;}[] = [
 { name: "Whisky", blurb: "Single malts, blends & bourbon" },
@@ -37,33 +36,28 @@ export function Home() {
 
   const wineProducts = products.filter((p) => p.category === "Wine").slice(0, 4);
   const beerProducts = products.filter((p) => p.category === "Beer").slice(0, 4);
+  const carouselProducts = topProducts.length > 0 ? topProducts : products.slice(0, 8);
 
   return (
     <div className="min-h-screen w-full bg-cream">
       <Navbar />
 
-      {/* Compact hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO} alt="" className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-burgundy-950/80" />
-        </div>
-        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-burgundy-800">
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            className="flex min-h-[220px] flex-col justify-center lg:min-h-[560px]">
 
-            <div>
-              <h1 className="font-serif text-3xl font-semibold leading-tight text-cream sm:text-4xl">
-                Premium drinks, delivered to your door.
-              </h1>
-              <p className="mt-3 max-w-lg text-cream/80">
-                Buy by the piece or by the case — genuine stock, straightforward pricing.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-serif text-4xl font-semibold leading-tight text-cream sm:text-5xl">
+              Premium drinks, delivered to your door.
+            </h1>
+            <p className="mt-4 max-w-lg text-lg text-cream/80">
+              Buy by the piece or by the case — genuine stock, straightforward pricing.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <ShopModeToggle />
               <Link
                 to="/shop"
@@ -74,6 +68,10 @@ export function Home() {
               </Link>
             </div>
           </motion.div>
+
+          <div className="h-[360px] py-8 sm:h-[440px] lg:h-[560px] lg:py-12">
+            <HeroCarousel products={carouselProducts} />
+          </div>
         </div>
       </section>
 

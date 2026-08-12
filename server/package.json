@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node --env-file=.env dist/index.js",
     "prisma:migrate": "prisma migrate dev",
-    "seed": "tsx --env-file=.env prisma/seed.ts"
+    "seed": "tsx --env-file=.env prisma/seed.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",
@@ -22,6 +23,7 @@
     "@types/node": "^20.14.0",
     "prisma": "^5.20.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.10"
   }
 }

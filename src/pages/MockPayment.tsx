@@ -1,17 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle2Icon, CreditCardIcon, XCircleIcon } from "lucide-react";
 import { useStore } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { api } from "../lib/api";
+import { Order } from "../types";
 
 export function MockPayment() {
   const { providerRef } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { orders, initiatePayment } = useStore();
+  const { fetchOrder, initiatePayment } = useStore();
   const orderId = searchParams.get("orderId") ?? "";
-  const order = orders.find((item) => item.id === orderId);
+  const [order, setOrder] = useState<Order | undefined>(undefined);
+
+  useEffect(() => {
+    if (!orderId) return;
+    fetchOrder(orderId).then(setOrder);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId]);
   const [status, setStatus] = useState<"choosing" | "processing" | "failed">("choosing");
   const [activeRef, setActiveRef] = useState(providerRef ?? "");
   const [error, setError] = useState("");

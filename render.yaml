@@ -29,6 +29,10 @@ services:
         value: sandbox
       - key: PESAPAL_CURRENCY
         value: RWF
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_SESSION_SECRET
+        sync: false
 
   - type: web
     name: atlas-storefront

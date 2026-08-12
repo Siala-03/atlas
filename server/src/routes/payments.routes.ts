@@ -25,7 +25,11 @@ paymentsRouter.get("/payments/pesapal/ipn", asyncHandler(async (req, res) => {
   const orderNotificationType = String(req.query.OrderNotificationType ?? "IPNCHANGE");
 
   if (orderTrackingId) {
-    await paymentService.recordProviderVerification(orderTrackingId);
+    try {
+      await paymentService.recordProviderVerification(orderTrackingId);
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Pesapal IPN verification failed for ${orderTrackingId}:`, error);
+    }
   }
 
   res.json({

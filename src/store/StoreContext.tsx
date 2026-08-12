@@ -24,7 +24,7 @@ const VAT_RATE = 0.18;
 const CART_KEY = "atlas.cart.v2";
 const MODE_KEY = "atlas.shoppingMode.v1";
 
-function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase">, item: CartItem): number {
+export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase">, item: CartItem): number {
   return item.mode === "business" ? product.casePrice * item.quantity : unitPrice(product) * item.quantity;
 }
 
@@ -52,6 +52,8 @@ interface StoreContextValue {
   removeFromCart: (productId: string, mode: ShoppingMode) => void;
   clearCart: () => void;
   getProduct: (id: string) => Product | undefined;
+  loadOrders: () => Promise<void>;
+  fetchOrder: (id: string) => Promise<Order | undefined>;
   placeOrder: (details: CheckoutDetails, paymentMethod?: PaymentMethod) => Promise<Order>;
   reorderOrder: (orderId: string) => Promise<{ addedUnits: number; unavailable: string[] }>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
@@ -97,11 +99,9 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
   };
 
   useEffect(() => {
-    Promise.all([api.getProducts(), api.getOrders()]).
-    then(([fetchedProducts, fetchedOrders]) => {
-      const nextProducts = fetchedProducts.length > 0 ? fetchedProducts : SEED_PRODUCTS;
-      setProducts(nextProducts);
-      setOrders(fetchedOrders);
+    api.getProducts().
+    then((fetchedProducts) => {
+      setProducts(fetchedProducts.length > 0 ? fetchedProducts : SEED_PRODUCTS);
       setBackendError(null);
     }).
     catch(() => {
@@ -152,6 +152,23 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     }, 0),
     [cart, products]
   );
+
+  const loadOrders = async () => {
+    const fetchedOrders = await api.getOrders();
+    setOrders(fetchedOrders);
+  };
+
+  const fetchOrder = async (id: string): Promise<Order | undefined> => {
+    const existing = orders.find((order) => order.id === id);
+    if (existing) return existing;
+    try {
+      const order = await api.getOrder(id);
+      setOrders((previous) => [order, ...previous.filter((o) => o.id !== order.id)]);
+      return order;
+    } catch {
+      return undefined;
+    }
+  };
 
   const placeOrder = async (
   details: CheckoutDetails,
@@ -204,7 +221,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     <StoreContext.Provider value={{
       products, orders, cart, cartCount, cartSubtotal, shoppingMode, setShoppingMode,
       loading, backendError, addToCart, updateCartQty,
-      removeFromCart, clearCart, getProduct, placeOrder,
+      removeFromCart, clearCart, getProduct, loadOrders, fetchOrder, placeOrder,
       reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateInvoiceStatus,
       updateProduct, restockProduct, initiatePayment, getPaymentStatus
     }}>

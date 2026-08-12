@@ -8,6 +8,7 @@ import {
   Product } from
 "../types";
 import type { CheckoutDetails } from "../store/StoreContext";
+import { endPortalSession, getPortalToken } from "./portalAuth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000/api";
 
@@ -18,14 +19,23 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getPortalToken();
   let response: Response;
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       ...init,
-      headers: { "Content-Type": "application/json", ...init?.headers }
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers
+      }
     });
   } catch {
     throw new ApiError(0, "Cannot reach the Atlas backend. Is it running?");
+  }
+
+  if (response.status === 401 && token) {
+    endPortalSession();
   }
 
   if (!response.ok) {
@@ -47,6 +57,11 @@ export const api = {
   request<Product>(`/products/${id}/restock`, { method: "POST", body: JSON.stringify({ cases }) }),
 
   getOrders: () => request<Order[]>("/orders"),
+
+  getOrder: (id: string) => request<Order>(`/orders/${id}`),
+
+  portalLogin: (password: string) =>
+  request<{ token: string }>("/portal/login", { method: "POST", body: JSON.stringify({ password }) }),
 
   placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
   request<Order>("/orders", { method: "POST", body: JSON.stringify(params) }),

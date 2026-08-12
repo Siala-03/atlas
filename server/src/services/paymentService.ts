@@ -56,7 +56,10 @@ export async function getPaymentForOrder(orderId: string) {
 
 export async function recordProviderVerification(providerRef: string) {
   const payment = await prisma.payment.findUnique({ where: { providerRef } });
-  if (!payment) return;
+  if (!payment) {
+    console.warn(`[${new Date().toISOString()}] Pesapal IPN referenced unknown payment: ${providerRef}`);
+    return;
+  }
   await applyVerification(payment);
 }
 

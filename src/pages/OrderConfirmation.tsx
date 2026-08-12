@@ -6,13 +6,20 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useStore } from "../store/StoreContext";
 import { formatCurrency, formatDateTime } from "../lib/format";
-import { Payment } from "../types";
+import { Order, Payment } from "../types";
 
 export function OrderConfirmation() {
   const { id } = useParams();
-  const { orders, getPaymentStatus } = useStore();
-  const order = orders.find((o) => o.id === id);
+  const { fetchOrder, getPaymentStatus } = useStore();
+  const [order, setOrder] = useState<Order | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const [payment, setPayment] = useState<Payment | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchOrder(id).then(setOrder).finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   useEffect(() => {
     if (!order || order.paymentMethod !== "card") return;
@@ -25,10 +32,16 @@ export function OrderConfirmation() {
       <div className="min-h-screen w-full bg-cream">
         <Navbar />
         <div className="mx-auto max-w-3xl px-4 py-32 text-center">
-          <h1 className="font-serif text-3xl text-ink">Order not found</h1>
-          <Link to="/shop" className="mt-6 inline-block text-burgundy-800 underline">
-            Back to catalogue
-          </Link>
+          {loading ?
+          <p className="text-ink/50">Loading your order…</p> :
+
+          <>
+              <h1 className="font-serif text-3xl text-ink">Order not found</h1>
+              <Link to="/shop" className="mt-6 inline-block text-burgundy-800 underline">
+                Back to catalogue
+              </Link>
+            </>
+          }
         </div>
         <Footer />
       </div>);

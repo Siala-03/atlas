@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboardIcon,
@@ -21,10 +21,16 @@ const LINKS = [
 
 
 export function AdminLayout({ children }: {children: React.ReactNode;}) {
-  const { orders, products } = useStore();
+  const { orders, products, loadOrders } = useStore();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadOrders().catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const pendingCount = orders.filter((o) => o.status === "Pending").length;
   const lowStock = products.filter(
     (p) => p.stockUnits <= p.lowStockThreshold

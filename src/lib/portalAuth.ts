@@ -1,13 +1,17 @@
-const PORTAL_SESSION_KEY = "atlas.operations.session.v1";
+const PORTAL_TOKEN_KEY = "atlas.operations.token.v1";
 
-export function hasPortalSession(): boolean {
-  return sessionStorage.getItem(PORTAL_SESSION_KEY) === "active";
+export function getPortalToken(): string | null {
+  return sessionStorage.getItem(PORTAL_TOKEN_KEY);
 }
 
-export function startPortalSession(): void {
-  sessionStorage.setItem(PORTAL_SESSION_KEY, "active");
+export function hasPortalSession(): boolean {
+  return getPortalToken() !== null;
+}
+
+export function startPortalSession(token: string): void {
+  sessionStorage.setItem(PORTAL_TOKEN_KEY, token);
 }
 
 export function endPortalSession(): void {
-  sessionStorage.removeItem(PORTAL_SESSION_KEY);
+  sessionStorage.removeItem(PORTAL_TOKEN_KEY);
 }
