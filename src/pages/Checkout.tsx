@@ -7,6 +7,7 @@ import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
 import { PaymentMethod, unitPrice } from "../types";
+import { isCaseOnly } from "../lib/productRules";
 
 const EMPTY: CheckoutDetails = {
   contactName: "",
@@ -209,7 +210,7 @@ export function Checkout() {
               {cart.map((item) => {
                 const product = getProduct(item.productId);
                 if (!product) return null;
-                const isBusiness = item.mode === "business";
+                const isBusiness = isCaseOnly(product.category);
                 const price = isBusiness ? product.casePrice : unitPrice(product);
                 return (
                 <li key={`${item.productId}-${item.mode}`} className="flex justify-between gap-4 text-sm">

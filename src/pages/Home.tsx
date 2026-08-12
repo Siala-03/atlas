@@ -6,7 +6,6 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
 import { BrandPortfolio } from "../components/BrandPortfolio";
-import { WhyAtlas } from "../components/WhyAtlas";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 import { HeroCarousel } from "../components/HeroCarousel";
 import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
@@ -99,20 +98,19 @@ export function Home() {
         </motion.div>
       </section>
 
-      {/* Category quick-nav */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          variants={staggerContainer}
-          className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-
-          {CATEGORIES.map((c) =>
-          <motion.div key={c.name} variants={staggerItem}>
-              <Link
+      {/* Category quick-nav — auto-scrolling marquee, pauses on hover */}
+      <Reveal className="overflow-hidden py-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Our range</p>
+          <h2 className="mt-1 font-serif text-2xl font-semibold text-ink">Shop by category</h2>
+        </div>
+        <div className="group/marquee relative mt-6">
+          <div className="animate-marquee flex w-max gap-4 px-4 sm:px-6 lg:px-8">
+            {[...CATEGORIES, ...CATEGORIES].map((c, i) =>
+            <Link
+              key={`${c.name}-${i}`}
               to={`/shop?category=${c.name}`}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md">
+              className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md sm:w-48">
 
                 <div className="relative aspect-square overflow-hidden bg-cream">
                   <img
@@ -124,10 +122,12 @@ export function Home() {
                   <p className="absolute bottom-2 left-3 font-serif text-sm font-semibold text-cream sm:text-base">{c.name}</p>
                 </div>
               </Link>
-            </motion.div>
-          )}
-        </motion.div>
-      </section>
+            )}
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-cream to-transparent sm:w-20" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-cream to-transparent sm:w-20" />
+        </div>
+      </Reveal>
 
       <Reveal>
         <ProductStrip title={featuredHeading} products={topProducts} viewAllHref="/shop" />
@@ -146,8 +146,6 @@ export function Home() {
       }
 
       <Reveal><BrandPortfolio /></Reveal>
-
-      <Reveal><WhyAtlas /></Reveal>
 
       {/* CTA */}
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">

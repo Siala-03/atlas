@@ -5,6 +5,7 @@ import { ArrowRightIcon, MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon, XIcon 
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
+import { isCaseOnly } from "../lib/productRules";
 
 export function CartDrawer() {
   const { cart, getProduct, updateCartQty, removeFromCart, cartSubtotal, isCartOpen, closeCart } = useStore();
@@ -63,7 +64,7 @@ export function CartDrawer() {
                   {cart.map((item) => {
                 const p = getProduct(item.productId);
                 if (!p) return null;
-                const isBusiness = item.mode === "business";
+                const isBusiness = isCaseOnly(p.category);
                 const price = isBusiness ? p.casePrice : unitPrice(p);
                 return (
                   <div key={`${item.productId}-${item.mode}`} className="flex gap-3">

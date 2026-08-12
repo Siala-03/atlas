@@ -19,13 +19,17 @@ import {
 "../types";
 import { api } from "../lib/api";
 import { SEED_PRODUCTS } from "../data/products";
+import { isCaseOnly } from "../lib/productRules";
 
 const VAT_RATE = 0.18;
 const CART_KEY = "atlas.cart.v2";
 const MODE_KEY = "atlas.shoppingMode.v1";
 
-export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase">, item: CartItem): number {
-  return item.mode === "business" ? product.casePrice * item.quantity : unitPrice(product) * item.quantity;
+// Never trust a cart item's stored `mode` for pricing — it can go stale
+// (e.g. items added before this rule existed, or cross-tab drift). Price is
+// always derived fresh from the product's category, the single source of truth.
+export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">, item: CartItem): number {
+  return isCaseOnly(product.category) ? product.casePrice * item.quantity : unitPrice(product) * item.quantity;
 }
 
 export interface CheckoutDetails {
