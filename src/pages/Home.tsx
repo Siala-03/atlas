@@ -13,7 +13,7 @@ import { FloatingBottles } from "../components/FloatingBottles";
 import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
-import { CATEGORY_IMAGES } from "../lib/categoryImages";
+import { CATEGORY_IMAGES, WINE_CELLAR } from "../lib/categoryImages";
 import { Category } from "../types";
 
 const CATEGORIES: {name: Category;blurb: string;}[] = [
@@ -57,7 +57,13 @@ export function Home() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-burgundy-800">
+      <section className="relative overflow-hidden bg-burgundy-950">
+        <img
+          src={WINE_CELLAR}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-br from-burgundy-950/95 via-burgundy-900/90 to-burgundy-800/85" />
         <FloatingBottles images={floatingImages} />
         {/* Ambient floating background shapes */}
         <motion.div
