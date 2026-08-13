@@ -5,7 +5,7 @@ import { ArrowRightIcon, MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon, XIcon 
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
-import { isCaseOnly } from "../lib/productRules";
+import { hasCaseOption } from "../lib/productRules";
 
 export function CartDrawer() {
   const { cart, getProduct, updateCartQty, removeFromCart, cartSubtotal, isCartOpen, closeCart } = useStore();
@@ -64,7 +64,7 @@ export function CartDrawer() {
                   {cart.map((item) => {
                 const p = getProduct(item.productId);
                 if (!p) return null;
-                const isBusiness = isCaseOnly(p.category);
+                const isBusiness = hasCaseOption(p.category) && item.mode === "business";
                 const price = isBusiness ? p.casePrice : unitPrice(p);
                 return (
                   <div key={`${item.productId}-${item.mode}`} className="flex gap-3">
@@ -82,7 +82,7 @@ export function CartDrawer() {
                               <TrashIcon className="h-3.5 w-3.5" />
                             </button>
                           </div>
-                          <p className="text-xs text-ink/50">{formatCurrency(price)}/{isBusiness ? "case" : "piece"}</p>
+                          <p className="text-xs text-ink/50">{formatCurrency(price)}/{isBusiness ? "case" : hasCaseOption(p.category) ? "piece" : "bottle"}</p>
                           <div className="mt-auto flex items-center justify-between pt-2">
                             <div className="flex items-center rounded-full border border-burgundy-200">
                               <button

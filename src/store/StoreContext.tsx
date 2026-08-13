@@ -19,17 +19,19 @@ import {
 "../types";
 import { api } from "../lib/api";
 import { SEED_PRODUCTS } from "../data/products";
-import { isCaseOnly } from "../lib/productRules";
+import { hasCaseOption } from "../lib/productRules";
 
 const VAT_RATE = 0.18;
 const CART_KEY = "atlas.cart.v2";
 const MODE_KEY = "atlas.shoppingMode.v1";
 
-// Never trust a cart item's stored `mode` for pricing — it can go stale
-// (e.g. items added before this rule existed, or cross-tab drift). Price is
-// always derived fresh from the product's category, the single source of truth.
+// Wine/spirits have no case price at all, so their stored mode is never
+// trusted for pricing — always per bottle regardless of what's stored (guards
+// against stale cart entries from before this rule existed). Beer/crates
+// genuinely support either mode, so the shopper's choice (item.mode) is honored.
 export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">, item: CartItem): number {
-  return isCaseOnly(product.category) ? product.casePrice * item.quantity : unitPrice(product) * item.quantity;
+  const isBusiness = hasCaseOption(product.category) && item.mode === "business";
+  return isBusiness ? product.casePrice * item.quantity : unitPrice(product) * item.quantity;
 }
 
 export interface CheckoutDetails {

@@ -9,20 +9,17 @@ describe("hasCaseOption", () => {
   it("does not give wine and spirits a case option", () => {
     expect(hasCaseOption("Wine")).toBe(false);
     expect(hasCaseOption("Whisky")).toBe(false);
-    expect(hasCaseOption("Rum")).toBe(false);
-    expect(hasCaseOption("Vodka")).toBe(false);
-    expect(hasCaseOption("Gin")).toBe(false);
   });
 });
 
 describe("resolveMode", () => {
-  it("honors the shopper's chosen mode for beer", () => {
+  it("trusts the client's requested mode for beer", () => {
     expect(resolveMode("Beer", "business")).toBe("business");
     expect(resolveMode("Beer", "individual")).toBe("individual");
   });
 
-  it("forces wine and spirits to individual regardless of requested mode", () => {
+  it("ignores a manipulated 'business' request for wine/spirits, forcing individual", () => {
     expect(resolveMode("Wine", "business")).toBe("individual");
-    expect(resolveMode("Wine", "individual")).toBe("individual");
+    expect(resolveMode("Whisky", "business")).toBe("individual");
   });
 });

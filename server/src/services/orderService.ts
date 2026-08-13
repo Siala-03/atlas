@@ -2,7 +2,7 @@ import { prisma } from "../db";
 import { NotFoundError, StockConflictError } from "../errors";
 import { computeTotals } from "../lib/money";
 import { generateReference } from "../lib/reference";
-import { isCaseOnly } from "../lib/productRules";
+import { resolveMode } from "../lib/productRules";
 import { z } from "zod";
 import { CartItemSchema, CheckoutDetailsSchema } from "../validation/schemas";
 
@@ -59,7 +59,7 @@ export async function createOrder(params: {
       const product = await tx.product.findUnique({ where: { id: item.productId } });
       if (!product) throw new StockConflictError([item.productId]);
 
-      const mode = isCaseOnly(product.category) ? "business" : "individual";
+      const mode = resolveMode(product.category, item.mode);
       const unitsNeeded = mode === "business" ? item.quantity * product.unitsPerCase : item.quantity;
 
       const result = await tx.product.updateMany({

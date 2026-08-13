@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
-import { isCaseOnly } from "../lib/productRules";
+import { hasCaseOption } from "../lib/productRules";
 
 const AUTO_ADVANCE_MS = 4500;
 
@@ -23,7 +23,7 @@ export function HeroCarousel({ products }: {products: Product[];}) {
   if (products.length === 0) return null;
 
   const product = products[index % products.length];
-  const caseOnly = isCaseOnly(product.category);
+  const caseOnly = hasCaseOption(product.category);
   const price = caseOnly ? product.casePrice : unitPrice(product);
 
   const go = (delta: number) => setIndex((i) => (i + delta + products.length) % products.length);

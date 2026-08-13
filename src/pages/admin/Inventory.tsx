@@ -11,7 +11,7 @@ import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
 import { Product, unitPrice } from "../../types";
-import { isCaseOnly } from "../../lib/productRules";
+import { hasCaseOption } from "../../lib/productRules";
 
 export function Inventory() {
   const { products, updateProduct, restockProduct } = useStore();
@@ -41,7 +41,7 @@ export function Inventory() {
   }, [products, query, onlyLow]);
 
   const startEdit = (p: Product) => {
-    const caseOnly = isCaseOnly(p.category);
+    const caseOnly = hasCaseOption(p.category);
     setEditId(p.id);
     setDraft({
       price: String(caseOnly ? p.casePrice : unitPrice(p)),
@@ -51,7 +51,7 @@ export function Inventory() {
   };
 
   const saveEdit = async (p: Product) => {
-    const caseOnly = isCaseOnly(p.category);
+    const caseOnly = hasCaseOption(p.category);
     setSavingId(p.id);
     setRowError(null);
     try {
@@ -72,7 +72,7 @@ export function Inventory() {
   };
 
   const restock = async (p: Product) => {
-    const caseOnly = isCaseOnly(p.category);
+    const caseOnly = hasCaseOption(p.category);
     setRestockingId(p.id);
     setRowError(null);
     try {
@@ -87,7 +87,7 @@ export function Inventory() {
   };
 
   const totalStockValue = products.reduce(
-    (s, p) => s + (isCaseOnly(p.category) ? p.casePrice * (p.stockUnits / p.unitsPerCase) : unitPrice(p) * p.stockUnits),
+    (s, p) => s + (hasCaseOption(p.category) ? p.casePrice * (p.stockUnits / p.unitsPerCase) : unitPrice(p) * p.stockUnits),
     0
   );
   const lowCount = products.filter((p) => p.stockUnits <= p.lowStockThreshold).
@@ -144,7 +144,7 @@ export function Inventory() {
             <tbody className="divide-y divide-burgundy-50">
               {rows.map((p) => {
                 const editing = editId === p.id;
-                const caseOnly = isCaseOnly(p.category);
+                const caseOnly = hasCaseOption(p.category);
                 const unitLabel = caseOnly ? "case" : "bottle";
                 const low = p.stockUnits <= p.lowStockThreshold;
                 const out = p.stockUnits === 0;

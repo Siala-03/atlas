@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -19,19 +19,20 @@ import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
-import { isCaseOnly } from "../lib/productRules";
+import { hasCaseOption } from "../lib/productRules";
+import { ShopModeToggle } from "../components/ShopModeToggle";
 
 export function ProductDetail() {
   const { id } = useParams();
-  const { getProduct, addToCart, products, openCart } = useStore();
+  const { getProduct, addToCart, products, openCart, shoppingMode } = useStore();
   const { showToast } = useToast();
   const { bestsellerIds } = usePopularity();
   const navigate = useNavigate();
   const product = id ? getProduct(id) : undefined;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const caseOnly = product ? isCaseOnly(product.category) : false;
-  const isBusiness = caseOnly;
+  const caseOption = product ? hasCaseOption(product.category) : false;
+  const isBusiness = caseOption && shoppingMode === "business";
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -60,6 +61,12 @@ export function ProductDetail() {
   const maxQuantity = isBusiness ? Math.max(availableCases, 1) : Math.max(product.stockUnits, 1);
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const lineTotal = price * quantity;
+  const pieceLabel = caseOption ? "piece" : "bottle";
+  const unitLabel = isBusiness ? "case" : pieceLabel;
+
+  useEffect(() => {
+    setQuantity(1);
+  }, [isBusiness]);
 
   const handleAdd = () => {
     addToCart(product.id, isBusiness ? "business" : "individual", quantity);
@@ -115,7 +122,7 @@ export function ProductDetail() {
               product.category,
               `${product.abv}% ABV`,
               product.volume,
-              ...(caseOnly ? [`${product.unitsPerCase} per case`] : [])].
+              ...(caseOption ? [`${product.unitsPerCase} per case`] : [])].
               map((chip) =>
               <span
                 key={chip}
@@ -127,10 +134,8 @@ export function ProductDetail() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-6">
-              {caseOnly &&
-              <p className="mb-5 inline-flex items-center rounded-full border border-burgundy-200 bg-burgundy-50 px-3.5 py-1.5 text-xs font-semibold text-burgundy-800">
-                  Sold by the case only
-                </p>
+              {caseOption &&
+              <ShopModeToggle className="mb-5" />
               }
               <div className="flex items-end justify-between">
                 <div>
@@ -138,7 +143,7 @@ export function ProductDetail() {
                     {formatCurrency(price)}
                   </p>
                   <p className="text-sm text-ink/50">
-                    {caseOnly ? `per case of ${product.unitsPerCase}` : "per bottle"}
+                    {caseOption ? isBusiness ? `per case of ${product.unitsPerCase}` : "per piece" : "per bottle"}
                   </p>
                 </div>
                 <div className="text-right">
@@ -147,7 +152,7 @@ export function ProductDetail() {
 
 
                   <span className="text-sm font-medium text-emerald-700">
-                      {isBusiness ? `${availableCases} cases available` : `${product.stockUnits} bottles available`}
+                      {isBusiness ? `${availableCases} cases available` : `${product.stockUnits} ${pieceLabel}s available`}
                     </span>
                   }
                 </div>
@@ -172,7 +177,7 @@ export function ProductDetail() {
                   </button>
                 </div>
                 <span className="text-sm text-ink/50">
-                  {isBusiness ? `= ${quantity * product.unitsPerCase} bottles` : `${quantity} bottle${quantity > 1 ? "s" : ""}`}
+                  {isBusiness ? `= ${quantity * product.unitsPerCase} ${pieceLabel}s` : `${quantity} ${pieceLabel}${quantity > 1 ? "s" : ""}`}
                 </span>
               </div>
 
@@ -188,7 +193,7 @@ export function ProductDetail() {
 
 
                 <>
-                    <ShoppingCartIcon className="h-5 w-5" /> Add {quantity} {isBusiness ? "case" : "bottle"}
+                    <ShoppingCartIcon className="h-5 w-5" /> Add {quantity} {unitLabel}
                     {quantity > 1 ? "s" : ""} · {formatCurrency(lineTotal)}
                   </>
                 }
