@@ -9,6 +9,7 @@ import { BrandPortfolio } from "../components/BrandPortfolio";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 import { HeroCarousel } from "../components/HeroCarousel";
 import { RotatingTagline } from "../components/RotatingTagline";
+import { FloatingBottles } from "../components/FloatingBottles";
 import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
@@ -31,7 +32,7 @@ const TAGLINES = [
 "Live stock, no surprises at checkout"];
 
 
-const HERO_CHIPS: Category[] = ["Whisky", "Wine", "Beer", "Gin"];
+const HERO_CHIPS: Category[] = ["Whisky", "Wine", "Beer", "Gin", "Vodka", "Rum"];
 
 const PERKS = [
 { icon: TruckIcon, title: "Next-day delivery", text: "Order by 4pm across the region." },
@@ -47,6 +48,9 @@ export function Home() {
   const wineProducts = products.filter((p) => p.category === "Wine").slice(0, 4);
   const beerProducts = products.filter((p) => p.category === "Beer").slice(0, 4);
   const carouselProducts = topProducts.length > 0 ? topProducts : products.slice(0, 8);
+  const floatingImages = HERO_CHIPS.
+  map((c) => products.find((p) => p.category === c)?.image).
+  filter((src): src is string => Boolean(src));
 
   return (
     <div className="min-h-screen w-full bg-cream">
@@ -54,6 +58,7 @@ export function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-burgundy-800">
+        <FloatingBottles images={floatingImages} />
         {/* Ambient floating background shapes */}
         <motion.div
           aria-hidden="true"
@@ -99,7 +104,7 @@ export function Home() {
                 </Link>
               </motion.div>
             </div>
-            <div className="mt-10 grid max-w-md grid-cols-4 gap-4">
+            <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
               {HERO_CHIPS.map((c, i) =>
               <motion.div
                 key={c}
