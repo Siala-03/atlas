@@ -59,7 +59,7 @@ export function HeroCarousel({ products }: {products: Product[];}) {
           transition={{ duration: 0.4 }}
           className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center sm:p-10">
 
-          <Link to={`/product/${product.id}`} className="relative flex h-52 items-center justify-center sm:h-72">
+          <Link to={`/product/${product.id}`} className="relative flex h-64 items-center justify-center sm:h-[26rem]">
             {bestsellerIds.has(product.id) &&
             <span className="absolute -top-1 left-0"><BestsellerBadge /></span>
             }
