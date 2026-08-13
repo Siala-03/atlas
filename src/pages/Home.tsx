@@ -49,7 +49,7 @@ export function Home() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex min-h-[220px] flex-col justify-center lg:min-h-[560px]">
+            className="flex min-h-[220px] flex-col justify-center lg:min-h-[620px]">
 
             <h1 className="font-serif text-4xl font-semibold leading-tight text-cream sm:text-5xl">
               Premium drinks, delivered to your door.
@@ -71,7 +71,7 @@ export function Home() {
             </div>
           </motion.div>
 
-          <div className="h-[360px] py-8 sm:h-[440px] lg:h-[560px] lg:py-12">
+          <div className="h-[420px] py-8 sm:h-[500px] lg:h-[620px] lg:py-12">
             <HeroCarousel products={carouselProducts} />
           </div>
         </div>
