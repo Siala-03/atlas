@@ -8,6 +8,7 @@ import { ProductStrip } from "../components/ProductStrip";
 import { BrandPortfolio } from "../components/BrandPortfolio";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 import { HeroCarousel } from "../components/HeroCarousel";
+import { RotatingTagline } from "../components/RotatingTagline";
 import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
@@ -22,6 +23,15 @@ const CATEGORIES: {name: Category;blurb: string;}[] = [
 { name: "Gin", blurb: "London Dry & botanical" },
 { name: "Rum", blurb: "Spiced, dark & golden" }];
 
+
+const TAGLINES = [
+"Genuine imports, traceable supply",
+"Next-day delivery across the region",
+"Pay by card or MTN MoMo",
+"Live stock, no surprises at checkout"];
+
+
+const HERO_CHIPS: Category[] = ["Whisky", "Wine", "Beer", "Gin"];
 
 const PERKS = [
 { icon: TruckIcon, title: "Next-day delivery", text: "Order by 4pm across the region." },
@@ -44,6 +54,25 @@ export function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-burgundy-950 via-burgundy-900 to-burgundy-800">
+        {/* Ambient floating background shapes */}
+        <motion.div
+          aria-hidden="true"
+          animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-amber2-500/20 blur-3xl" />
+
+        <motion.div
+          aria-hidden="true"
+          animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute -right-20 top-1/3 h-96 w-96 rounded-full bg-burgundy-500/20 blur-3xl" />
+
+        <motion.div
+          aria-hidden="true"
+          animate={{ x: [0, 20, 0], y: [0, -25, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-amber2-300/10 blur-3xl" />
+
         <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-0">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -57,6 +86,7 @@ export function Home() {
             <p className="mt-4 max-w-lg text-lg text-cream/80">
               Buy by the piece or by the case — genuine stock, straightforward pricing.
             </p>
+            <RotatingTagline items={TAGLINES} className="mt-3 max-w-lg text-sm font-medium text-amber2-300" />
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <ShopModeToggle />
               <motion.div whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.03 }}>
@@ -68,6 +98,17 @@ export function Home() {
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
               </motion.div>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              {HERO_CHIPS.map((c) =>
+              <Link
+                key={c}
+                to={`/shop?category=${c}`}
+                className="rounded-full border border-cream/20 px-3.5 py-1.5 text-xs font-medium text-cream/80 transition-colors hover:border-cream/40 hover:text-cream">
+
+                  {c}
+                </Link>
+              )}
             </div>
           </motion.div>
 
