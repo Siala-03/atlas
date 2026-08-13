@@ -99,15 +99,28 @@ export function Home() {
                 </Link>
               </motion.div>
             </div>
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              {HERO_CHIPS.map((c) =>
-              <Link
+            <div className="mt-10 grid max-w-md grid-cols-4 gap-4">
+              {HERO_CHIPS.map((c, i) =>
+              <motion.div
                 key={c}
-                to={`/shop?category=${c}`}
-                className="rounded-full border border-cream/20 px-3.5 py-1.5 text-xs font-medium text-cream/80 transition-colors hover:border-cream/40 hover:text-cream">
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}>
 
-                  {c}
-                </Link>
+                  <Link
+                  to={`/shop?category=${c}`}
+                  className="group flex flex-col items-center gap-2">
+
+                    <span className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-cream/15 bg-cream/5 p-2 transition-colors group-hover:border-amber2-400/60 sm:h-24 sm:w-24">
+                      <img
+                      src={CATEGORY_IMAGES[c]}
+                      alt=""
+                      className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110" />
+
+                    </span>
+                    <span className="text-xs font-medium text-cream/70 group-hover:text-cream">{c}</span>
+                  </Link>
+                </motion.div>
               )}
             </div>
           </motion.div>
