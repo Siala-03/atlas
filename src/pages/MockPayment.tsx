@@ -59,7 +59,7 @@ export function MockPayment() {
           <CreditCardIcon className="h-6 w-6" />
         </div>
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-amber2-600">
-          Pesapal (sandbox — mock)
+          Pesapal (sandbox mock)
         </p>
         <h1 className="mt-2 font-serif text-3xl font-semibold text-ink">Confirm card payment</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink/60">

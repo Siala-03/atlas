@@ -95,7 +95,7 @@ export function Home() {
               Premium drinks, delivered to your door.
             </h1>
             <p className="mt-4 max-w-lg text-lg text-cream/80">
-              Buy by the piece or by the case — genuine stock, straightforward pricing.
+              Buy by the piece or by the case: genuine stock, straightforward pricing.
             </p>
             <RotatingTagline items={TAGLINES} className="mt-3 max-w-lg text-sm font-medium text-amber2-300" />
             <div className="mt-8 flex flex-wrap items-center gap-3">

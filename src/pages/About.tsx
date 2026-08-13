@@ -8,14 +8,14 @@ import { VODKA, REDWINE, BEER } from "../lib/categoryImages";
 const HERO = "/c76d1c17-8922-4717-b20e-ae6d0135e87f.jpg";
 
 const VALUES = [
-{ title: "Genuine imports", text: "Every case is sourced through verified, traceable supply routes — no grey-market stock." },
+{ title: "Genuine imports", text: "Every case is sourced through verified, traceable supply routes, no grey-market stock." },
 { title: "Straightforward pricing", text: "Case pricing shown up front, not adjusted after the fact." },
 { title: "Rwanda-based", text: "Built in Kigali, around real stock, delivery windows and local realities." },
 { title: "Reliable delivery", text: "Orders are confirmed against real stock before dispatch, so what's promised is what arrives." }];
 
 
 const STEPS = [
-{ title: "You order", text: "Browse case pricing and check out — by card or MTN MoMo." },
+{ title: "You order", text: "Browse case pricing and check out by card or MTN MoMo." },
 { title: "We confirm", text: "Stock confirmed before anything leaves the warehouse." },
 { title: "You receive", text: "Delivery scheduled and confirmed, not left to guesswork." }];
 
@@ -44,7 +44,7 @@ export function About() {
         <section className="grid gap-10 lg:grid-cols-5">
           <blockquote className="lg:col-span-2">
             <p className="font-serif text-3xl italic leading-snug text-burgundy-800">
-              "Everyone deserves one accountable supplier — not a patchwork
+              "Everyone deserves one accountable supplier, not a patchwork
               of informal sourcing."
             </p>
           </blockquote>
@@ -53,7 +53,7 @@ export function About() {
             <p className="mt-3 leading-relaxed text-ink/70">
               Buyers across Rwanda have long had to choose between slow,
               informal supply chains and pricing that doesn't reflect real
-              volume. Atlas Supplies Ltd was built to close that gap — a single,
+              volume. Atlas Supplies Ltd was built to close that gap: a single,
               accountable distributor of spirits, wine and beer, offering
               transparent case pricing, verified stock levels, and a straightforward
               path from order to delivery, paying securely by card or MTN MoMo.

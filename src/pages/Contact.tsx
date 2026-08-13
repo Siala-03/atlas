@@ -24,7 +24,7 @@ export function Contact() {
           <p className="text-sm font-semibold uppercase tracking-widest text-amber2-300">Get in touch</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold text-cream sm:text-5xl">Contact Atlas</h1>
           <p className="mt-4 max-w-2xl text-cream/80">
-            Questions about an order, delivery or anything else — reach us directly, or send a message below.
+            Questions about an order, delivery or anything else? Reach us directly, or send a message below.
           </p>
         </div>
       </div>
@@ -60,7 +60,7 @@ export function Contact() {
                   <CheckCircle2Icon className="h-10 w-10 text-emerald-600" />
                   <p className="mt-4 font-serif text-2xl font-semibold text-ink">Message sent</p>
                   <p className="mt-2 text-sm text-ink/60">
-                    Thanks for reaching out — the Atlas team will get back to you shortly.
+                    Thanks for reaching out. The Atlas team will get back to you shortly.
                   </p>
                 </div> :
 
@@ -112,7 +112,7 @@ export function Contact() {
           <h2 className="font-serif text-2xl font-semibold text-ink">Find us</h2>
           <div className="mt-5 overflow-hidden rounded-2xl border border-burgundy-100">
             <iframe
-              title="Atlas Supplies Ltd location — KG 12 St, Kigali, Rwanda"
+              title="Atlas Supplies Ltd location, KG 12 St, Kigali, Rwanda"
               src="https://www.google.com/maps?q=KG+12+St,+Kigali,+Rwanda&output=embed"
               className="h-96 w-full"
               style={{ border: 0 }}

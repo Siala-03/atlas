@@ -289,7 +289,7 @@ export const SEED_PRODUCTS: Product[] = [
   lowStockThreshold: 90,
   image: BACARDI_SUPERIOR,
   description:
-  "The original Bacardí carta blanca — light, clean and endlessly mixable. The world's best-known white rum.",
+  "The original Bacardí carta blanca, light, clean and endlessly mixable. The world's best-known white rum.",
   origin: "Puerto Rico"
 },
 {
@@ -305,7 +305,7 @@ export const SEED_PRODUCTS: Product[] = [
   lowStockThreshold: 72,
   image: JOHNNIE_WALKER_BLACK,
   description:
-  "The benchmark blended Scotch — rich, smoky and well-rounded at 12 years old. A recognised name on any back bar.",
+  "The benchmark blended Scotch, rich, smoky and well-rounded at 12 years old. A recognised name on any back bar.",
   origin: "Scotland"
 },
 {
@@ -561,7 +561,7 @@ export const SEED_PRODUCTS: Product[] = [
   lowStockThreshold: 120,
   image: GORDONS_GIN,
   description:
-  "The world's best-selling London Dry Gin, distilled to a recipe unchanged since 1769. Juniper-forward with a crisp, clean finish — the trade standard for gin cocktails.",
+  "The world's best-selling London Dry Gin, distilled to a recipe unchanged since 1769. Juniper-forward with a crisp, clean finish and the trade standard for gin cocktails.",
   origin: "United Kingdom"
 },
 {

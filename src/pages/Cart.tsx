@@ -150,7 +150,7 @@ export function Cart() {
                 <SmartphoneIcon className="h-5 w-5" /> Pay {formatCurrency(total)} with MTN MoMo
               </a>
               <p className="mt-3 text-center text-xs text-ink/50">
-                MoMo opens your phone dialer with the code pre-filled — tap call to confirm. Delivery scheduled after order confirmation.
+                MoMo opens your phone dialer with the code pre-filled. Tap call to confirm, and delivery is scheduled after order confirmation.
               </p>
             </div>
           </div>

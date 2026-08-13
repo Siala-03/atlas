@@ -26,7 +26,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <div className="max-w-md text-center">
             <h1 className="font-serif text-3xl font-semibold text-ink">Something went wrong</h1>
             <p className="mt-3 text-ink/60">
-              We hit an unexpected error. Please refresh the page — if this keeps
+              We hit an unexpected error. Please refresh the page. If this keeps
               happening, contact the Atlas team.
             </p>
             <button

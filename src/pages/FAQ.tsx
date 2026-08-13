@@ -6,7 +6,7 @@ import { Footer } from "../components/Footer";
 const FAQS: { question: string; answer: string }[] = [
 {
   question: "What's the minimum order size?",
-  answer: "There's no minimum order value — case pricing applies from a single case upward, though larger orders make the most of trade delivery scheduling."
+  answer: "There's no minimum order value. Case pricing applies from a single case upward, though larger orders make the most of trade delivery scheduling."
 },
 {
   question: "How does delivery work?",
@@ -18,15 +18,11 @@ const FAQS: { question: string; answer: string }[] = [
 },
 {
   question: "What if an item is out of stock?",
-  answer: "Stock levels shown at checkout are live. If something sells out between browsing and checkout, you'll see it clearly marked before you complete your order — never after."
-},
-{
-  question: "Can I reorder a previous order?",
-  answer: "Yes — every past order has a \"Reorder items\" option that rebuilds your cart from whatever's currently available, adjusting quantities automatically if stock has changed."
+  answer: "Stock levels shown at checkout are live. If something sells out between browsing and checkout, you'll see it clearly marked before you complete your order, never after."
 },
 {
   question: "Who can I contact with a question about my order?",
-  answer: "Reach the Atlas team directly through the Contact page, or call during business hours — Monday to Saturday, 8am to 6pm."
+  answer: "Reach the Atlas team directly through the Contact page, or call during business hours, Monday to Saturday, 8am to 6pm."
 }];
 
 

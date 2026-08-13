@@ -21,6 +21,28 @@ export function computePopularity(orders: Order[]): Map<string, PopularityStats>
   return stats;
 }
 
+function diversifyByCategory(products: Product[]): Product[] {
+  const byCategory = new Map<string, Product[]>();
+  for (const product of products) {
+    const bucket = byCategory.get(product.category) ?? [];
+    bucket.push(product);
+    byCategory.set(product.category, bucket);
+  }
+  const categories = [...byCategory.keys()];
+  const result: Product[] = [];
+  let remaining = products.length;
+  let i = 0;
+  while (remaining > 0) {
+    const bucket = byCategory.get(categories[i % categories.length])!;
+    if (bucket.length > 0) {
+      result.push(bucket.shift()!);
+      remaining--;
+    }
+    i++;
+  }
+  return result;
+}
+
 export function usePopularity(topN = 4) {
   const { orders, products } = useStore();
 
@@ -31,7 +53,7 @@ export function usePopularity(topN = 4) {
     filter((entry): entry is {product: Product;sold: number;} => entry.sold !== undefined).
     sort((a, b) => b.sold - a.sold).
     map((entry) => entry.product);
-    const fallback = products.filter((product) => !stats.has(product.id));
+    const fallback = diversifyByCategory(products.filter((product) => !stats.has(product.id)));
     const topProducts: Product[] = [...ranked, ...fallback].slice(0, topN);
     const bestsellerIds = new Set(ranked.slice(0, topN).map((product) => product.id));
 
