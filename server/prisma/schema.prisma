@@ -78,3 +78,10 @@ model Payment {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// Simple key-value store for settings that need to persist and change at
+// runtime — currently just the admin portal password.
+model Setting {
+  key   String @id
+  value String
+}

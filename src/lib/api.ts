@@ -63,6 +63,9 @@ export const api = {
   portalLogin: (password: string) =>
   request<{ token: string }>("/portal/login", { method: "POST", body: JSON.stringify({ password }) }),
 
+  changePortalPassword: (currentPassword: string, newPassword: string) =>
+  request<{ ok: boolean }>("/portal/change-password", { method: "POST", body: JSON.stringify({ currentPassword, newPassword }) }),
+
   placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
   request<Order>("/orders", { method: "POST", body: JSON.stringify(params) }),
 

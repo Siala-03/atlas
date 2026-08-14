@@ -58,3 +58,8 @@ export const MockCallbackSchema = z.object({
   providerRef: z.string().min(1),
   outcome: z.enum(["success", "fail"])
 });
+
+export const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(4, "New password must be at least 4 characters")
+});

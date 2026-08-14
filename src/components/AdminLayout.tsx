@@ -7,7 +7,8 @@ import {
   StoreIcon,
   MenuIcon,
   XIcon,
-  LogOutIcon } from
+  LogOutIcon,
+  SettingsIcon } from
 "lucide-react";
 import { Logo } from "./Logo";
 import { BackendStatusBanner } from "./BackendStatusBanner";
@@ -17,7 +18,8 @@ import { useStore } from "../store/StoreContext";
 const LINKS = [
 { to: "/portal", label: "Dashboard", icon: LayoutDashboardIcon, end: true },
 { to: "/portal/orders", label: "Orders", icon: ClipboardListIcon },
-{ to: "/portal/inventory", label: "Inventory", icon: BoxesIcon }];
+{ to: "/portal/inventory", label: "Inventory", icon: BoxesIcon },
+{ to: "/portal/settings", label: "Settings", icon: SettingsIcon }];
 
 
 export function AdminLayout({ children }: {children: React.ReactNode;}) {
