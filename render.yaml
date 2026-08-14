@@ -18,7 +18,7 @@ services:
       - key: PUBLIC_APP_URL
         value: https://atlas-storefront.onrender.com
       - key: PUBLIC_API_URL
-        value: https://atlas-core-api.onrender.com
+        value: https://atlas-elz2.onrender.com
       - key: PAYMENT_PROVIDER
         value: mock
       - key: PESAPAL_CONSUMER_KEY
@@ -43,7 +43,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://atlas-core-api.onrender.com/api
+        value: https://atlas-elz2.onrender.com/api
     routes:
       - type: rewrite
         source: /*
