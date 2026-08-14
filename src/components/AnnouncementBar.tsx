@@ -16,7 +16,7 @@ export function AnnouncementBar() {
           <a
             href={`tel:${CONTACT_PHONE_INTL}`}
             aria-label="Call us"
-            className="inline-flex items-center gap-1 text-cream/80 transition-colors hover:text-cream">
+            className="inline-flex items-center gap-1 text-amber2-400 transition-colors hover:text-amber2-300">
 
             <PhoneIcon className="h-3.5 w-3.5" />
           </a>
@@ -25,7 +25,7 @@ export function AnnouncementBar() {
             target="_blank"
             rel="noreferrer"
             aria-label="WhatsApp us"
-            className="inline-flex items-center gap-1 text-cream/80 transition-colors hover:text-cream">
+            className="inline-flex items-center gap-1 text-amber2-400 transition-colors hover:text-amber2-300">
 
             <MessageCircleIcon className="h-3.5 w-3.5" />
           </a>

@@ -34,6 +34,22 @@ const TANQUERAY_GIN = "/tanqueray gin.jpeg";
 const WILDJAC_GIN = "/wildjac gin.jpg";
 const GORDONS_GIN = "/Gordons gin.jpeg";
 const THE_BOTANIST_GIN = "/The_Botanist_-_70cl gin.webp";
+const HENNESSY_VS = "/Hennessy-V.S-Cognac-3.jpeg";
+const REMY_MARTIN_VSOP = "/remy martin cognac.png";
+const REMY_MARTIN_XO = "/Remy-Martin-XO-cognac.jpeg";
+const MARTELL_VSOP = "/martell_vsop_cognac.webp";
+const MARTELL_XO = "/martell-xo-cognac-extra-old.webp";
+const BAILEYS_ORIGINAL = "/baileys-irish-cream 70cl liquer.jpg";
+const COINTREAU = "/cointreau.jpeg";
+const APEROL = "/Aperol aperitif.jpg";
+const CAMPARI = "/campari-bitter aperitif.jpg";
+const ANGOSTURA_BITTERS = "/angostura bitters.jpeg";
+const PEYCHAUDS_BITTERS = "/Peychauds bitters.jpg";
+const SMIRNOFF_ICE = "/smirnoff ice 600ml.jpg";
+const SMIRNOFF_ICE_GUARANA = "/smirnoff ice guarana can 330ml.jpg";
+const SAVANNA_DRY = "/savanna-dry-cider-340ml- rtd.webp";
+const PRIMUS_LAGER = "/primus 50cl knowless.jpg";
+const MUTZIG_LAGER = "/mutzig.webp";
 
 export const SEED_PRODUCTS: Product[] = [
 {
@@ -436,7 +452,7 @@ export const SEED_PRODUCTS: Product[] = [
 },
 {
   id: "p-heineken-case",
-  name: "Heineken Lager (Case)",
+  name: "Heineken Lager",
   brand: "Heineken",
   category: "Beer",
   subtype: "Imported",
@@ -453,7 +469,7 @@ export const SEED_PRODUCTS: Product[] = [
 },
 {
   id: "p-tusker-case",
-  name: "Tusker Malt Lager (Case)",
+  name: "Tusker Malt Lager",
   brand: "Tusker",
   category: "Beer",
   subtype: "Imported",
@@ -470,7 +486,7 @@ export const SEED_PRODUCTS: Product[] = [
 },
 {
   id: "p-skol-case",
-  name: "Skol Lager (Case)",
+  name: "Skol Lager",
   brand: "Skol",
   category: "Beer",
   subtype: "Imported",
@@ -599,7 +615,7 @@ export const SEED_PRODUCTS: Product[] = [
 },
 {
   id: "p-primus-lager",
-  name: "Primus Lager (Case)",
+  name: "Primus Lager",
   brand: "Primus",
   category: "Beer",
   subtype: "Local",
@@ -609,14 +625,14 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 28800,
   stockUnits: 960,
   lowStockThreshold: 360,
-  image: HEINEKEN_CRATE,
+  image: PRIMUS_LAGER,
   description:
   "Rwanda's original lager, malty and full-bodied. A steady, high-volume local favourite.",
   origin: "Rwanda"
 },
 {
   id: "p-mutzig-lager",
-  name: "Mützig Lager (Case)",
+  name: "Mützig Lager",
   brand: "Mützig",
   category: "Beer",
   subtype: "Local",
@@ -626,7 +642,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 15000,
   stockUnits: 864,
   lowStockThreshold: 288,
-  image: TUSKER_CRATE,
+  image: MUTZIG_LAGER,
   description:
   "Crisp, premium-positioned Rwandan lager. A popular choice on local bar and restaurant menus.",
   origin: "Rwanda"
@@ -642,7 +658,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 48000,
   stockUnits: 60,
   lowStockThreshold: 24,
-  image: CHIVAS_REGAL_18,
+  image: HENNESSY_VS,
   description:
   "The world's best-selling Cognac. Fruity and full-bodied with a distinctive Hennessy character.",
   origin: "France"
@@ -658,7 +674,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 75000,
   stockUnits: 36,
   lowStockThreshold: 18,
-  image: GLENLIVET_12,
+  image: REMY_MARTIN_VSOP,
   description:
   "A rich, well-balanced VSOP blend with notes of dried fruit and vanilla. A recognised premium Cognac label.",
   origin: "France"
@@ -674,7 +690,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 22000,
   stockUnits: 84,
   lowStockThreshold: 36,
-  image: WILDJAC_GIN,
+  image: BAILEYS_ORIGINAL,
   description:
   "The world's best-known Irish cream liqueur, blending fresh cream and Irish whiskey. A dependable dessert-list staple.",
   origin: "Ireland"
@@ -690,7 +706,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 38000,
   stockUnits: 48,
   lowStockThreshold: 24,
-  image: BEEFEATER_PINK,
+  image: COINTREAU,
   description:
   "A clean, orange-peel triple sec used across classic cocktails. A must-stock for any serious cocktail programme.",
   origin: "France"
@@ -738,7 +754,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 20000,
   stockUnits: 90,
   lowStockThreshold: 36,
-  image: PINTA_NEGRA,
+  image: APEROL,
   description:
   "Bright orange, bittersweet Italian aperitivo. The essential base for an Aperol Spritz.",
   origin: "Italy"
@@ -754,7 +770,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 24000,
   stockUnits: 60,
   lowStockThreshold: 24,
-  image: KWV_SHIRAZ,
+  image: CAMPARI,
   description:
   "Deeply bitter, herbal Italian aperitivo with a signature red hue. A classic Negroni and spritz component.",
   origin: "Italy"
@@ -770,7 +786,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 9000,
   stockUnits: 96,
   lowStockThreshold: 36,
-  image: SPIRIT_OF_YORK_RYE,
+  image: ANGOSTURA_BITTERS,
   description:
   "The industry-standard aromatic bitters, dashed into cocktails worldwide. A back-bar essential.",
   origin: "Trinidad and Tobago"
@@ -786,7 +802,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 8500,
   stockUnits: 72,
   lowStockThreshold: 24,
-  image: BUMBU_XO,
+  image: PEYCHAUDS_BITTERS,
   description:
   "Sweet, floral anise-forward bitters, the signature note in a Sazerac. A staple for classic cocktail lists.",
   origin: "USA"
@@ -802,7 +818,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 21000,
   stockUnits: 480,
   lowStockThreshold: 168,
-  image: SKOL_CRATE,
+  image: SMIRNOFF_ICE,
   description:
   "Crisp, refreshing premix vodka mixer. Ready to drink straight from the bottle, no mixing required.",
   origin: "South Africa"
@@ -818,7 +834,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 26000,
   stockUnits: 384,
   lowStockThreshold: 144,
-  image: TUSKER_CRATE,
+  image: SAVANNA_DRY,
   description:
   "Dry, crisp apple cider with a clean finish. A consistently strong seller in the ready-to-drink category.",
   origin: "South Africa"
@@ -854,4 +870,68 @@ export const SEED_PRODUCTS: Product[] = [
   description:
   "The everyday mixer for rum and whisky serves. High-turnover stock for any bar setup.",
   origin: "Rwanda"
+},
+{
+  id: "p-remy-martin-xo",
+  name: "XO Cognac",
+  brand: "Rémy Martin",
+  category: "Cognac",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 145000,
+  stockUnits: 24,
+  lowStockThreshold: 12,
+  image: REMY_MARTIN_XO,
+  description:
+  "A rich, complex XO blend of aged eaux-de-vie with notes of fig, plum and toasted spice. A top-shelf Cognac for serious collectors.",
+  origin: "France"
+},
+{
+  id: "p-martell-vsop",
+  name: "VSOP Cognac",
+  brand: "Martell",
+  category: "Cognac",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 70000,
+  stockUnits: 42,
+  lowStockThreshold: 18,
+  image: MARTELL_VSOP,
+  description:
+  "The world's oldest great Cognac house's signature VSOP, smooth and elegantly balanced. A widely recognised premium Cognac.",
+  origin: "France"
+},
+{
+  id: "p-martell-xo",
+  name: "XO Extra Old Cognac",
+  brand: "Martell",
+  category: "Cognac",
+  abv: 40,
+  volume: "70cl",
+  unitsPerCase: 6,
+  casePrice: 140000,
+  stockUnits: 24,
+  lowStockThreshold: 12,
+  image: MARTELL_XO,
+  description:
+  "A deep, opulent XO blend aged for decades, showing notes of candied fruit and oak. A prestige Cognac for special occasions.",
+  origin: "France"
+},
+{
+  id: "p-smirnoff-ice-guarana",
+  name: "Smirnoff Ice Guaraná",
+  brand: "Smirnoff",
+  category: "RTD",
+  abv: 4.5,
+  volume: "33cl",
+  unitsPerCase: 24,
+  casePrice: 24000,
+  stockUnits: 384,
+  lowStockThreshold: 144,
+  image: SMIRNOFF_ICE_GUARANA,
+  description:
+  "Smirnoff Ice with a tropical guaraná twist. A vibrant, fruity ready-to-drink can.",
+  origin: "South Africa"
 }];

@@ -52,6 +52,21 @@ export function Contact() {
                 <span className="text-ink/70">Monday – Saturday, 8am – 6pm (CAT)</span>
               </li>
             </ul>
+
+            <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-5">
+              <h3 className="font-serif text-lg font-semibold text-ink">Pay us directly</h3>
+              <p className="mt-1.5 text-sm text-ink/60">For one-off or invoiced payments outside a cart order.</p>
+              <div className="mt-4">
+                <iframe
+                  title="Pay Atlas Supplies Ltd via Pesapal"
+                  width="200"
+                  height="40"
+                  src="https://store.pesapal.com/embed-code?pageUrl=https://store.pesapal.com/atlassuppliesltdpayment"
+                  style={{ border: 0 }}
+                  allowFullScreen />
+
+              </div>
+            </div>
           </div>
 
           <div className="lg:col-span-3">

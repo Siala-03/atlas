@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRightIcon, TruckIcon, ShieldCheckIcon, CreditCardIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
@@ -26,11 +26,6 @@ const TAGLINES = [
 
 const HERO_CHIPS: Category[] = ["Whisky", "Wine", "Beer", "Gin", "Vodka", "Rum"];
 
-const PERKS = [
-{ icon: TruckIcon, title: "Next-day delivery", text: "Order by 4pm across the region." },
-{ icon: CreditCardIcon, title: "Secure payment", text: "Pay by card or MTN MoMo." },
-{ icon: ShieldCheckIcon, title: "Genuine stock", text: "Traceable supply, live availability." }];
-
 
 export function Home() {
   const { products, shoppingMode } = useStore();
@@ -43,6 +38,12 @@ export function Home() {
   const floatingImages = HERO_CHIPS.
   map((c) => products.find((p) => p.category === c)?.image).
   filter((src): src is string => Boolean(src));
+  const categoryTileImages = SHOP_BY_CATEGORY.map((tile) => {
+    const match = products.find(
+      (p) => tile.categories.includes(p.category) && (!tile.subtype || p.subtype === tile.subtype)
+    );
+    return match?.image;
+  });
 
   return (
     <div className="min-h-screen w-full bg-cream">
@@ -134,27 +135,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* Perks strip */}
-      <section className="border-b border-burgundy-100 bg-white">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-40px" }}
-          variants={staggerContainer}
-          className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 sm:grid-cols-3 sm:px-6 lg:px-8">
-
-          {PERKS.map((p) =>
-          <motion.div key={p.title} variants={staggerItem} className="flex items-center gap-3">
-              <p.icon className="h-5 w-5 shrink-0 text-burgundy-700" />
-              <div>
-                <p className="text-sm font-semibold text-ink">{p.title}</p>
-                <p className="text-xs text-ink/55">{p.text}</p>
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-      </section>
-
       {/* Category quick-nav: static grid, one tile per top-level category */}
       <Reveal className="py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -167,7 +147,7 @@ export function Home() {
             variants={staggerContainer}
             className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
 
-            {SHOP_BY_CATEGORY.map((c) =>
+            {SHOP_BY_CATEGORY.map((c, i) =>
             <motion.div key={c.label} variants={staggerItem}>
                 <Link
                 to={c.to}
@@ -175,7 +155,7 @@ export function Home() {
 
                   <div className="relative aspect-square overflow-hidden bg-cream">
                     <img
-                    src={c.image}
+                    src={categoryTileImages[i]}
                     alt=""
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
 

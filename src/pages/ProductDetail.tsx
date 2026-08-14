@@ -122,7 +122,7 @@ export function ProductDetail() {
               product.category,
               `${product.abv}% ABV`,
               product.volume,
-              ...(caseOption ? [`${product.unitsPerCase} per ${labels.business}`] : [])].
+              ...(isBusiness ? [`${product.unitsPerCase} per ${labels.business}`] : [])].
               map((chip) =>
               <span
                 key={chip}

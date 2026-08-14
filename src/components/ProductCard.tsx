@@ -65,7 +65,7 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
           </h3>
         </Link>
         <p className="mt-1 text-sm text-ink/50">
-          {product.volume} · {product.abv}%{caseOption ? ` · ${product.unitsPerCase}/${labels.business}` : ""}
+          {product.volume} · {product.abv}%{isBusiness ? ` · ${product.unitsPerCase}/${labels.business}` : ""}
         </p>
 
         <div className="mt-auto flex items-end justify-between pt-4">
