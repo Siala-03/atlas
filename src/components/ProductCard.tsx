@@ -6,7 +6,7 @@ import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
-import { hasCaseOption } from "../lib/productRules";
+import { unitLabels } from "../lib/productRules";
 import { BestsellerBadge } from "./BestsellerBadge";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
@@ -15,8 +15,8 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
   const out = product.stockUnits === 0;
   const low = !out && product.stockUnits <= product.lowStockThreshold;
 
-  const caseOption = hasCaseOption(product.category);
-  const isBusiness = caseOption && shoppingMode === "business";
+  const labels = unitLabels(product.category);
+  const isBusiness = shoppingMode === "business";
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const availableToAdd = isBusiness ?
   Math.floor(product.stockUnits / product.unitsPerCase) === 0 :
@@ -64,7 +64,7 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
           </h3>
         </Link>
         <p className="mt-1 text-sm text-ink/50">
-          {product.volume} · {product.abv}%{caseOption ? ` · ${product.unitsPerCase}/case` : ""}
+          {product.volume} · {product.abv}% · {product.unitsPerCase}/{labels.business}
         </p>
 
         <div className="mt-auto flex items-end justify-between pt-4">
@@ -72,7 +72,7 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
             <p className="font-serif text-2xl font-semibold text-burgundy-800">
               {formatCurrency(price)}
             </p>
-            <p className="text-xs text-ink/50">{caseOption ? isBusiness ? "per case" : "per piece" : "per bottle"}</p>
+            <p className="text-xs text-ink/50">per {isBusiness ? labels.business : labels.individual}</p>
           </div>
           <motion.button
             whileTap={{ scale: 0.9 }}

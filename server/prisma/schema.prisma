@@ -13,6 +13,7 @@ model Product {
   name              String
   brand             String
   category          String
+  subtype           String?
   abv               Float
   volume            String
   unitsPerCase      Int

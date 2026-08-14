@@ -1,28 +1,34 @@
 import { describe, expect, it } from "vitest";
-import { hasCaseOption, resolveMode } from "./productRules";
+import { resolveMode, unitLabels, isCaseStocked } from "./productRules";
 
-describe("hasCaseOption", () => {
-  it("gives beer the case option", () => {
-    expect(hasCaseOption("Beer")).toBe(true);
-  });
-
-  it("does not give wine and spirits a case option", () => {
-    expect(hasCaseOption("Wine")).toBe(false);
-    expect(hasCaseOption("Whisky")).toBe(false);
-    expect(hasCaseOption("Rum")).toBe(false);
-    expect(hasCaseOption("Vodka")).toBe(false);
-    expect(hasCaseOption("Gin")).toBe(false);
+describe("resolveMode", () => {
+  it("honors the shopper's chosen mode for every category", () => {
+    expect(resolveMode("Beer", "business")).toBe("business");
+    expect(resolveMode("Beer", "individual")).toBe("individual");
+    expect(resolveMode("Wine", "business")).toBe("business");
+    expect(resolveMode("Whisky", "individual")).toBe("individual");
   });
 });
 
-describe("resolveMode", () => {
-  it("honors the shopper's chosen mode for beer", () => {
-    expect(resolveMode("Beer", "business")).toBe("business");
-    expect(resolveMode("Beer", "individual")).toBe("individual");
+describe("unitLabels", () => {
+  it("uses bottle/case for wine and spirits", () => {
+    expect(unitLabels("Wine")).toEqual({ individual: "bottle", business: "case" });
+    expect(unitLabels("Whisky")).toEqual({ individual: "bottle", business: "case" });
   });
 
-  it("forces wine and spirits to individual regardless of requested mode", () => {
-    expect(resolveMode("Wine", "business")).toBe("individual");
-    expect(resolveMode("Wine", "individual")).toBe("individual");
+  it("uses piece/crate for beer", () => {
+    expect(unitLabels("Beer")).toEqual({ individual: "piece", business: "crate" });
+  });
+
+  it("uses can/pack for RTDs", () => {
+    expect(unitLabels("RTD")).toEqual({ individual: "can", business: "pack" });
+  });
+});
+
+describe("isCaseStocked", () => {
+  it("only stocks beer in whole cases", () => {
+    expect(isCaseStocked("Beer")).toBe(true);
+    expect(isCaseStocked("Wine")).toBe(false);
+    expect(isCaseStocked("RTD")).toBe(false);
   });
 });

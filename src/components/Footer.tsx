@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { MapPinIcon, PhoneIcon, MailIcon } from "lucide-react";
 import { Logo } from "./Logo";
+import { CONTACT_ADDRESS, CONTACT_PHONE_DISPLAY, CONTACT_EMAIL } from "../lib/contact";
 
 export function Footer() {
   return (
@@ -46,15 +47,15 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm">
             <li className="flex items-start gap-2">
               <MapPinIcon className="mt-0.5 h-4 w-4 text-amber2-400" />
-              KG 12 St, Kigali, Rwanda
+              {CONTACT_ADDRESS}
             </li>
             <li className="flex items-center gap-2">
               <PhoneIcon className="h-4 w-4 text-amber2-400" />
-              +250 788 123 456
+              {CONTACT_PHONE_DISPLAY}
             </li>
             <li className="flex items-center gap-2">
               <MailIcon className="h-4 w-4 text-amber2-400" />
-              orders@atlassupplies.rw
+              {CONTACT_EMAIL}
             </li>
           </ul>
         </div>

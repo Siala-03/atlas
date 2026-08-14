@@ -1,12 +1,19 @@
-export type Category = "Whisky" | "Vodka" | "Wine" | "Beer" | "Gin" | "Rum";
+export type Category =
+"Whisky" | "Vodka" | "Wine" | "Beer" | "Gin" | "Rum" |
+"Cognac" | "Liqueur" | "Tequila" | "Aperitif" | "Bitters" | "RTD" | "Mixer";
 
 export type ShoppingMode = "individual" | "business";
+
+export type WineSubtype = "Red" | "White" | "Rose" | "Sparkling";
+export type BeerSubtype = "Imported" | "Local";
+export type Subtype = WineSubtype | BeerSubtype;
 
 export interface Product {
   id: string;
   name: string;
   brand: string;
   category: Category;
+  subtype?: Subtype;
   abv: number;
   volume: string;
   unitsPerCase: number;

@@ -14,16 +14,8 @@ import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES, WINE_CELLAR } from "../lib/categoryImages";
+import { SHOP_BY_CATEGORY } from "../lib/categoryTaxonomy";
 import { Category } from "../types";
-
-const CATEGORIES: {name: Category;blurb: string;}[] = [
-{ name: "Whisky", blurb: "Single malts, blends & bourbon" },
-{ name: "Wine", blurb: "Reds, whites & sparkling" },
-{ name: "Vodka", blurb: "Premium & craft distillations" },
-{ name: "Beer", blurb: "Craft lager, IPA & more" },
-{ name: "Gin", blurb: "London Dry & botanical" },
-{ name: "Rum", blurb: "Spiced, dark & golden" }];
-
 
 const TAGLINES = [
 "Genuine imports, traceable supply",
@@ -163,34 +155,37 @@ export function Home() {
         </motion.div>
       </section>
 
-      {/* Category quick-nav — auto-scrolling marquee, pauses on hover */}
-      <Reveal className="overflow-hidden py-10">
+      {/* Category quick-nav: static grid, one tile per top-level category */}
+      <Reveal className="py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Our range</p>
           <h2 className="mt-1 font-serif text-2xl font-semibold text-ink">Shop by category</h2>
-        </div>
-        <div className="group/marquee relative mt-6">
-          <div className="animate-marquee flex w-max gap-4 px-4 sm:px-6 lg:px-8">
-            {[...CATEGORIES, ...CATEGORIES].map((c, i) =>
-            <Link
-              key={`${c.name}-${i}`}
-              to={`/shop?category=${c.name}`}
-              className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md sm:w-48">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-40px" }}
+            variants={staggerContainer}
+            className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
 
-                <div className="relative aspect-square overflow-hidden bg-cream">
-                  <img
-                  src={CATEGORY_IMAGES[c.name]}
-                  alt=""
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            {SHOP_BY_CATEGORY.map((c) =>
+            <motion.div key={c.label} variants={staggerItem}>
+                <Link
+                to={c.to}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md">
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-burgundy-950/70 via-burgundy-950/5 to-transparent" />
-                  <p className="absolute bottom-2 left-3 font-serif text-sm font-semibold text-cream sm:text-base">{c.name}</p>
-                </div>
-              </Link>
+                  <div className="relative aspect-square overflow-hidden bg-cream">
+                    <img
+                    src={c.image}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-burgundy-950/70 via-burgundy-950/5 to-transparent" />
+                    <p className="absolute bottom-2 left-3 font-serif text-sm font-semibold text-cream sm:text-base">{c.label}</p>
+                  </div>
+                </Link>
+              </motion.div>
             )}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-cream to-transparent sm:w-20" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-cream to-transparent sm:w-20" />
+          </motion.div>
         </div>
       </Reveal>
 

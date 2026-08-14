@@ -19,7 +19,7 @@ import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
-import { hasCaseOption } from "../lib/productRules";
+import { unitLabels } from "../lib/productRules";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 
 export function ProductDetail() {
@@ -31,8 +31,7 @@ export function ProductDetail() {
   const product = id ? getProduct(id) : undefined;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const caseOption = product ? hasCaseOption(product.category) : false;
-  const isBusiness = caseOption && shoppingMode === "business";
+  const isBusiness = shoppingMode === "business";
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -61,8 +60,9 @@ export function ProductDetail() {
   const maxQuantity = isBusiness ? Math.max(availableCases, 1) : Math.max(product.stockUnits, 1);
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const lineTotal = price * quantity;
-  const pieceLabel = caseOption ? "piece" : "bottle";
-  const unitLabel = isBusiness ? "case" : pieceLabel;
+  const labels = unitLabels(product.category);
+  const pieceLabel = labels.individual;
+  const unitLabel = isBusiness ? labels.business : pieceLabel;
 
   useEffect(() => {
     setQuantity(1);
@@ -122,7 +122,7 @@ export function ProductDetail() {
               product.category,
               `${product.abv}% ABV`,
               product.volume,
-              ...(caseOption ? [`${product.unitsPerCase} per case`] : [])].
+              `${product.unitsPerCase} per ${labels.business}`].
               map((chip) =>
               <span
                 key={chip}
@@ -134,16 +134,14 @@ export function ProductDetail() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-6">
-              {caseOption &&
               <ShopModeToggle className="mb-5" />
-              }
               <div className="flex items-end justify-between">
                 <div>
                   <p className="font-serif text-4xl font-semibold text-burgundy-800">
                     {formatCurrency(price)}
                   </p>
                   <p className="text-sm text-ink/50">
-                    {caseOption ? isBusiness ? `per case of ${product.unitsPerCase}` : "per piece" : "per bottle"}
+                    {isBusiness ? `per ${labels.business} of ${product.unitsPerCase}` : `per ${labels.individual}`}
                   </p>
                 </div>
                 <div className="text-right">

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react";
 import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
-import { hasCaseOption } from "../lib/productRules";
+import { unitLabels } from "../lib/productRules";
 import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
@@ -30,8 +30,8 @@ export function HeroCarousel({ products }: {products: Product[];}) {
   if (products.length === 0) return null;
 
   const product = products[index % products.length];
-  const caseOption = hasCaseOption(product.category);
-  const isBusiness = caseOption && shoppingMode === "business";
+  const labels = unitLabels(product.category);
+  const isBusiness = shoppingMode === "business";
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const out = product.stockUnits === 0;
   const low = !out && product.stockUnits <= product.lowStockThreshold;
@@ -78,7 +78,7 @@ export function HeroCarousel({ products }: {products: Product[];}) {
             <div className="mt-3 flex items-center justify-center gap-4">
               <p className="font-serif text-xl font-semibold text-amber2-300">
                 {formatCurrency(price)}
-                <span className="ml-1 text-sm font-normal text-cream/60">{caseOption ? isBusiness ? "/case" : "/piece" : "/bottle"}</span>
+                <span className="ml-1 text-sm font-normal text-cream/60">/{isBusiness ? labels.business : labels.individual}</span>
               </p>
               <motion.button
                 whileTap={{ scale: 0.92 }}

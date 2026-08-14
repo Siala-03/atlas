@@ -10,16 +10,24 @@ import { staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { CATEGORY_HERO_IMAGES } from "../lib/categoryImages";
-import { Category } from "../types";
+import { SPIRIT_CATEGORIES } from "../lib/categoryTaxonomy";
+import { Category, Subtype } from "../types";
 
 const CATEGORIES: (Category | "All")[] = [
 "All",
 "Whisky",
-"Wine",
-"Vodka",
 "Gin",
+"Cognac",
+"Vodka",
 "Rum",
-"Beer"];
+"Liqueur",
+"Tequila",
+"Aperitif",
+"Bitters",
+"Wine",
+"Beer",
+"RTD",
+"Mixer"];
 
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
@@ -29,6 +37,8 @@ export function Shop() {
   const { bestsellerIds } = usePopularity();
   const [params, setParams] = useSearchParams();
   const activeCategory = params.get("category") as Category | null ?? "All";
+  const activeFamily = params.get("family");
+  const activeSubtype = params.get("subtype") as Subtype | null;
   const [query, setQuery] = useState(() => params.get("q") ?? "");
 
   useEffect(() => {
@@ -46,15 +56,27 @@ export function Shop() {
     } else {
       params.set("category", c);
     }
+    params.delete("family");
+    params.delete("subtype");
     setParams(params, { replace: true });
   };
 
   const heroImage = activeCategory !== "All" ? CATEGORY_HERO_IMAGES[activeCategory] : undefined;
+  const pageTitle = activeFamily === "Spirits" ?
+  "Spirits" :
+  activeCategory === "All" ?
+  "The Catalogue" :
+  activeSubtype ?
+  `${activeCategory} · ${activeSubtype}` :
+  activeCategory;
 
   const filtered = useMemo(() => {
-    let list = products.filter((p) =>
-    activeCategory === "All" ? true : p.category === activeCategory
-    );
+    let list = products.filter((p) => {
+      if (activeFamily === "Spirits") return SPIRIT_CATEGORIES.includes(p.category);
+      if (activeCategory !== "All" && p.category !== activeCategory) return false;
+      if (activeSubtype && p.subtype !== activeSubtype) return false;
+      return true;
+    });
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter(
@@ -75,7 +97,7 @@ export function Shop() {
       default:
         return list;
     }
-  }, [products, activeCategory, query, sort, filters]);
+  }, [products, activeCategory, activeFamily, activeSubtype, query, sort, filters]);
 
   return (
     <div className="min-h-screen w-full bg-cream">
@@ -90,10 +112,10 @@ export function Shop() {
         }
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <h1 className="font-serif text-4xl font-semibold text-cream sm:text-5xl">
-            {activeCategory === "All" ? "The Catalogue" : activeCategory}
+            {pageTitle}
           </h1>
           <p className="mt-2 text-cream/70">
-            Case pricing · {filtered.length} products{activeCategory === "All" ? " in stock" : ` in ${activeCategory}`}
+            {filtered.length} products{pageTitle === "The Catalogue" ? " in stock" : ` in ${pageTitle}`}
           </p>
         </div>
       </div>

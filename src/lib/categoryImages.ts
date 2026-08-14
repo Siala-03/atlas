@@ -8,10 +8,17 @@ export const BEER = "/65e17f27-387d-4e8b-a37f-4886d88503f6.jpg";
 export const CATEGORY_IMAGES: Record<Category, string> = {
   Whisky: WHISKY,
   Rum: WHISKY,
+  Cognac: WHISKY,
+  Bitters: WHISKY,
   Vodka: VODKA,
   Gin: VODKA,
+  Tequila: VODKA,
+  Liqueur: VODKA,
+  Mixer: VODKA,
   Wine: REDWINE,
-  Beer: BEER
+  Aperitif: REDWINE,
+  Beer: BEER,
+  RTD: BEER
 };
 
 export const VODKA_LINEUP = "/vodkas.webp";

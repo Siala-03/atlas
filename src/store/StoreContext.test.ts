@@ -13,13 +13,11 @@ describe("lineUnitTotal", () => {
     expect(lineUnitTotal(beer, { productId: "p1", mode: "individual", quantity: 3 })).toBe(3000);
   });
 
-  it("always prices wine/spirits by the bottle regardless of requested mode", () => {
+  it("prices wine by the bottle in individual mode", () => {
     expect(lineUnitTotal(wine, { productId: "p1", mode: "individual", quantity: 4 })).toBe(4000);
   });
 
-  it("ignores a stale/incorrect stored business mode on wine — still prices per bottle", () => {
-    // A wine item incorrectly stored as "business" mode (e.g. from before this
-    // rule existed) must still price per bottle, not per case.
-    expect(lineUnitTotal(wine, { productId: "p1", mode: "business", quantity: 3 })).toBe(3000);
+  it("prices wine by the case in business mode", () => {
+    expect(lineUnitTotal(wine, { productId: "p1", mode: "business", quantity: 3 })).toBe(18000);
   });
 });

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MapPinIcon, PhoneIcon, MailIcon, ClockIcon, SendIcon, CheckCircle2Icon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { CONTACT_ADDRESS, CONTACT_PHONE_DISPLAY, CONTACT_EMAIL } from "../lib/contact";
 
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -36,15 +37,15 @@ export function Contact() {
             <ul className="mt-6 space-y-5 text-sm">
               <li className="flex items-start gap-3">
                 <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-burgundy-700" />
-                <span className="text-ink/70">KG 12 St, Kigali, Rwanda</span>
+                <span className="text-ink/70">{CONTACT_ADDRESS}</span>
               </li>
               <li className="flex items-center gap-3">
                 <PhoneIcon className="h-5 w-5 shrink-0 text-burgundy-700" />
-                <span className="text-ink/70">+250 788 123 456</span>
+                <span className="text-ink/70">{CONTACT_PHONE_DISPLAY}</span>
               </li>
               <li className="flex items-center gap-3">
                 <MailIcon className="h-5 w-5 shrink-0 text-burgundy-700" />
-                <span className="text-ink/70">orders@atlassupplies.rw</span>
+                <span className="text-ink/70">{CONTACT_EMAIL}</span>
               </li>
               <li className="flex items-start gap-3">
                 <ClockIcon className="mt-0.5 h-5 w-5 shrink-0 text-burgundy-700" />
@@ -112,8 +113,8 @@ export function Contact() {
           <h2 className="font-serif text-2xl font-semibold text-ink">Find us</h2>
           <div className="mt-5 overflow-hidden rounded-2xl border border-burgundy-100">
             <iframe
-              title="Atlas Supplies Ltd location, KG 12 St, Kigali, Rwanda"
-              src="https://www.google.com/maps?q=KG+12+St,+Kigali,+Rwanda&output=embed"
+              title={`Atlas Supplies Ltd location, ${CONTACT_ADDRESS}`}
+              src="https://www.google.com/maps?q=KK+15+Rd,+Kigali,+Rwanda&output=embed"
               className="h-96 w-full"
               style={{ border: 0 }}
               loading="lazy"

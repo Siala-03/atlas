@@ -8,7 +8,7 @@ import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
 import { unitPrice } from "../types";
-import { hasCaseOption } from "../lib/productRules";
+import { unitLabels } from "../lib/productRules";
 
 export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
@@ -48,9 +48,10 @@ export function Cart() {
               {cart.map((item) => {
               const p = getProduct(item.productId);
               if (!p) return null;
-              const isBusiness = hasCaseOption(p.category) && item.mode === "business";
+              const isBusiness = item.mode === "business";
               const price = isBusiness ? p.casePrice : unitPrice(p);
-              const unitLabel = isBusiness ? "case" : hasCaseOption(p.category) ? "piece" : "bottle";
+              const labels = unitLabels(p.category);
+              const unitLabel = isBusiness ? labels.business : labels.individual;
               return (
                 <div
                   key={`${item.productId}-${item.mode}`}
@@ -75,7 +76,7 @@ export function Cart() {
                             {p.name}
                           </Link>
                           <p className="text-xs text-ink/50">
-                            {formatCurrency(price)}/{unitLabel}{isBusiness ? ` · ${p.unitsPerCase} per case` : ""}
+                            {formatCurrency(price)}/{unitLabel}{isBusiness ? ` · ${p.unitsPerCase} per ${labels.business}` : ""}
                           </p>
                         </div>
                         <button
