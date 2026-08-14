@@ -4,6 +4,13 @@ import { WHISKY, VODKA, REDWINE, BEER } from "./categoryImages";
 export const SPIRIT_CATEGORIES: Category[] = [
 "Whisky", "Gin", "Cognac", "Vodka", "Rum", "Liqueur", "Tequila", "Aperitif", "Bitters"];
 
+// Categories whose products use a genuine photo of that exact bottle. Cognac,
+// Liqueur, Tequila, Aperitif, Bitters, RTD and Mixer currently borrow a
+// stand-in photo from another category (no real product photography exists
+// yet), so they're excluded from prominent, cosmetic showcases like the
+// homepage's featured strip until real photos are supplied.
+export const PHOTO_VERIFIED_CATEGORIES: Category[] = ["Whisky", "Vodka", "Wine", "Beer", "Gin", "Rum"];
+
 
 export interface NavLinkSpec {
   label: string;

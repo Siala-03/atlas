@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Order, Product } from "../types";
 import { useStore } from "../store/StoreContext";
+import { PHOTO_VERIFIED_CATEGORIES } from "./categoryTaxonomy";
 
 export interface PopularityStats {
   unitsSold: number;
@@ -53,7 +54,12 @@ export function usePopularity(topN = 4) {
     filter((entry): entry is {product: Product;sold: number;} => entry.sold !== undefined).
     sort((a, b) => b.sold - a.sold).
     map((entry) => entry.product);
-    const fallback = diversifyByCategory(products.filter((product) => !stats.has(product.id)));
+    // The fallback is cosmetic curation (no real sales data backs it), so it
+    // sticks to categories with genuine product photography — a real sale
+    // (in `ranked`, above) earns its spot regardless of category.
+    const fallback = diversifyByCategory(
+      products.filter((product) => !stats.has(product.id) && PHOTO_VERIFIED_CATEGORIES.includes(product.category))
+    );
     const topProducts: Product[] = [...ranked, ...fallback].slice(0, topN);
     const bestsellerIds = new Set(ranked.slice(0, topN).map((product) => product.id));
 

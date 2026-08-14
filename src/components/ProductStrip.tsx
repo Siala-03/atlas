@@ -29,7 +29,13 @@ export function ProductStrip({ title, products, viewAllHref }: {
           </Link>
         }
       </div>
+      {/* key forces a remount (and fresh viewport trigger) whenever the
+          product list itself changes — `products` loads async and can
+          reorder/replace items after first mount; without this, cards
+          swapped in post-fetch would keep their hidden initial state
+          forever since a `once:true` trigger only fires once per mount. */}
       <motion.div
+        key={products.map((product) => product.id).join(",")}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "-40px" }}

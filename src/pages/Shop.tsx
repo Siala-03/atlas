@@ -200,7 +200,13 @@ export function Shop() {
                 <p className="mt-2 text-ink/60">Try a different category, search term or filter.</p>
               </div> :
 
+            // key forces a remount (and fresh viewport trigger) whenever the
+            // filtered list changes — `products` loads async and can
+            // reorder/replace items after first mount; without this, cards
+            // swapped in post-fetch would keep their hidden initial state
+            // forever since a once:true trigger only fires once per mount.
             <motion.div
+              key={filtered.map((p) => p.id).join(",")}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
