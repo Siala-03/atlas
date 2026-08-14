@@ -1,4 +1,4 @@
-import { Category, ShoppingMode } from "../types";
+import { Category, Product, ShoppingMode, unitPrice } from "../types";
 
 // Spirits (whisky, rum, vodka, gin, cognac, liqueur, tequila, aperitif,
 // bitters) aren't sold by the case in practice — only bottle pricing applies
@@ -12,6 +12,14 @@ export function hasCaseOption(category: Category): boolean {
 
 export function resolveMode(category: Category, shoppingMode: ShoppingMode): ShoppingMode {
   return hasCaseOption(category) ? shoppingMode : "individual";
+}
+
+// The per-bottle price a shopper sees/pays. For case-option categories the
+// stored price is a real case total, so it's divided by unitsPerCase. For
+// everything else (spirits) there's no case concept at all — the stored
+// price already *is* the bottle price, so it's used directly.
+export function bottlePrice(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">): number {
+  return hasCaseOption(product.category) ? unitPrice(product) : product.casePrice;
 }
 
 export interface UnitLabels {

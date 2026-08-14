@@ -4,8 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRightIcon, MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon, XIcon } from "lucide-react";
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
-import { unitPrice } from "../types";
-import { hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
 
 export function CartDrawer() {
   const { cart, getProduct, updateCartQty, removeFromCart, cartSubtotal, isCartOpen, closeCart } = useStore();
@@ -65,7 +64,7 @@ export function CartDrawer() {
                 const p = getProduct(item.productId);
                 if (!p) return null;
                 const isBusiness = hasCaseOption(p.category) && item.mode === "business";
-                const price = isBusiness ? p.casePrice : unitPrice(p);
+                const price = isBusiness ? p.casePrice : bottlePrice(p);
                 const labels = unitLabels(p.category);
                 return (
                   <div key={`${item.productId}-${item.mode}`} className="flex gap-3">

@@ -11,3 +11,10 @@ export function hasCaseOption(category: string): boolean {
 export function resolveMode(category: string, requestedMode: "individual" | "business"): "individual" | "business" {
   return hasCaseOption(category) ? requestedMode : "individual";
 }
+
+// The per-bottle price. For case-option categories the stored price is a
+// real case total, so it's divided by unitsPerCase. For spirits there's no
+// case concept at all — the stored price already *is* the bottle price.
+export function bottlePrice(product: { category: string; casePrice: number; unitsPerCase: number }): number {
+  return hasCaseOption(product.category) ? Math.round(product.casePrice / product.unitsPerCase) : product.casePrice;
+}

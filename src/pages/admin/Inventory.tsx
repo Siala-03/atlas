@@ -10,8 +10,8 @@ import {
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
-import { Product, unitPrice } from "../../types";
-import { isCaseStocked } from "../../lib/productRules";
+import { Product } from "../../types";
+import { bottlePrice, hasCaseOption, isCaseStocked } from "../../lib/productRules";
 
 export function Inventory() {
   const { products, updateProduct, restockProduct } = useStore();
@@ -44,7 +44,7 @@ export function Inventory() {
     const caseOnly = isCaseStocked(p.category);
     setEditId(p.id);
     setDraft({
-      price: String(caseOnly ? p.casePrice : unitPrice(p)),
+      price: String(caseOnly ? p.casePrice : bottlePrice(p)),
       stock: String(caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits),
       lowStockThreshold: String(caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold)
     });
@@ -58,8 +58,17 @@ export function Inventory() {
       const enteredPrice = parseFloat(draft.price) || 0;
       const enteredStock = parseInt(draft.stock, 10) || 0;
       const enteredThreshold = parseInt(draft.lowStockThreshold, 10) || 0;
+      // Categories with a real case price (Wine/Beer/RTD/Mixer) store
+      // casePrice as a true case total, so a bottle-entered price needs
+      // multiplying back up. Spirits have no case concept at all — the
+      // entered bottle price is stored directly.
+      const nextCasePrice = caseOnly ?
+      enteredPrice :
+      hasCaseOption(p.category) ?
+      Math.round(enteredPrice * p.unitsPerCase) :
+      enteredPrice;
       await updateProduct(p.id, {
-        casePrice: caseOnly ? enteredPrice : Math.round(enteredPrice * p.unitsPerCase),
+        casePrice: nextCasePrice,
         stockUnits: caseOnly ? enteredStock * p.unitsPerCase : enteredStock,
         lowStockThreshold: caseOnly ? enteredThreshold * p.unitsPerCase : enteredThreshold
       });
@@ -87,7 +96,7 @@ export function Inventory() {
   };
 
   const totalStockValue = products.reduce(
-    (s, p) => s + (isCaseStocked(p.category) ? p.casePrice * (p.stockUnits / p.unitsPerCase) : unitPrice(p) * p.stockUnits),
+    (s, p) => s + (isCaseStocked(p.category) ? p.casePrice * (p.stockUnits / p.unitsPerCase) : bottlePrice(p) * p.stockUnits),
     0
   );
   const lowCount = products.filter((p) => p.stockUnits <= p.lowStockThreshold).
@@ -148,7 +157,7 @@ export function Inventory() {
                 const unitLabel = caseOnly ? "case" : "bottle";
                 const low = p.stockUnits <= p.lowStockThreshold;
                 const out = p.stockUnits === 0;
-                const displayPrice = caseOnly ? p.casePrice : unitPrice(p);
+                const displayPrice = caseOnly ? p.casePrice : bottlePrice(p);
                 const displayStock = caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits;
                 const displayThreshold = caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold;
                 return (

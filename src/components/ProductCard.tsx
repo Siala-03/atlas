@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PlusIcon } from "lucide-react";
-import { Product, unitPrice } from "../types";
+import { Product } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
-import { hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
 import { BestsellerBadge } from "./BestsellerBadge";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
@@ -18,7 +18,7 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
   const labels = unitLabels(product.category);
   const caseOption = hasCaseOption(product.category);
   const isBusiness = caseOption && shoppingMode === "business";
-  const price = isBusiness ? product.casePrice : unitPrice(product);
+  const price = isBusiness ? product.casePrice : bottlePrice(product);
   const availableToAdd = isBusiness ?
   Math.floor(product.stockUnits / product.unitsPerCase) === 0 :
   false;

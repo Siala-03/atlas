@@ -18,8 +18,7 @@ import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
-import { unitPrice } from "../types";
-import { hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 
 export function ProductDetail() {
@@ -59,7 +58,7 @@ export function ProductDetail() {
   const out = product.stockUnits === 0;
   const availableCases = Math.floor(product.stockUnits / product.unitsPerCase);
   const maxQuantity = isBusiness ? Math.max(availableCases, 1) : Math.max(product.stockUnits, 1);
-  const price = isBusiness ? product.casePrice : unitPrice(product);
+  const price = isBusiness ? product.casePrice : bottlePrice(product);
   const lineTotal = price * quantity;
   const labels = unitLabels(product.category);
   const pieceLabel = labels.individual;

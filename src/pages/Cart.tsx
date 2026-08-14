@@ -7,8 +7,7 @@ import { ProductStrip } from "../components/ProductStrip";
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
-import { unitPrice } from "../types";
-import { hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
 
 export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
@@ -49,7 +48,7 @@ export function Cart() {
               const p = getProduct(item.productId);
               if (!p) return null;
               const isBusiness = hasCaseOption(p.category) && item.mode === "business";
-              const price = isBusiness ? p.casePrice : unitPrice(p);
+              const price = isBusiness ? p.casePrice : bottlePrice(p);
               const labels = unitLabels(p.category);
               const unitLabel = isBusiness ? labels.business : labels.individual;
               return (

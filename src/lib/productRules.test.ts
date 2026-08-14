@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasCaseOption, resolveMode, unitLabels, isCaseStocked } from "./productRules";
+import { bottlePrice, hasCaseOption, resolveMode, unitLabels, isCaseStocked } from "./productRules";
 
 describe("hasCaseOption", () => {
   it("gives wine, beer, RTDs and mixers the case option", () => {
@@ -56,5 +56,15 @@ describe("isCaseStocked", () => {
     expect(isCaseStocked("Beer")).toBe(true);
     expect(isCaseStocked("Wine")).toBe(false);
     expect(isCaseStocked("RTD")).toBe(false);
+  });
+});
+
+describe("bottlePrice", () => {
+  it("divides the stored price for case-option categories", () => {
+    expect(bottlePrice({ category: "Wine", casePrice: 32000, unitsPerCase: 6 })).toBe(5333);
+  });
+
+  it("uses the stored price directly for spirits (no case concept to divide)", () => {
+    expect(bottlePrice({ category: "Whisky", casePrice: 14000, unitsPerCase: 6 })).toBe(14000);
   });
 });

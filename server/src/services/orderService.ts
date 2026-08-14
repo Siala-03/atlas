@@ -2,7 +2,7 @@ import { prisma } from "../db";
 import { NotFoundError, StockConflictError } from "../errors";
 import { computeTotals } from "../lib/money";
 import { generateReference } from "../lib/reference";
-import { resolveMode } from "../lib/productRules";
+import { bottlePrice, resolveMode } from "../lib/productRules";
 import { z } from "zod";
 import { CartItemSchema, CheckoutDetailsSchema } from "../validation/schemas";
 
@@ -76,7 +76,7 @@ export async function createOrder(params: {
         quantity: item.quantity,
         unitsPerCase: product.unitsPerCase,
         casePrice: product.casePrice,
-        unitPrice: Math.round(product.casePrice / product.unitsPerCase)
+        unitPrice: bottlePrice(product)
       });
     }
 
