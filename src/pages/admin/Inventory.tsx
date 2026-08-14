@@ -5,18 +5,20 @@ import {
   CheckIcon,
   XIcon,
   PencilIcon,
-  AlertTriangleIcon } from
+  AlertTriangleIcon,
+  FilterIcon } from
 "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
-import { Product } from "../../types";
+import { Category, Product } from "../../types";
 import { bottlePrice, hasCaseOption, isCaseStocked } from "../../lib/productRules";
 
 export function Inventory() {
   const { products, updateProduct, restockProduct } = useStore();
   const [query, setQuery] = useState("");
   const [onlyLow, setOnlyLow] = useState(false);
+  const [category, setCategory] = useState<Category | "All">("All");
   const [editId, setEditId] = useState<string | null>(null);
   const [draft, setDraft] = useState<{price: string;stock: string;lowStockThreshold: string;}>({
     price: "",
@@ -27,8 +29,14 @@ export function Inventory() {
   const [restockingId, setRestockingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
 
+  const categories = useMemo(
+    () => [...new Set(products.map((p) => p.category))].sort(),
+    [products]
+  );
+
   const rows = useMemo(() => {
     let list = products;
+    if (category !== "All") list = list.filter((p) => p.category === category);
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter(
@@ -38,7 +46,7 @@ export function Inventory() {
     }
     if (onlyLow) list = list.filter((p) => p.stockUnits <= p.lowStockThreshold);
     return list;
-  }, [products, query, onlyLow]);
+  }, [products, query, onlyLow, category]);
 
   const startEdit = (p: Product) => {
     const caseOnly = isCaseStocked(p.category);
@@ -113,18 +121,33 @@ export function Inventory() {
       </p>
       {rowError && <p className="mt-3 text-sm font-medium text-red-600">{rowError}</p>}
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          onClick={() => setOnlyLow((v) => !v)}
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-          onlyLow ?
-          "bg-amber2-500 text-white" :
-          "border border-burgundy-200 bg-white text-ink/70 hover:bg-burgundy-50"}`
-          }>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            onClick={() => setOnlyLow((v) => !v)}
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            onlyLow ?
+            "bg-amber2-500 text-white" :
+            "border border-burgundy-200 bg-white text-ink/70 hover:bg-burgundy-50"}`
+            }>
 
-          <AlertTriangleIcon className="h-4 w-4" />
-          Low stock only ({lowCount})
-        </button>
+            <AlertTriangleIcon className="h-4 w-4" />
+            Low stock only ({lowCount})
+          </button>
+          <div className="relative">
+            <FilterIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Category | "All")}
+              className="appearance-none rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-8 text-sm font-medium text-ink/70 outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200">
+
+              <option value="All">All categories</option>
+              {categories.map((c) =>
+              <option key={c} value={c}>{c}</option>
+              )}
+            </select>
+          </div>
+        </div>
         <div className="relative sm:w-64">
           <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
           <input
