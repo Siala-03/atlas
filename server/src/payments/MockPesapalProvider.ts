@@ -1,7 +1,9 @@
 import { prisma } from "../db";
 import { PaymentProvider, PaymentStatusResult } from "./PaymentProvider";
 
-const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL ?? "http://localhost:5173";
+// PUBLIC_APP_URL may be a comma-separated list of allowed CORS origins; the
+// first entry is the canonical app URL used for redirects.
+const PUBLIC_APP_URL = (process.env.PUBLIC_APP_URL ?? "http://localhost:5173").split(",")[0].trim();
 
 export class MockPesapalProvider implements PaymentProvider {
   readonly name = "mock_pesapal";

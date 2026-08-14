@@ -5,7 +5,9 @@ const BASE_URL = PESAPAL_ENV === "live" ? "https://pay.pesapal.com/v3" : "https:
 const CONSUMER_KEY = process.env.PESAPAL_CONSUMER_KEY ?? "";
 const CONSUMER_SECRET = process.env.PESAPAL_CONSUMER_SECRET ?? "";
 const CURRENCY = process.env.PESAPAL_CURRENCY ?? "RWF";
-const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL ?? "http://localhost:5173";
+// PUBLIC_APP_URL may be a comma-separated list of allowed CORS origins; the
+// first entry is the canonical app URL used for redirects.
+const PUBLIC_APP_URL = (process.env.PUBLIC_APP_URL ?? "http://localhost:5173").split(",")[0].trim();
 const PUBLIC_API_URL = process.env.PUBLIC_API_URL ?? "http://localhost:4000";
 
 interface PesapalTokenResponse {

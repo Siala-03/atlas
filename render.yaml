@@ -16,7 +16,7 @@ services:
       - key: PORT
         value: 4000
       - key: PUBLIC_APP_URL
-        value: https://atlas-storefront.onrender.com
+        value: https://www.atlasdrinks.africa,https://atlas-rho-two.vercel.app
       - key: PUBLIC_API_URL
         value: https://atlas-elz2.onrender.com
       - key: PAYMENT_PROVIDER

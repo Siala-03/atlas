@@ -10,7 +10,10 @@ import { portalRouter } from "./routes/portal.routes";
 export function createApp() {
   const app = express();
 
-  app.use(cors({ origin: process.env.PUBLIC_APP_URL ?? "http://localhost:5173" }));
+  const allowedOrigins = (process.env.PUBLIC_APP_URL ?? "http://localhost:5173").
+  split(",").
+  map((origin) => origin.trim());
+  app.use(cors({ origin: allowedOrigins }));
   app.use(express.json());
 
   app.use(healthRouter);
