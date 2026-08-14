@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react";
 import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
-import { unitLabels } from "../lib/productRules";
+import { hasCaseOption, unitLabels } from "../lib/productRules";
 import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
@@ -31,7 +31,7 @@ export function HeroCarousel({ products }: {products: Product[];}) {
 
   const product = products[index % products.length];
   const labels = unitLabels(product.category);
-  const isBusiness = shoppingMode === "business";
+  const isBusiness = hasCaseOption(product.category) && shoppingMode === "business";
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const out = product.stockUnits === 0;
   const low = !out && product.stockUnits <= product.lowStockThreshold;

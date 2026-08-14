@@ -6,7 +6,7 @@ import { Product, unitPrice } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
-import { unitLabels } from "../lib/productRules";
+import { hasCaseOption, unitLabels } from "../lib/productRules";
 import { BestsellerBadge } from "./BestsellerBadge";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
@@ -16,7 +16,8 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
   const low = !out && product.stockUnits <= product.lowStockThreshold;
 
   const labels = unitLabels(product.category);
-  const isBusiness = shoppingMode === "business";
+  const caseOption = hasCaseOption(product.category);
+  const isBusiness = caseOption && shoppingMode === "business";
   const price = isBusiness ? product.casePrice : unitPrice(product);
   const availableToAdd = isBusiness ?
   Math.floor(product.stockUnits / product.unitsPerCase) === 0 :
@@ -64,7 +65,7 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
           </h3>
         </Link>
         <p className="mt-1 text-sm text-ink/50">
-          {product.volume} · {product.abv}% · {product.unitsPerCase}/{labels.business}
+          {product.volume} · {product.abv}%{caseOption ? ` · ${product.unitsPerCase}/${labels.business}` : ""}
         </p>
 
         <div className="mt-auto flex items-end justify-between pt-4">

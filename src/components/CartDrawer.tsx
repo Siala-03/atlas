@@ -5,7 +5,7 @@ import { ArrowRightIcon, MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon, XIcon 
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
-import { unitLabels } from "../lib/productRules";
+import { hasCaseOption, unitLabels } from "../lib/productRules";
 
 export function CartDrawer() {
   const { cart, getProduct, updateCartQty, removeFromCart, cartSubtotal, isCartOpen, closeCart } = useStore();
@@ -64,7 +64,7 @@ export function CartDrawer() {
                   {cart.map((item) => {
                 const p = getProduct(item.productId);
                 if (!p) return null;
-                const isBusiness = item.mode === "business";
+                const isBusiness = hasCaseOption(p.category) && item.mode === "business";
                 const price = isBusiness ? p.casePrice : unitPrice(p);
                 const labels = unitLabels(p.category);
                 return (

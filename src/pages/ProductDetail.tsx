@@ -19,7 +19,7 @@ import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
 import { unitPrice } from "../types";
-import { unitLabels } from "../lib/productRules";
+import { hasCaseOption, unitLabels } from "../lib/productRules";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 
 export function ProductDetail() {
@@ -31,7 +31,8 @@ export function ProductDetail() {
   const product = id ? getProduct(id) : undefined;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const isBusiness = shoppingMode === "business";
+  const caseOption = product ? hasCaseOption(product.category) : false;
+  const isBusiness = caseOption && shoppingMode === "business";
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -122,7 +123,7 @@ export function ProductDetail() {
               product.category,
               `${product.abv}% ABV`,
               product.volume,
-              `${product.unitsPerCase} per ${labels.business}`].
+              ...(caseOption ? [`${product.unitsPerCase} per ${labels.business}`] : [])].
               map((chip) =>
               <span
                 key={chip}
@@ -134,7 +135,9 @@ export function ProductDetail() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-6">
+              {caseOption &&
               <ShopModeToggle className="mb-5" />
+              }
               <div className="flex items-end justify-between">
                 <div>
                   <p className="font-serif text-4xl font-semibold text-burgundy-800">

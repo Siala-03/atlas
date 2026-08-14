@@ -1,10 +1,17 @@
 import { Category, ShoppingMode } from "../types";
 
-// Every product carries both a per-unit and a case price, so switching
-// between Individual and Business mode always changes pricing and
-// quantities — it's valid for every category, not just beer.
-export function resolveMode(_category: Category, shoppingMode: ShoppingMode): ShoppingMode {
-  return shoppingMode;
+// Spirits (whisky, rum, vodka, gin, cognac, liqueur, tequila, aperitif,
+// bitters) aren't sold by the case in practice — only bottle pricing applies
+// regardless of the shopper's Individual/Business toggle. Wine, Beer, RTDs
+// and Mixers genuinely support both.
+const CASE_OPTION_CATEGORIES: Category[] = ["Wine", "Beer", "RTD", "Mixer"];
+
+export function hasCaseOption(category: Category): boolean {
+  return CASE_OPTION_CATEGORIES.includes(category);
+}
+
+export function resolveMode(category: Category, shoppingMode: ShoppingMode): ShoppingMode {
+  return hasCaseOption(category) ? shoppingMode : "individual";
 }
 
 export interface UnitLabels {

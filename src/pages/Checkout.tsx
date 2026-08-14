@@ -7,7 +7,7 @@ import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { buildMomoUssdLink } from "../lib/momo";
 import { PaymentMethod, unitPrice } from "../types";
-import { unitLabels } from "../lib/productRules";
+import { hasCaseOption, unitLabels } from "../lib/productRules";
 
 const EMPTY: CheckoutDetails = {
   contactName: "",
@@ -210,7 +210,7 @@ export function Checkout() {
               {cart.map((item) => {
                 const product = getProduct(item.productId);
                 if (!product) return null;
-                const isBusiness = item.mode === "business";
+                const isBusiness = hasCaseOption(product.category) && item.mode === "business";
                 const price = isBusiness ? product.casePrice : unitPrice(product);
                 const labels = unitLabels(product.category);
                 const label = isBusiness ? labels.business : labels.individual;
