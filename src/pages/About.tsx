@@ -4,6 +4,7 @@ import { ArrowRightIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { VODKA, REDWINE, BEER } from "../lib/categoryImages";
+import { useSEO } from "../lib/seo";
 
 const HERO = "/c76d1c17-8922-4717-b20e-ae6d0135e87f.jpg";
 
@@ -21,6 +22,12 @@ const STEPS = [
 
 
 export function About() {
+  useSEO({
+    title: "About Us",
+    description:
+    "Atlas Supplies Ltd is a Rwanda-based drinks wholesaler and retailer, supplying genuine imported and local spirits, wine and beer to businesses and individuals across Kigali.",
+    path: "/about"
+  });
   return (
     <div className="min-h-screen w-full bg-cream">
       <Navbar />

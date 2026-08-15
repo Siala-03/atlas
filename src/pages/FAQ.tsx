@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ChevronDownIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { useSEO } from "../lib/seo";
 
 const FAQS: { question: string; answer: string }[] = [
 {
@@ -27,6 +28,12 @@ const FAQS: { question: string; answer: string }[] = [
 
 
 export function FAQ() {
+  useSEO({
+    title: "Frequently Asked Questions",
+    description:
+    "Answers to common questions about ordering, payment, delivery and wholesale pricing from Atlas Supplies Ltd in Rwanda.",
+    path: "/faq"
+  });
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (

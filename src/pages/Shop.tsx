@@ -12,6 +12,7 @@ import { usePopularity } from "../lib/popularity";
 import { CATEGORY_HERO_IMAGES } from "../lib/categoryImages";
 import { SPIRIT_CATEGORIES } from "../lib/categoryTaxonomy";
 import { Category, Subtype } from "../types";
+import { useSEO } from "../lib/seo";
 
 const CATEGORIES: (Category | "All")[] = [
 "All",
@@ -40,6 +41,15 @@ export function Shop() {
   const activeFamily = params.get("family");
   const activeSubtype = params.get("subtype") as Subtype | null;
   const [query, setQuery] = useState(() => params.get("q") ?? "");
+
+  useSEO({
+    title: activeCategory !== "All" ? `${activeCategory} for sale in Rwanda` : "Shop all drinks online",
+    description:
+    activeCategory !== "All" ?
+    `Browse and order ${activeCategory} online from Atlas Supplies Ltd, with wholesale case pricing for businesses and single-bottle pricing for individuals. Delivery across Kigali and Rwanda.` :
+    "Browse the full Atlas Supplies catalogue: whisky, wine, beer, vodka, gin, rum and more, with wholesale and retail pricing and delivery across Rwanda.",
+    path: activeCategory !== "All" ? `/shop?category=${encodeURIComponent(activeCategory)}` : "/shop"
+  });
 
   useEffect(() => {
     const urlQuery = params.get("q") ?? "";

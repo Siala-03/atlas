@@ -3,8 +3,15 @@ import { MapPinIcon, PhoneIcon, MailIcon, ClockIcon, SendIcon, CheckCircle2Icon 
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { CONTACT_ADDRESS, CONTACT_PHONE_DISPLAY, CONTACT_EMAIL } from "../lib/contact";
+import { useSEO } from "../lib/seo";
 
 export function Contact() {
+  useSEO({
+    title: "Contact Us",
+    description:
+    "Get in touch with Atlas Supplies Ltd for orders, delivery questions or wholesale enquiries. Based in Kigali, Rwanda, reachable by phone, WhatsApp or email.",
+    path: "/contact"
+  });
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
 

@@ -8,6 +8,7 @@ import { ProductCard } from "../components/ProductCard";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
 import { slugify } from "../lib/slug";
+import { useSEO } from "../lib/seo";
 
 export function BrandDetail() {
   const { slug } = useParams();
@@ -23,6 +24,14 @@ export function BrandDetail() {
     () => [...new Set(brandProducts.map((p) => p.category))],
     [brandProducts]
   );
+
+  useSEO({
+    title: brand ? `${brand} drinks in Rwanda` : "Brand",
+    description: brand ?
+    `Shop all ${brand} products available from Atlas Supplies Ltd, with wholesale and retail pricing and delivery across Rwanda.` :
+    "Browse drinks by brand from Atlas Supplies Ltd.",
+    path: `/brands/${slug ?? ""}`
+  });
 
   if (!brand) {
     return (

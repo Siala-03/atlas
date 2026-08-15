@@ -16,6 +16,7 @@ import { usePopularity } from "../lib/popularity";
 import { CATEGORY_IMAGES, WINE_CELLAR } from "../lib/categoryImages";
 import { SHOP_BY_CATEGORY } from "../lib/categoryTaxonomy";
 import { Category } from "../types";
+import { useSEO } from "../lib/seo";
 
 const TAGLINES = [
 "Genuine imports, traceable supply",
@@ -28,6 +29,12 @@ const HERO_CHIPS: Category[] = ["Whisky", "Wine", "Beer", "Gin", "Vodka", "Rum"]
 
 
 export function Home() {
+  useSEO({
+    title: "Wholesale & Retail Drinks Delivery in Rwanda",
+    description:
+    "Order whisky, wine, beer, vodka, gin and more online from Atlas Supplies Ltd. Wholesale case pricing for businesses, single-bottle pricing for individuals, with delivery across Kigali and Rwanda.",
+    path: "/"
+  });
   const { products, shoppingMode } = useStore();
   const { bestsellerIds, topProducts } = usePopularity(8);
   const featuredHeading = bestsellerIds.size > 0 ? "Popular right now" : "Featured selection";

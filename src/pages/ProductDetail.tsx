@@ -20,6 +20,7 @@ import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
 import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
 import { ShopModeToggle } from "../components/ShopModeToggle";
+import { useSEO, truncateAtWord } from "../lib/seo";
 
 export function ProductDetail() {
   const { id } = useParams();
@@ -32,6 +33,19 @@ export function ProductDetail() {
   const [added, setAdded] = useState(false);
   const caseOption = product ? hasCaseOption(product.category) : false;
   const isBusiness = caseOption && shoppingMode === "business";
+
+  const productDescription = product ?
+  truncateAtWord(
+    `Buy ${product.brand} ${product.name} (${product.volume}, ${product.abv}% ABV) online in Rwanda. ${product.description}`,
+    155
+  ) :
+  "Browse drinks available from Atlas Supplies Ltd.";
+
+  useSEO({
+    title: product ? `${product.name} - ${product.brand}` : "Product",
+    description: productDescription,
+    path: `/product/${id ?? ""}`
+  });
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
