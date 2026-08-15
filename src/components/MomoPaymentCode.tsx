@@ -21,8 +21,15 @@ export function MomoPaymentCode({ amount }: { amount: number }) {
       <p className="flex items-center gap-1.5 font-semibold text-ink">
         <SmartphoneIcon className="h-4 w-4" /> Pay with MTN MoMo
       </p>
-      <p className="mt-1 text-xs text-ink/60">
-        Dial this code on the phone you&apos;re paying from, or copy it and paste it into your dialer.
+      <a
+        href={buildMomoUssdLink(amount)}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-burgundy-800 py-3.5 font-semibold text-cream transition-colors hover:bg-burgundy-900">
+
+        <SmartphoneIcon className="h-4 w-4" /> Open dialer with code ready
+      </a>
+      <p className="mt-2 text-xs text-ink/60">
+        On the phone you&apos;re paying from, this opens your dialer with the code below ready to call.
+        If it doesn&apos;t open, dial the code yourself or copy it in.
       </p>
       <div className="mt-3 flex items-center gap-2">
         <code className="flex-1 select-all rounded-xl border border-burgundy-200 bg-white px-4 py-3 text-center font-mono text-base font-semibold tracking-wide text-burgundy-800">
@@ -37,12 +44,6 @@ export function MomoPaymentCode({ amount }: { amount: number }) {
           {copied ? <CheckIcon className="h-4 w-4 text-emerald-600" /> : <CopyIcon className="h-4 w-4" />}
         </button>
       </div>
-      <a
-        href={buildMomoUssdLink(amount)}
-        className="mt-2 inline-block text-xs font-medium text-burgundy-700 underline underline-offset-2">
-
-        On this phone? Tap to try opening your dialer
-      </a>
       <p className="mt-3 text-xs text-ink/50">
         Delivery is scheduled once we confirm your payment has come through.
       </p>
