@@ -7,7 +7,9 @@ export function AnnouncementBar() {
     <div className="w-full bg-burgundy-950 text-cream/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-1.5 text-xs sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span>We&apos;ve got you 24/7</span>
+          <span className="font-medium text-cream/90">Wholesale and Retail Drinks Delivery in Rwanda</span>
+          <span className="hidden text-cream/30 sm:inline">·</span>
+          <span className="hidden sm:inline">We&apos;ve got you 24/7</span>
           <span className="hidden text-cream/30 sm:inline">·</span>
           <span className="hidden sm:inline">Business orders: Same-day delivery before 4PM</span>
         </div>
