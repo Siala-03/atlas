@@ -50,6 +50,8 @@ const SMIRNOFF_ICE_GUARANA = "/smirnoff ice guarana can 330ml.jpg";
 const SAVANNA_DRY = "/savanna-dry-cider-340ml- rtd.webp";
 const PRIMUS_LAGER = "/primus 50cl knowless.jpg";
 const MUTZIG_LAGER = "/mutzig.webp";
+const JOSE_CUERVO_ESPECIAL = "/JOSE CUERVO ESPECIAL - TEQUILA.webp";
+const PATRON_SILVER = "/PATRON SILVER-TEQUILA.png";
 
 export const SEED_PRODUCTS: Product[] = [
 {
@@ -722,7 +724,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 28000,
   stockUnits: 72,
   lowStockThreshold: 30,
-  image: SMIRNOFF_NO21,
+  image: JOSE_CUERVO_ESPECIAL,
   description:
   "The world's best-selling tequila. Smooth gold tequila for shots and classic cocktails alike.",
   origin: "Mexico"
@@ -738,7 +740,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 72000,
   stockUnits: 36,
   lowStockThreshold: 18,
-  image: SPIRIT_OF_YORK_VODKA,
+  image: PATRON_SILVER,
   description:
   "Ultra-premium 100% Weber blue agave tequila. Clean and smooth, made for sipping or an elevated margarita.",
   origin: "Mexico"
