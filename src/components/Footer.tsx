@@ -10,7 +10,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="inline-block rounded-xl bg-cream p-3">
-            <Logo className="h-14" />
+            <Logo className="h-20" />
           </div>
           <p className="mt-4 max-w-xs font-serif text-lg italic text-cream/70">
             Stocking your shelves, one sip at a time.
