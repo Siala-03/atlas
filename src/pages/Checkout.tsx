@@ -160,7 +160,7 @@ export function Checkout() {
                     className="mt-0.5 h-4 w-4 border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
                   <span>
                     <span className="flex items-center gap-1.5 font-semibold text-ink"><SmartphoneIcon className="h-4 w-4" /> Pay with MTN MoMo</span>
-                    <span className="mt-1 block text-ink/60">You&apos;ll get a MoMo code to dial after placing your order.</span>
+                    <span className="mt-1 block text-ink/60">Opens your dialer with our MoMo code and total ready after you place your order.</span>
                   </span>
                 </label>
               </div>
@@ -232,12 +232,12 @@ export function Checkout() {
               <LockIcon className="h-4 w-4" />
               {submitting ?
               "Placing order…" :
-              paymentMethod === "card" ? "Continue to payment" : "Place order & get MoMo code"}
+              paymentMethod === "card" ? "Continue to payment" : "Place order & pay with MoMo"}
             </button>
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/50">
               {paymentMethod === "card" ?
               "You'll be redirected to complete a secure card payment." :
-              "Your order is placed, then we'll show you the MoMo code to dial."}
+              "Your order is placed, then your dialer opens with the MoMo code ready."}
             </p>
           </aside>
         </form>
