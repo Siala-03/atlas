@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { CheckCircleIcon, ArrowRightIcon, ClipboardListIcon, CreditCardIcon, TruckIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { MomoPaymentCode } from "../components/MomoPaymentCode";
 import { useStore } from "../store/StoreContext";
 import { formatCurrency, formatDateTime } from "../lib/format";
 import { Order, Payment } from "../types";
@@ -78,6 +79,12 @@ export function OrderConfirmation() {
           <span className="text-red-600">Payment failed</span> :
 
           <span className="text-amber2-700">Payment pending</span>}
+          </div>
+        }
+
+        {order.paymentMethod === "momo" &&
+        <div className="mt-6">
+            <MomoPaymentCode amount={order.total} />
           </div>
         }
 

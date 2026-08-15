@@ -5,7 +5,6 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
-import { buildMomoUssdLink } from "../lib/momo";
 import { PaymentMethod } from "../types";
 import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
 
@@ -70,9 +69,6 @@ export function Checkout() {
         const { redirectUrl } = await initiatePayment(order.id);
         window.location.assign(redirectUrl);
         return;
-      }
-      if (paymentMethod === "momo") {
-        window.location.assign(buildMomoUssdLink(total));
       }
       navigate(`/order-confirmed/${order.id}`);
     } catch (error) {
@@ -164,7 +160,7 @@ export function Checkout() {
                     className="mt-0.5 h-4 w-4 border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
                   <span>
                     <span className="flex items-center gap-1.5 font-semibold text-ink"><SmartphoneIcon className="h-4 w-4" /> Pay with MTN MoMo</span>
-                    <span className="mt-1 block text-ink/60">Opens your phone dialer with our MoMo code and your total pre-filled. Tap call to confirm.</span>
+                    <span className="mt-1 block text-ink/60">You&apos;ll get a MoMo code to dial after placing your order.</span>
                   </span>
                 </label>
               </div>
@@ -236,12 +232,12 @@ export function Checkout() {
               <LockIcon className="h-4 w-4" />
               {submitting ?
               "Placing order…" :
-              paymentMethod === "card" ? "Continue to payment" : "Place order & pay with MoMo"}
+              paymentMethod === "card" ? "Continue to payment" : "Place order & get MoMo code"}
             </button>
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/50">
               {paymentMethod === "card" ?
               "You'll be redirected to complete a secure card payment." :
-              "Your order is placed, then your phone dialer opens with our MoMo code and total pre-filled."}
+              "Your order is placed, then we'll show you the MoMo code to dial."}
             </p>
           </aside>
         </form>
