@@ -24,7 +24,11 @@ const BRANDS: BrandLogo[] = [
 { name: "Martell", image: "/martell logo.svg", to: "/brands/martell" },
 { name: "Baileys", image: "/baileys logo.svg", to: "/brands/baileys" },
 { name: "Jose Cuervo", image: "/jose cuervo logo.svg", to: "/brands/jose-cuervo" },
-{ name: "Heineken", image: "/heineken logo.svg", to: "/brands/heineken" }];
+{ name: "Heineken", image: "/heineken logo.svg", to: "/brands/heineken" },
+{ name: "Coca-Cola", image: "/coca-cola logo.svg", to: "/brands/coca-cola" },
+{ name: "Schweppes", image: "/schweppes logo.svg", to: "/brands/schweppes" },
+{ name: "Skol", image: "/skol logo.svg", to: "/brands/skol" },
+{ name: "SKYY Vodka", image: "/skyy vodka logo.svg", to: "/brands/skyy" }];
 
 
 const PARTNERS: BrandLogo[] = [
