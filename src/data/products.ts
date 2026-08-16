@@ -52,6 +52,8 @@ const PRIMUS_LAGER = "/primus 50cl knowless.jpg";
 const MUTZIG_LAGER = "/mutzig.webp";
 const JOSE_CUERVO_ESPECIAL = "/JOSE CUERVO ESPECIAL - TEQUILA.webp";
 const PATRON_SILVER = "/PATRON SILVER-TEQUILA.png";
+const FOUR_COUSINS_CABERNET = "/four cousins cabernet sauvignon.jpeg";
+const FOUR_COUSINS_SWEET_RED = "/four cousins natural sweet red.png";
 
 export const SEED_PRODUCTS: Product[] = [
 {
@@ -935,5 +937,39 @@ export const SEED_PRODUCTS: Product[] = [
   image: SMIRNOFF_ICE_GUARANA,
   description:
   "Smirnoff Ice with a tropical guaraná twist. A vibrant, fruity ready-to-drink can.",
+  origin: "South Africa"
+},
+{
+  id: "p-four-cousins-cabernet-sauvignon",
+  name: "Collection Cabernet Sauvignon",
+  brand: "Four Cousins",
+  category: "Wine",
+  subtype: "Red",
+  abv: 13,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 33000,
+  stockUnits: 180,
+  lowStockThreshold: 72,
+  image: FOUR_COUSINS_CABERNET,
+  description:
+  "An easy-drinking South African Cabernet Sauvignon from a family of wine lovers, soft tannins and ripe dark fruit.",
+  origin: "South Africa"
+},
+{
+  id: "p-four-cousins-natural-sweet-red",
+  name: "Natural Sweet Red",
+  brand: "Four Cousins",
+  category: "Wine",
+  subtype: "Red",
+  abv: 8,
+  volume: "75cl",
+  unitsPerCase: 6,
+  casePrice: 27000,
+  stockUnits: 216,
+  lowStockThreshold: 90,
+  image: FOUR_COUSINS_SWEET_RED,
+  description:
+  "A juicy, low-alcohol natural sweet red bursting with berry flavour. One of South Africa's most popular easy-drinking reds.",
   origin: "South Africa"
 }];

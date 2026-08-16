@@ -14,8 +14,8 @@ const BRANDS: BrandLogo[] = [
 { name: "Chivas Regal", image: "/chivas regal logo.jpg", inCatalogue: true },
 { name: "Campari", image: "/campari logo.png", inCatalogue: true },
 { name: "KWV", image: "/kwv logo.jpg", inCatalogue: true },
-{ name: "Bacardi", image: "/Bacardi-Logo.png" },
-{ name: "Four Cousins", image: "/four cousins logo.jpg" }];
+{ name: "Bacardi", image: "/Bacardi-Logo.png", inCatalogue: true },
+{ name: "Four Cousins", image: "/four cousins logo.jpg", inCatalogue: true }];
 
 
 const PARTNERS: BrandLogo[] = [

@@ -57,4 +57,4 @@ export const SHOP_BY_CATEGORY: CategoryTile[] = [
 { label: "Champagnes", to: "/shop?category=Wine&subtype=Sparkling", categories: ["Wine"], subtype: "Sparkling", image: "/champaigns.jpg" },
 { label: "Beer", to: "/shop?category=Beer", categories: ["Beer"], image: "/beers.jpeg" },
 { label: "RTDs & Ciders", to: "/shop?category=RTD", categories: ["RTD"], image: "/ciders rtda.jpg" },
-{ label: "Mixers", to: "/shop?category=Mixer", categories: ["Mixer"] }];
+{ label: "Mixers", to: "/shop?category=Mixer", categories: ["Mixer"], image: "/mixers.jpg" }];
