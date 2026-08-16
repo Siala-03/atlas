@@ -16,7 +16,15 @@ const BRANDS: BrandLogo[] = [
 { name: "Bacardi", image: "/Bacardi-Logo.png", to: "/brands/bacardi" },
 { name: "Four Cousins", image: "/four cousins logo.jpg", to: "/brands/four-cousins" },
 { name: "Tusker", image: "/Tusker logo.png", to: "/brands/tusker" },
-{ name: "Bralirwa", image: "/Rwanda-Bralirwa-logo.png", to: "/shop?category=Beer&subtype=Local" }];
+{ name: "Bralirwa", image: "/Rwanda-Bralirwa-logo.png", to: "/shop?category=Beer&subtype=Local" },
+{ name: "Smirnoff", image: "/smirnoff logo.svg", to: "/brands/smirnoff" },
+{ name: "Absolut", image: "/absolut logo.svg", to: "/brands/absolut" },
+{ name: "Tanqueray", image: "/tanqueray logo.jpg", to: "/brands/tanqueray" },
+{ name: "Rémy Martin", image: "/remy martin logo.svg", to: "/brands/remy-martin" },
+{ name: "Martell", image: "/martell logo.svg", to: "/brands/martell" },
+{ name: "Baileys", image: "/baileys logo.svg", to: "/brands/baileys" },
+{ name: "Jose Cuervo", image: "/jose cuervo logo.svg", to: "/brands/jose-cuervo" },
+{ name: "Heineken", image: "/heineken logo.svg", to: "/brands/heineken" }];
 
 
 const PARTNERS: BrandLogo[] = [
