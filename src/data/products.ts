@@ -54,6 +54,8 @@ const JOSE_CUERVO_ESPECIAL = "/JOSE CUERVO ESPECIAL - TEQUILA.webp";
 const PATRON_SILVER = "/PATRON SILVER-TEQUILA.png";
 const FOUR_COUSINS_CABERNET = "/four cousins cabernet sauvignon.jpeg";
 const FOUR_COUSINS_SWEET_RED = "/four cousins natural sweet red.png";
+const SCHWEPPES_TONIC = "/schweppes tonic water pack.jpg";
+const COCA_COLA_BOTTLE = "/coca-cola bottle.png";
 
 export const SEED_PRODUCTS: Product[] = [
 {
@@ -854,7 +856,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 12000,
   stockUnits: 600,
   lowStockThreshold: 216,
-  image: GILBEYS_GIN,
+  image: SCHWEPPES_TONIC,
   description:
   "The classic quinine mixer for gin and tonics. Essential shelf stock alongside any gin selection.",
   origin: "United Kingdom"
@@ -870,7 +872,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 10000,
   stockUnits: 720,
   lowStockThreshold: 240,
-  image: HENDRICKS_GIN,
+  image: COCA_COLA_BOTTLE,
   description:
   "The everyday mixer for rum and whisky serves. High-turnover stock for any bar setup.",
   origin: "Rwanda"
