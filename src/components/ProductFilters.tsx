@@ -6,7 +6,7 @@ export interface FilterState {
   priceMax: number | null;
   abvMin: number | null;
   abvMax: number | null;
-  origins: Set<string>;
+  brands: Set<string>;
 }
 
 export const EMPTY_FILTERS: FilterState = {
@@ -14,7 +14,7 @@ export const EMPTY_FILTERS: FilterState = {
   priceMax: null,
   abvMin: null,
   abvMax: null,
-  origins: new Set()
+  brands: new Set()
 };
 
 export function isFilterActive(filters: FilterState): boolean {
@@ -23,7 +23,7 @@ export function isFilterActive(filters: FilterState): boolean {
     filters.priceMax !== null ||
     filters.abvMin !== null ||
     filters.abvMax !== null ||
-    filters.origins.size > 0);
+    filters.brands.size > 0);
 
 }
 
@@ -33,7 +33,7 @@ export function applyFilters(products: Product[], filters: FilterState): Product
     if (filters.priceMax !== null && product.casePrice > filters.priceMax) return false;
     if (filters.abvMin !== null && product.abv < filters.abvMin) return false;
     if (filters.abvMax !== null && product.abv > filters.abvMax) return false;
-    if (filters.origins.size > 0 && !filters.origins.has(product.origin)) return false;
+    if (filters.brands.size > 0 && !filters.brands.has(product.brand)) return false;
     return true;
   });
 }
@@ -45,15 +45,15 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ products, filters, onChange }: ProductFiltersProps) {
-  const origins = useMemo(
-    () => [...new Set(products.map((p) => p.origin))].sort(),
+  const brands = useMemo(
+    () => [...new Set(products.map((p) => p.brand))].sort(),
     [products]
   );
 
-  const toggleOrigin = (origin: string) => {
-    const next = new Set(filters.origins);
-    if (next.has(origin)) next.delete(origin);else next.add(origin);
-    onChange({ ...filters, origins: next });
+  const toggleBrand = (brand: string) => {
+    const next = new Set(filters.brands);
+    if (next.has(brand)) next.delete(brand);else next.add(brand);
+    onChange({ ...filters, brands: next });
   };
 
   const numberField = (
@@ -93,17 +93,17 @@ export function ProductFilters({ products, filters, onChange }: ProductFiltersPr
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-ink/50">Origin</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-ink/50">Brand</p>
         <div className="mt-2 space-y-1.5">
-          {origins.map((origin) =>
-          <label key={origin} className="flex cursor-pointer items-center gap-2 text-sm text-ink/70">
+          {brands.map((brand) =>
+          <label key={brand} className="flex cursor-pointer items-center gap-2 text-sm text-ink/70">
               <input
               type="checkbox"
-              checked={filters.origins.has(origin)}
-              onChange={() => toggleOrigin(origin)}
+              checked={filters.brands.has(brand)}
+              onChange={() => toggleBrand(brand)}
               className="h-4 w-4 rounded border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
 
-              {origin}
+              {brand}
             </label>
           )}
         </div>
