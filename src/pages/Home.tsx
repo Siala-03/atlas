@@ -46,6 +46,7 @@ export function Home() {
   map((c) => products.find((p) => p.category === c)?.image).
   filter((src): src is string => Boolean(src));
   const categoryTileImages = SHOP_BY_CATEGORY.map((tile) => {
+    if (tile.image) return tile.image;
     const match = products.find(
       (p) => tile.categories.includes(p.category) && (!tile.subtype || p.subtype === tile.subtype)
     );

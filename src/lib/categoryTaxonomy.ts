@@ -45,15 +45,16 @@ export interface CategoryTile {
   to: string;
   categories: Category[];
   subtype?: Subtype;
+  image?: string;
 }
 
-// Image is resolved at render time from an actual product in `categories`
-// (optionally narrowed by `subtype`), so each tile shows a genuine photo of
-// something really sold in that grouping rather than a generic stand-in.
+// If `image` is set, it's used directly. Otherwise the image is resolved at
+// render time from an actual product in `categories` (optionally narrowed by
+// `subtype`), so the tile still shows a genuine photo rather than nothing.
 export const SHOP_BY_CATEGORY: CategoryTile[] = [
-{ label: "Spirits", to: "/shop?family=Spirits", categories: SPIRIT_CATEGORIES },
-{ label: "Wine", to: "/shop?category=Wine", categories: ["Wine"] },
-{ label: "Champagnes", to: "/shop?category=Wine&subtype=Sparkling", categories: ["Wine"], subtype: "Sparkling" },
-{ label: "Beer", to: "/shop?category=Beer", categories: ["Beer"] },
-{ label: "RTDs & Ciders", to: "/shop?category=RTD", categories: ["RTD"] },
+{ label: "Spirits", to: "/shop?family=Spirits", categories: SPIRIT_CATEGORIES, image: "/spirits.jpg" },
+{ label: "Wine", to: "/shop?category=Wine", categories: ["Wine"], image: "/wines.jpg" },
+{ label: "Champagnes", to: "/shop?category=Wine&subtype=Sparkling", categories: ["Wine"], subtype: "Sparkling", image: "/champaigns.jpg" },
+{ label: "Beer", to: "/shop?category=Beer", categories: ["Beer"], image: "/beers.webp" },
+{ label: "RTDs & Ciders", to: "/shop?category=RTD", categories: ["RTD"], image: "/ciders rtda.jpg" },
 { label: "Mixers", to: "/shop?category=Mixer", categories: ["Mixer"] }];

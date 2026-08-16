@@ -1,84 +1,76 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { useStore } from "../store/StoreContext";
-import { Category } from "../types";
+import { slugify } from "../lib/slug";
 
-const CATEGORIES: (Category | "All")[] = [
-"All",
-"Whisky",
-"Wine",
-"Vodka",
-"Gin",
-"Rum",
-"Beer"];
+interface BrandLogo {
+  name: string;
+  image: string;
+  inCatalogue?: boolean;
+}
 
+const BRANDS: BrandLogo[] = [
+{ name: "Johnnie Walker", image: "/johnnie walker-brands.jpg", inCatalogue: true },
+{ name: "Hennessy", image: "/hennessy logo.png", inCatalogue: true },
+{ name: "Chivas Regal", image: "/chivas regal logo.jpg", inCatalogue: true },
+{ name: "Campari", image: "/campari logo.png", inCatalogue: true },
+{ name: "KWV", image: "/kwv logo.jpg", inCatalogue: true },
+{ name: "Bacardi", image: "/Bacardi-Logo.png" },
+{ name: "Four Cousins", image: "/four cousins logo.jpg" }];
+
+
+const PARTNERS: BrandLogo[] = [
+{ name: "Tusker", image: "/Tusker logo.png" },
+{ name: "Bralirwa", image: "/Rwanda-Bralirwa-logo.png" }];
+
+
+function LogoCard({ brand }: { brand: BrandLogo }) {
+  const content = (
+    <div className="flex h-28 items-center justify-center rounded-2xl border border-burgundy-100 bg-white p-6 transition-all hover:border-burgundy-300 hover:shadow-md">
+      <img
+        src={brand.image}
+        alt={brand.name}
+        className="h-full w-full object-contain" />
+
+    </div>);
+
+
+  if (brand.inCatalogue) {
+    return (
+      <Link to={`/brands/${slugify(brand.name)}`} className="group">
+        {content}
+      </Link>);
+
+  }
+  return content;
+}
 
 export function BrandPortfolio() {
-  const { products } = useStore();
-  const [active, setActive] = useState<Category | "All">("All");
-
-  const filtered = useMemo(
-    () => active === "All" ? products : products.filter((p) => p.category === active),
-    [products, active]
-  );
-
-  if (products.length === 0) return null;
-
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Our portfolio</p>
-        <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">Partners we work with</h2>
+        <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">Brands we supply</h2>
         <p className="mt-3 text-ink/60">
           A trusted selection of spirits, wine and beer brands, stocked, genuine and ready to order.
         </p>
       </div>
 
-      <div className="mt-8 flex flex-wrap justify-center gap-2">
-        {CATEGORIES.map((c) =>
-        <button
-          key={c}
-          onClick={() => setActive(c)}
-          className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-          active === c ?
-          "bg-burgundy-800 text-cream" :
-          "border border-burgundy-200 bg-white text-ink/70 hover:bg-burgundy-50"}`
-          }>
-
-            {c}
-          </button>
+      <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-7">
+        {BRANDS.map((brand) =>
+        <LogoCard key={brand.name} brand={brand} />
         )}
       </div>
 
-      <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
-        {filtered.map((product) =>
-        <Link
-          key={product.id}
-          to={`/product/${product.id}`}
-          className="group flex flex-col overflow-hidden rounded-2xl border border-burgundy-100 bg-white transition-all hover:border-burgundy-300 hover:shadow-md">
-
-            <div className="flex aspect-square items-center justify-center bg-cream p-4">
-              <img
-              src={product.image}
-              alt={product.name}
-              className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105" />
-
-            </div>
-            <div className="p-3 text-center">
-              <p className="font-serif text-sm font-semibold uppercase tracking-wide text-ink group-hover:text-burgundy-800">
-                {product.brand} - {product.name}
-              </p>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-amber2-600">
-                {product.category}
-              </p>
-            </div>
-          </Link>
-        )}
+      <div className="mx-auto mt-16 max-w-2xl text-center">
+        <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Who we work with</p>
+        <h2 className="mt-2 font-serif text-3xl font-semibold text-ink">Our supply partners</h2>
       </div>
 
-      {filtered.length === 0 &&
-      <p className="mt-10 text-center text-sm text-ink/50">No brands in this category yet.</p>
-      }
+      <div className="mx-auto mt-8 grid max-w-md grid-cols-2 gap-5">
+        {PARTNERS.map((partner) =>
+        <LogoCard key={partner.name} brand={partner} />
+        )}
+      </div>
     </section>);
 
 }
