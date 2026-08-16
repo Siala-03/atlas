@@ -43,7 +43,7 @@ export function Shop() {
   const [query, setQuery] = useState(() => params.get("q") ?? "");
 
   useSEO({
-    title: activeCategory !== "All" ? `${activeCategory} for sale in Rwanda` : "Shop all drinks online",
+    title: activeCategory !== "All" ? `Buy ${activeCategory} Online in Rwanda` : "Buy Drinks Online in Rwanda",
     description:
     activeCategory !== "All" ?
     `Browse and order ${activeCategory} online from Atlas Supplies Ltd, with wholesale case pricing for businesses and single-bottle pricing for individuals. Delivery across Kigali and Rwanda.` :

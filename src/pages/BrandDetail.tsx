@@ -26,7 +26,7 @@ export function BrandDetail() {
   );
 
   useSEO({
-    title: brand ? `${brand} drinks in Rwanda` : "Brand",
+    title: brand ? `Buy ${brand} Online in Rwanda` : "Brand",
     description: brand ?
     `Shop all ${brand} products available from Atlas Supplies Ltd, with wholesale and retail pricing and delivery across Rwanda.` :
     "Browse drinks by brand from Atlas Supplies Ltd.",
