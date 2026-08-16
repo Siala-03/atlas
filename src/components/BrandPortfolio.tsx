@@ -1,21 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { slugify } from "../lib/slug";
 
 interface BrandLogo {
   name: string;
   image: string;
-  inCatalogue?: boolean;
+  to?: string;
 }
 
 const BRANDS: BrandLogo[] = [
-{ name: "Johnnie Walker", image: "/johnnie walker-brands.jpg", inCatalogue: true },
-{ name: "Hennessy", image: "/hennessy logo.png", inCatalogue: true },
-{ name: "Chivas Regal", image: "/chivas regal logo.jpg", inCatalogue: true },
-{ name: "Campari", image: "/campari logo.png", inCatalogue: true },
-{ name: "KWV", image: "/kwv logo.jpg", inCatalogue: true },
-{ name: "Bacardi", image: "/Bacardi-Logo.png", inCatalogue: true },
-{ name: "Four Cousins", image: "/four cousins logo.jpg", inCatalogue: true }];
+{ name: "Johnnie Walker", image: "/johnnie walker-brands.jpg", to: "/brands/johnnie-walker" },
+{ name: "Hennessy", image: "/hennessy logo.png", to: "/brands/hennessy" },
+{ name: "Chivas Regal", image: "/chivas regal logo.jpg", to: "/brands/chivas-regal" },
+{ name: "Campari", image: "/campari logo.png", to: "/brands/campari" },
+{ name: "KWV", image: "/kwv logo.jpg", to: "/brands/kwv" },
+{ name: "Bacardi", image: "/Bacardi-Logo.png", to: "/brands/bacardi" },
+{ name: "Four Cousins", image: "/four cousins logo.jpg", to: "/brands/four-cousins" },
+{ name: "Tusker", image: "/Tusker logo.png", to: "/brands/tusker" },
+{ name: "Bralirwa", image: "/Rwanda-Bralirwa-logo.png", to: "/shop?category=Beer&subtype=Local" }];
 
 
 const PARTNERS: BrandLogo[] = [
@@ -34,9 +35,9 @@ function LogoCard({ brand }: { brand: BrandLogo }) {
     </div>);
 
 
-  if (brand.inCatalogue) {
+  if (brand.to) {
     return (
-      <Link to={`/brands/${slugify(brand.name)}`} className="group">
+      <Link to={brand.to} className="group">
         {content}
       </Link>);
 
@@ -49,7 +50,7 @@ export function BrandPortfolio() {
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-sm font-semibold uppercase tracking-widest text-amber2-600">Our portfolio</p>
-        <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">Brands we supply</h2>
+        <h2 className="mt-2 font-serif text-4xl font-semibold text-ink">Shop by favorite brands</h2>
         <p className="mt-3 text-ink/60">
           A trusted selection of spirits, wine and beer brands, stocked, genuine and ready to order.
         </p>
