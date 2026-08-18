@@ -7,7 +7,8 @@ import { useSEO } from "../lib/seo";
 
 export function Contact() {
   useSEO({
-    title: "Contact Us",
+    title: "Contact Atlas Supplies | Kigali, Rwanda",
+    appendSiteName: false,
     description:
     "Get in touch with Atlas Supplies Ltd for orders, delivery questions or wholesale enquiries. Based in Kigali, Rwanda, reachable by phone, WhatsApp or email.",
     path: "/contact"

@@ -23,7 +23,8 @@ const STEPS = [
 
 export function About() {
   useSEO({
-    title: "About Us",
+    title: "About Atlas Supplies | Wholesale & Retail Drinks, Made Simple",
+    appendSiteName: false,
     description:
     "Atlas Supplies Ltd is a Rwanda-based drinks wholesaler and retailer, supplying genuine imported and local spirits, wine and beer to businesses and individuals across Kigali.",
     path: "/about"

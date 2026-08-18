@@ -29,7 +29,8 @@ const FAQS: { question: string; answer: string }[] = [
 
 export function FAQ() {
   useSEO({
-    title: "Frequently Asked Questions",
+    title: "Atlas Supplies FAQs | Ordering, Delivery & Payments",
+    appendSiteName: false,
     description:
     "Answers to common questions about ordering, payment, delivery and wholesale pricing from Atlas Supplies Ltd in Rwanda.",
     path: "/faq"

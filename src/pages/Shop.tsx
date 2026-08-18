@@ -42,13 +42,28 @@ export function Shop() {
   const activeSubtype = params.get("subtype") as Subtype | null;
   const [query, setQuery] = useState(() => params.get("q") ?? "");
 
+  const isSpiritsFamily = activeCategory === "All" && activeFamily === "Spirits";
+
   useSEO({
-    title: activeCategory !== "All" ? `Buy ${activeCategory} Online in Rwanda` : "Buy Drinks Online in Rwanda",
+    title:
+    isSpiritsFamily ?
+    "Buy Spirits | Whisky, Gin, Vodka & Rum | Atlas Supplies" :
+    activeCategory !== "All" ?
+    `Buy ${activeCategory} Online in Rwanda | Atlas Supplies` :
+    "Buy Drinks Online in Rwanda | Atlas Supplies",
+    appendSiteName: false,
     description:
+    isSpiritsFamily ?
+    "Shop whisky, gin, vodka, rum, cognac and more from Atlas Supplies, with wholesale case pricing for businesses and single-bottle pricing for individuals. Delivery across Kigali and Rwanda." :
     activeCategory !== "All" ?
     `Browse and order ${activeCategory} online from Atlas Supplies Ltd, with wholesale case pricing for businesses and single-bottle pricing for individuals. Delivery across Kigali and Rwanda.` :
     "Browse the full Atlas Supplies catalogue: whisky, wine, beer, vodka, gin, rum and more, with wholesale and retail pricing and delivery across Rwanda.",
-    path: activeCategory !== "All" ? `/shop?category=${encodeURIComponent(activeCategory)}` : "/shop"
+    path:
+    isSpiritsFamily ?
+    "/shop?family=Spirits" :
+    activeCategory !== "All" ?
+    `/shop?category=${encodeURIComponent(activeCategory)}` :
+    "/shop"
   });
 
   useEffect(() => {

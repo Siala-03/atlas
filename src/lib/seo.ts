@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE_NAME = "Atlas Supplies Ltd";
+const SITE_NAME = "Atlas Supplies";
 const SITE_URL = "https://www.atlasdrinks.africa";
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
@@ -34,11 +34,15 @@ interface SEOOptions {
   title: string;
   description: string;
   path: string;
+  // Set false when `title` is already the complete tab title (e.g. it has
+  // its own custom " | ..." suffix) and shouldn't get " | Atlas Supplies"
+  // appended on top of it.
+  appendSiteName?: boolean;
 }
 
-export function useSEO({ title, description, path }: SEOOptions) {
+export function useSEO({ title, description, path, appendSiteName = true }: SEOOptions) {
   useEffect(() => {
-    const fullTitle = `${title} | ${SITE_NAME}`;
+    const fullTitle = appendSiteName ? `${title} | ${SITE_NAME}` : title;
     document.title = fullTitle;
     setMeta("name", "description", description);
     setMeta("property", "og:title", fullTitle);
@@ -47,5 +51,5 @@ export function useSEO({ title, description, path }: SEOOptions) {
     setMeta("name", "twitter:title", fullTitle);
     setMeta("name", "twitter:description", description);
     setCanonical(path);
-  }, [title, description, path]);
+  }, [title, description, path, appendSiteName]);
 }
