@@ -54,6 +54,8 @@ const JOSE_CUERVO_ESPECIAL = "/JOSE CUERVO ESPECIAL - TEQUILA.webp";
 const PATRON_SILVER = "/PATRON SILVER-TEQUILA.png";
 const FOUR_COUSINS_CABERNET = "/four cousins cabernet sauvignon.jpeg";
 const FOUR_COUSINS_SWEET_RED = "/four cousins natural sweet red.png";
+const CHATEAU_GILLET_ROUGE = "/chateau gillet bordeaux rouge.jpg";
+const COTES_DU_RHONE_BOTTLE = "/cotes du rhone bottle.jpg";
 const SCHWEPPES_TONIC = "/schweppes tonic water pack.jpg";
 const COCA_COLA_BOTTLE = "/coca-cola bottle.png";
 
@@ -987,7 +989,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 21000,
   stockUnits: 240,
   lowStockThreshold: 96,
-  image: KWV_CABERNET,
+  image: CHATEAU_GILLET_ROUGE,
   description: "Classic Bordeaux red blend with soft tannins and dark fruit.",
   origin: "France"
 },
@@ -1083,7 +1085,7 @@ export const SEED_PRODUCTS: Product[] = [
   casePrice: 201000,
   stockUnits: 108,
   lowStockThreshold: 48,
-  image: KWV_SHIRAZ,
+  image: COTES_DU_RHONE_BOTTLE,
   description: "Peppery, warm-climate Côtes du Rhône red blend.",
   origin: "France"
 },
