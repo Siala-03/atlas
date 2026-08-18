@@ -13,7 +13,7 @@ import { FloatingBottles } from "../components/FloatingBottles";
 import { Reveal, staggerContainer, staggerItem } from "../components/Reveal";
 import { useStore } from "../store/StoreContext";
 import { usePopularity } from "../lib/popularity";
-import { CATEGORY_IMAGES, WINE_CELLAR } from "../lib/categoryImages";
+import { WINE_CELLAR } from "../lib/categoryImages";
 import { SHOP_BY_CATEGORY } from "../lib/categoryTaxonomy";
 import { Category } from "../types";
 import { useSEO } from "../lib/seo";
@@ -42,9 +42,6 @@ export function Home() {
   const wineProducts = products.filter((p) => p.category === "Wine").slice(0, 4);
   const beerProducts = products.filter((p) => p.category === "Beer").slice(0, 4);
   const carouselProducts = topProducts.length > 0 ? topProducts : products.slice(0, 8);
-  const floatingImages = HERO_CHIPS.
-  map((c) => products.find((p) => p.category === c)?.image).
-  filter((src): src is string => Boolean(src));
   const categoryTileImages = SHOP_BY_CATEGORY.map((tile) => {
     if (tile.image) return tile.image;
     const match = products.find(
@@ -52,6 +49,13 @@ export function Home() {
     );
     return match?.image;
   });
+  const heroChipImage = (category: Category) => {
+    const tileIndex = SHOP_BY_CATEGORY.findIndex((tile) => tile.categories.includes(category));
+    return tileIndex >= 0 ? categoryTileImages[tileIndex] : undefined;
+  };
+  const floatingImages = HERO_CHIPS.
+  map(heroChipImage).
+  filter((src): src is string => Boolean(src));
 
   return (
     <div className="min-h-screen w-full bg-cream">
@@ -125,7 +129,7 @@ export function Home() {
 
                     <span className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-cream/15 bg-cream/5 p-2 transition-colors group-hover:border-amber2-400/60 sm:h-24 sm:w-24">
                       <img
-                      src={CATEGORY_IMAGES[c]}
+                      src={heroChipImage(c)}
                       alt=""
                       className="h-full w-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110" />
 
