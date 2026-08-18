@@ -18,15 +18,15 @@ import {
 "../types";
 import { api } from "../lib/api";
 import { SEED_PRODUCTS } from "../data/products";
-import { bottlePrice, hasCaseOption } from "../lib/productRules";
+import { bottlePrice, caseTotalPrice } from "../lib/productRules";
 
 const VAT_RATE = 0.18;
 const CART_KEY = "atlas.cart.v2";
 const MODE_KEY = "atlas.shoppingMode.v1";
 
 export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">, item: CartItem): number {
-  const isBusiness = hasCaseOption(product.category) && item.mode === "business";
-  return isBusiness ? product.casePrice * item.quantity : bottlePrice(product) * item.quantity;
+  const isBusiness = item.mode === "business";
+  return isBusiness ? caseTotalPrice(product) * item.quantity : bottlePrice(product) * item.quantity;
 }
 
 export interface CheckoutDetails {

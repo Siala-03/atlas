@@ -18,7 +18,7 @@ import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
 import { usePopularity } from "../lib/popularity";
 import { formatCurrency } from "../lib/format";
-import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
 import { ShopModeToggle } from "../components/ShopModeToggle";
 import { useSEO, truncateAtWord } from "../lib/seo";
 
@@ -31,8 +31,7 @@ export function ProductDetail() {
   const product = id ? getProduct(id) : undefined;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const caseOption = product ? hasCaseOption(product.category) : false;
-  const isBusiness = caseOption && shoppingMode === "business";
+  const isBusiness = shoppingMode === "business";
 
   const productDescription = product ?
   truncateAtWord(
@@ -72,7 +71,7 @@ export function ProductDetail() {
   const out = product.stockUnits === 0;
   const availableCases = Math.floor(product.stockUnits / product.unitsPerCase);
   const maxQuantity = isBusiness ? Math.max(availableCases, 1) : Math.max(product.stockUnits, 1);
-  const price = isBusiness ? product.casePrice : bottlePrice(product);
+  const price = isBusiness ? caseTotalPrice(product) : bottlePrice(product);
   const lineTotal = price * quantity;
   const labels = unitLabels(product.category);
   const pieceLabel = labels.individual;
@@ -148,9 +147,7 @@ export function ProductDetail() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-burgundy-100 bg-white p-6">
-              {caseOption &&
               <ShopModeToggle className="mb-5" />
-              }
               <div className="flex items-end justify-between">
                 <div>
                   <p className="font-serif text-4xl font-semibold text-burgundy-800">

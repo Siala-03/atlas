@@ -6,7 +6,7 @@ import { Product } from "../types";
 import { formatCurrency } from "../lib/format";
 import { useStore } from "../store/StoreContext";
 import { useToast } from "../store/ToastContext";
-import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
 import { BestsellerBadge } from "./BestsellerBadge";
 
 export function ProductCard({ product, isBestseller = false }: {product: Product;isBestseller?: boolean;}) {
@@ -16,9 +16,8 @@ export function ProductCard({ product, isBestseller = false }: {product: Product
   const low = !out && product.stockUnits <= product.lowStockThreshold;
 
   const labels = unitLabels(product.category);
-  const caseOption = hasCaseOption(product.category);
-  const isBusiness = caseOption && shoppingMode === "business";
-  const price = isBusiness ? product.casePrice : bottlePrice(product);
+  const isBusiness = shoppingMode === "business";
+  const price = isBusiness ? caseTotalPrice(product) : bottlePrice(product);
   const availableToAdd = isBusiness ?
   Math.floor(product.stockUnits / product.unitsPerCase) === 0 :
   false;

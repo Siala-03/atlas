@@ -22,8 +22,11 @@ describe("lineUnitTotal", () => {
     expect(lineUnitTotal(wine, { productId: "p1", mode: "business", quantity: 3 })).toBe(18000);
   });
 
-  it("prices spirits by the stored price directly, ignoring business mode and unitsPerCase", () => {
+  it("prices spirits by the stored (undivided) price in individual mode", () => {
     expect(lineUnitTotal(whisky, { productId: "p1", mode: "individual", quantity: 2 })).toBe(28000);
-    expect(lineUnitTotal(whisky, { productId: "p1", mode: "business", quantity: 2 })).toBe(28000);
+  });
+
+  it("prices spirits wholesale in business mode: undivided price × unitsPerCase × cases", () => {
+    expect(lineUnitTotal(whisky, { productId: "p1", mode: "business", quantity: 2 })).toBe(168000);
   });
 });

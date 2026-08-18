@@ -7,7 +7,7 @@ import { ProductStrip } from "../components/ProductStrip";
 import { MomoPaymentCode } from "../components/MomoPaymentCode";
 import { useStore, VAT_RATE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
-import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
 
 export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
@@ -47,8 +47,8 @@ export function Cart() {
               {cart.map((item) => {
               const p = getProduct(item.productId);
               if (!p) return null;
-              const isBusiness = hasCaseOption(p.category) && item.mode === "business";
-              const price = isBusiness ? p.casePrice : bottlePrice(p);
+              const isBusiness = item.mode === "business";
+              const price = isBusiness ? caseTotalPrice(p) : bottlePrice(p);
               const labels = unitLabels(p.category);
               const unitLabel = isBusiness ? labels.business : labels.individual;
               return (

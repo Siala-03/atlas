@@ -6,7 +6,7 @@ import { Footer } from "../components/Footer";
 import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { PaymentMethod } from "../types";
-import { bottlePrice, hasCaseOption, unitLabels } from "../lib/productRules";
+import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
 
 const EMPTY: CheckoutDetails = {
   contactName: "",
@@ -206,8 +206,8 @@ export function Checkout() {
               {cart.map((item) => {
                 const product = getProduct(item.productId);
                 if (!product) return null;
-                const isBusiness = hasCaseOption(product.category) && item.mode === "business";
-                const price = isBusiness ? product.casePrice : bottlePrice(product);
+                const isBusiness = item.mode === "business";
+                const price = isBusiness ? caseTotalPrice(product) : bottlePrice(product);
                 const labels = unitLabels(product.category);
                 const label = isBusiness ? labels.business : labels.individual;
                 return (

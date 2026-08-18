@@ -1,17 +1,23 @@
 import { Category, Product, ShoppingMode, unitPrice } from "../types";
 
-// Spirits (whisky, rum, vodka, gin, cognac, liqueur, tequila, aperitif,
-// bitters) aren't sold by the case in practice — only bottle pricing applies
-// regardless of the shopper's Individual/Business toggle. Wine, Beer, RTDs
-// and Mixers genuinely support both.
+// Wine, Beer, RTDs and Mixers are stocked with a genuine case SKU, so their
+// stored `casePrice` is already a real case total. Spirits (whisky, rum,
+// vodka, gin, cognac, liqueur, tequila, aperitif, bitters) have no separate
+// case SKU — their stored `casePrice` is actually the bottle price. This
+// only affects how the per-bottle and per-case prices are *derived*; every
+// category supports wholesale/business buying (minimum 1 case).
 const CASE_OPTION_CATEGORIES: Category[] = ["Wine", "Beer", "RTD", "Mixer"];
 
 export function hasCaseOption(category: Category): boolean {
   return CASE_OPTION_CATEGORIES.includes(category);
 }
 
-export function resolveMode(category: Category, shoppingMode: ShoppingMode): ShoppingMode {
-  return hasCaseOption(category) ? shoppingMode : "individual";
+// Business/wholesale buying (quantity = number of cases) is available for
+// every category, so this is now just an identity pass-through. Kept as a
+// named function since it's the one place that would change if that ever
+// stopped being true.
+export function resolveMode(_category: Category, shoppingMode: ShoppingMode): ShoppingMode {
+  return shoppingMode;
 }
 
 // The per-bottle price a shopper sees/pays. For case-option categories the
@@ -20,6 +26,14 @@ export function resolveMode(category: Category, shoppingMode: ShoppingMode): Sho
 // price already *is* the bottle price, so it's used directly.
 export function bottlePrice(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">): number {
   return hasCaseOption(product.category) ? unitPrice(product) : product.casePrice;
+}
+
+// The wholesale per-case total a business buyer pays. For case-option
+// categories the stored price already *is* the real case total. For spirits
+// there's no separate case SKU, so the case total is the original, undivided
+// bottle price multiplied by the number of bottles in a case.
+export function caseTotalPrice(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">): number {
+  return hasCaseOption(product.category) ? product.casePrice : bottlePrice(product) * product.unitsPerCase;
 }
 
 export interface UnitLabels {
