@@ -35,11 +35,18 @@ model Order {
   email           String
   phone           String
   deliveryAddress String
+  deliveryLat     Float?
+  deliveryLng     Float?
   deliveryDate    String?
   notes           String      @default("")
   internalNotes   String?
   invoiceStatus   String      @default("To invoice")
   paymentMethod   String      @default("card")
+  companyName     String?
+  tin             String?
+  needsEbm        Boolean     @default(false)
+  ebmPurchaseCode String?
+  ebmInvoiceEmail String?
   confirmedAt     DateTime?
   packedAt        DateTime?
   dispatchedAt    DateTime?

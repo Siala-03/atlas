@@ -33,9 +33,19 @@ export interface CheckoutDetails {
   contactName: string;
   email: string;
   phone: string;
-  deliveryAddress: string;
+  neighborhood: string;
+  streetNumber: string;
+  houseNumber: string;
+  deliveryLat?: number;
+  deliveryLng?: number;
   deliveryDate: string;
   notes: string;
+  isBusinessCheckout: boolean;
+  companyName: string;
+  tin: string;
+  needsEbm: boolean;
+  ebmPurchaseCode: string;
+  ebmInvoiceEmail: string;
 }
 
 interface StoreContextValue {

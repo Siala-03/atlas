@@ -81,11 +81,18 @@ export interface Order {
   email: string;
   phone: string;
   deliveryAddress: string;
+  deliveryLat?: number;
+  deliveryLng?: number;
   deliveryDate?: string;
   notes: string;
   internalNotes?: string;
   invoiceStatus: InvoiceStatus;
   paymentMethod: PaymentMethod;
+  companyName?: string;
+  tin?: string;
+  needsEbm: boolean;
+  ebmPurchaseCode?: string;
+  ebmInvoiceEmail?: string;
   confirmedAt?: string;
   packedAt?: string;
   dispatchedAt?: string;

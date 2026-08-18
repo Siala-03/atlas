@@ -3,6 +3,7 @@ import { NotFoundError, StockConflictError } from "../errors";
 import { computeTotals } from "../lib/money";
 import { generateReference } from "../lib/reference";
 import { bottlePrice, caseTotalPrice, resolveMode } from "../lib/productRules";
+import { sendOrderConfirmationEmail } from "../lib/mailer";
 import { z } from "zod";
 import { CartItemSchema, CheckoutDetailsSchema } from "../validation/schemas";
 
@@ -82,6 +83,12 @@ export async function createOrder(params: {
 
     const { subtotal, vat, total } = computeTotals(lines);
 
+    const deliveryAddress = [
+    details.neighborhood,
+    `Street ${details.streetNumber}`,
+    details.houseNumber ? `House ${details.houseNumber}` : null].
+    filter(Boolean).join(", ");
+
     const order = await tx.order.create({
       data: {
         reference: generateReference(),
@@ -89,17 +96,28 @@ export async function createOrder(params: {
         contactName: details.contactName,
         email: details.email,
         phone: details.phone,
-        deliveryAddress: details.deliveryAddress,
+        deliveryAddress,
+        deliveryLat: details.deliveryLat,
+        deliveryLng: details.deliveryLng,
         deliveryDate: details.deliveryDate || undefined,
         notes: details.notes || "",
         invoiceStatus: "To invoice",
         paymentMethod,
+        companyName: details.isBusinessCheckout ? details.companyName : undefined,
+        tin: details.isBusinessCheckout ? details.tin : undefined,
+        needsEbm: details.needsEbm ?? false,
+        ebmPurchaseCode: details.needsEbm ? details.ebmPurchaseCode : undefined,
+        ebmInvoiceEmail: details.needsEbm ? details.ebmInvoiceEmail : undefined,
         subtotal,
         vat,
         total,
         lines: { create: lines }
       },
       include: ORDER_INCLUDE
+    });
+
+    sendOrderConfirmationEmail(order).catch((error) => {
+      console.error(`Failed to send order confirmation email for ${order.reference}:`, error);
     });
 
     return order;

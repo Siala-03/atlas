@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CalendarDaysIcon, CreditCardIcon, LockIcon, ArrowLeftIcon, SmartphoneIcon, UserIcon } from "lucide-react";
+import { CalendarDaysIcon, CreditCardIcon, LockIcon, ArrowLeftIcon, SmartphoneIcon, UserIcon, Building2Icon, XIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { LocationPicker } from "../components/LocationPicker";
 import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { PaymentMethod } from "../types";
@@ -12,20 +13,32 @@ const EMPTY: CheckoutDetails = {
   contactName: "",
   email: "",
   phone: "",
-  deliveryAddress: "",
+  neighborhood: "",
+  streetNumber: "",
+  houseNumber: "",
   deliveryDate: "",
-  notes: ""
+  notes: "",
+  isBusinessCheckout: false,
+  companyName: "",
+  tin: "",
+  needsEbm: false,
+  ebmPurchaseCode: "",
+  ebmInvoiceEmail: ""
 };
 
+type TextField = Exclude<keyof CheckoutDetails, "isBusinessCheckout" | "needsEbm" | "deliveryLat" | "deliveryLng">;
+
 export function Checkout() {
-  const { cart, getProduct, cartSubtotal, placeOrder, initiatePayment } = useStore();
+  const { cart, getProduct, cartSubtotal, placeOrder, initiatePayment, shoppingMode } = useStore();
   const navigate = useNavigate();
   const [form, setForm] = useState<CheckoutDetails>(EMPTY);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutDetails, boolean>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [ebmModalOpen, setEbmModalOpen] = useState(false);
 
+  const isBusiness = shoppingMode === "business";
   const vat = cartSubtotal * VAT_RATE;
   const total = cartSubtotal + vat;
 
@@ -42,28 +55,40 @@ export function Checkout() {
 
   }
 
-  const set = (key: keyof CheckoutDetails, value: string) =>
+  const set = (key: TextField, value: string) =>
   setForm((previous) => ({ ...previous, [key]: value }));
+
+  const setLocation = (value: { lat: number; lng: number }) =>
+  setForm((previous) => ({ ...previous, deliveryLat: value.lat, deliveryLng: value.lng }));
+
+  const toggleEbm = (checked: boolean) => {
+    setForm((previous) => ({ ...previous, needsEbm: checked }));
+    if (checked) setEbmModalOpen(true);
+  };
 
   const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const PHONE_PATTERN = /^[+\d][\d\s()-]{6,}$/;
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const required: (keyof CheckoutDetails)[] = [
-    "contactName", "email", "phone", "deliveryAddress"];
+    const required: TextField[] = ["contactName", "email", "phone", "neighborhood", "streetNumber"];
+    if (isBusiness) required.push("companyName", "tin");
+    if (form.needsEbm) required.push("ebmPurchaseCode", "ebmInvoiceEmail");
 
     const nextErrors: Partial<Record<keyof CheckoutDetails, boolean>> = {};
     required.forEach((key) => {if (!form[key].trim()) nextErrors[key] = true;});
     if (form.email.trim() && !EMAIL_PATTERN.test(form.email.trim())) nextErrors.email = true;
     if (form.phone.trim() && !PHONE_PATTERN.test(form.phone.trim())) nextErrors.phone = true;
+    if (form.needsEbm && form.ebmInvoiceEmail.trim() && !EMAIL_PATTERN.test(form.ebmInvoiceEmail.trim())) {
+      nextErrors.ebmInvoiceEmail = true;
+    }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
     setSubmitError("");
     try {
-      const order = await placeOrder(form, paymentMethod);
+      const order = await placeOrder({ ...form, isBusinessCheckout: isBusiness }, paymentMethod);
 
       if (paymentMethod === "card") {
         const { redirectUrl } = await initiatePayment(order.id);
@@ -79,7 +104,7 @@ export function Checkout() {
   };
 
   const field = (
-  key: keyof CheckoutDetails,
+  key: TextField,
   label: string,
   props: React.InputHTMLAttributes<HTMLInputElement> = {}) =>
 
@@ -97,6 +122,7 @@ export function Checkout() {
       <p className="mt-1 text-xs text-red-600">
           {form[key].trim() && key === "email" ? "Enter a valid email address" :
           form[key].trim() && key === "phone" ? "Enter a valid phone number" :
+          form[key].trim() && key === "ebmInvoiceEmail" ? "Enter a valid email address" :
           "This field is required"}
         </p>
       }
@@ -130,6 +156,49 @@ export function Checkout() {
                 {field("phone", "Phone", { type: "tel" })}
               </div>
             </section>
+
+            {isBusiness &&
+            <section className="rounded-2xl border border-burgundy-100 bg-white p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Business account</p>
+                    <h2 className="mt-1 font-serif text-2xl font-semibold text-ink">Company details</h2>
+                  </div>
+                  <Building2Icon className="h-6 w-6 text-burgundy-700" />
+                </div>
+
+                <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                  {field("companyName", "Company name")}
+                  {field("tin", "TIN")}
+                </div>
+
+                <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-burgundy-200 bg-burgundy-50/50 p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={form.needsEbm}
+                    onChange={(event) => toggleEbm(event.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
+
+                  <span>
+                    <span className="font-semibold text-ink">I need EBM under my TIN</span>
+                    <span className="mt-0.5 block text-ink/60">We'll issue an EBM-compliant invoice for this order.</span>
+                  </span>
+                </label>
+                {form.needsEbm &&
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink/60">
+                    <span>
+                      Purchase code: <span className="font-medium text-ink">{form.ebmPurchaseCode || "not set"}</span> · Invoice email: <span className="font-medium text-ink">{form.ebmInvoiceEmail || "not set"}</span>
+                    </span>
+                    <button type="button" onClick={() => setEbmModalOpen(true)} className="font-semibold text-burgundy-800 underline underline-offset-2">
+                      Edit
+                    </button>
+                  </div>
+              }
+                {(errors.ebmPurchaseCode || errors.ebmInvoiceEmail) &&
+              <p className="mt-2 text-xs text-red-600">Add your EBM purchase code and invoice email to continue.</p>
+              }
+              </section>
+            }
 
             <section className="rounded-2xl border border-burgundy-100 bg-white p-6">
               <div className="flex items-start justify-between gap-4">
@@ -175,16 +244,15 @@ export function Checkout() {
                 <CalendarDaysIcon className="h-6 w-6 text-burgundy-700" />
               </div>
               <div className="mt-6 space-y-5">
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-ink/70">Delivery address</label>
-                  <textarea
-                    value={form.deliveryAddress}
-                    onChange={(event) => set("deliveryAddress", event.target.value)}
-                    rows={3}
-                    className={`w-full rounded-xl border bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-burgundy-200 ${errors.deliveryAddress ? "border-red-400" : "border-burgundy-200 focus:border-burgundy-500"}`} />
-
-                  {errors.deliveryAddress && <p className="mt-1 text-xs text-red-600">This field is required</p>}
+                <div className="grid gap-5 sm:grid-cols-3">
+                  <div className="sm:col-span-2">{field("neighborhood", "Neighborhood / address")}</div>
+                  {field("streetNumber", "Street number")}
                 </div>
+                <div className="max-w-xs">{field("houseNumber", "House number (optional)")}</div>
+                <LocationPicker
+                  value={form.deliveryLat != null && form.deliveryLng != null ? { lat: form.deliveryLat, lng: form.deliveryLng } : null}
+                  onChange={setLocation} />
+
                 <div className="max-w-xs">{field("deliveryDate", "Preferred delivery date", { type: "date", min: new Date().toISOString().slice(0, 10) })}</div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-ink/70">Delivery notes (optional)</label>
@@ -206,10 +274,10 @@ export function Checkout() {
               {cart.map((item) => {
                 const product = getProduct(item.productId);
                 if (!product) return null;
-                const isBusiness = item.mode === "business";
-                const price = isBusiness ? caseTotalPrice(product) : bottlePrice(product);
+                const lineIsBusiness = item.mode === "business";
+                const price = lineIsBusiness ? caseTotalPrice(product) : bottlePrice(product);
                 const labels = unitLabels(product.category);
-                const label = isBusiness ? labels.business : labels.individual;
+                const label = lineIsBusiness ? labels.business : labels.individual;
                 return (
                 <li key={`${item.productId}-${item.mode}`} className="flex justify-between gap-4 text-sm">
                     <span className="text-ink/70">
@@ -220,9 +288,8 @@ export function Checkout() {
               })}
             </ul>
             <dl className="mt-5 space-y-2 border-t border-burgundy-100 pt-4 text-sm">
-              <div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(cartSubtotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-ink/60">VAT ({Math.round(VAT_RATE * 100)}%)</dt><dd>{formatCurrency(vat)}</dd></div>
               <div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(total)}</dd></div>
+              <p className="text-xs text-ink/40">VAT inclusive</p>
             </dl>
             {submitError && <p className="mt-4 text-sm font-medium text-red-600">{submitError}</p>}
             <button
@@ -243,6 +310,31 @@ export function Checkout() {
         </form>
       </main>
       <Footer />
+
+      {ebmModalOpen &&
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <div className="flex items-center justify-between">
+              <p className="font-serif text-lg font-semibold text-ink">EBM invoice details</p>
+              <button type="button" onClick={() => setEbmModalOpen(false)} aria-label="Close" className="rounded-lg p-1.5 text-ink/50 hover:bg-burgundy-50">
+                <XIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mt-1 text-sm text-ink/60">We'll use these to issue your EBM-compliant invoice.</p>
+            <div className="mt-5 space-y-4">
+              {field("ebmPurchaseCode", "Purchase code")}
+              {field("ebmInvoiceEmail", "Invoice email", { type: "email" })}
+            </div>
+            <button
+              type="button"
+              onClick={() => setEbmModalOpen(false)}
+              className="mt-6 w-full rounded-full bg-burgundy-800 py-3 text-sm font-semibold text-cream hover:bg-burgundy-900">
+
+              Save
+            </button>
+          </div>
+        </div>
+      }
     </div>);
 
 }

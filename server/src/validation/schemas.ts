@@ -9,9 +9,35 @@ export const CheckoutDetailsSchema = z.object({
   contactName: z.string().min(1),
   email: z.string().email(),
   phone: z.string().min(1),
-  deliveryAddress: z.string().min(1),
+  neighborhood: z.string().min(1),
+  streetNumber: z.string().min(1),
+  houseNumber: z.string().optional(),
+  deliveryLat: z.number().optional(),
+  deliveryLng: z.number().optional(),
   deliveryDate: z.string().optional(),
-  notes: z.string().optional().default("")
+  notes: z.string().optional().default(""),
+  isBusinessCheckout: z.boolean().optional().default(false),
+  companyName: z.string().optional(),
+  tin: z.string().optional(),
+  needsEbm: z.boolean().optional().default(false),
+  ebmPurchaseCode: z.string().optional(),
+  ebmInvoiceEmail: z.string().optional()
+}).
+refine((data) => !data.isBusinessCheckout || !!data.companyName?.trim(), {
+  message: "Company name is required for business orders",
+  path: ["companyName"]
+}).
+refine((data) => !data.isBusinessCheckout || !!data.tin?.trim(), {
+  message: "TIN is required for business orders",
+  path: ["tin"]
+}).
+refine((data) => !data.needsEbm || !!data.ebmPurchaseCode?.trim(), {
+  message: "Purchase code is required when an EBM invoice is requested",
+  path: ["ebmPurchaseCode"]
+}).
+refine((data) => !data.needsEbm || z.string().email().safeParse(data.ebmInvoiceEmail).success, {
+  message: "A valid invoice email is required when an EBM invoice is requested",
+  path: ["ebmInvoiceEmail"]
 });
 
 export const SHOPPING_MODES = ["individual", "business"] as const;
