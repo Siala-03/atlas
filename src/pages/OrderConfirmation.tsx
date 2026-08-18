@@ -123,7 +123,11 @@ export function OrderConfirmation() {
 
         <div className="mt-6 flex items-start gap-3 rounded-2xl bg-burgundy-50 p-5">
           <TruckIcon className="mt-0.5 h-5 w-5 shrink-0 text-burgundy-800" />
-          <p className="text-sm text-ink/70">Your Order is in! 🥂</p>
+          <p className="text-sm text-ink/70">
+            Your Order is in! 🥂
+            <br />
+            We&apos;re getting everything ready and will keep you updated on your delivery.
+          </p>
         </div>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
