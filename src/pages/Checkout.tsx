@@ -322,7 +322,10 @@ export function Checkout() {
             </div>
             <p className="mt-1 text-sm text-ink/60">We'll use these to issue your EBM-compliant invoice.</p>
             <div className="mt-5 space-y-4">
-              {field("ebmPurchaseCode", "Purchase code")}
+              <div>
+                {field("ebmPurchaseCode", "Purchase code")}
+                <p className="mt-1.5 text-xs text-ink/50">Our TIN: <span className="font-medium text-ink">154674995</span></p>
+              </div>
               {field("ebmInvoiceEmail", "Invoice email", { type: "email" })}
             </div>
             <button

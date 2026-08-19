@@ -41,14 +41,9 @@ export function Navbar() {
     <div className="sticky top-0 z-40 w-full">
       <AnnouncementBar />
       <header className="w-full border-b border-burgundy-100 bg-cream/95 backdrop-blur">
-        <div className="mx-auto flex h-32 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-3">
-            <Logo className="h-28" />
-            <span className="hidden font-serif text-sm italic text-burgundy-700/80 sm:block">
-              Stocking your shelves,
-              <br />
-              one sip at a time
-            </span>
+        <div className="mx-auto flex h-40 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link to="/" className="flex items-center">
+            <Logo className="h-36" />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">
