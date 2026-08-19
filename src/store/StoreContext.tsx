@@ -20,7 +20,7 @@ import { api } from "../lib/api";
 import { SEED_PRODUCTS } from "../data/products";
 import { bottlePrice, caseTotalPrice } from "../lib/productRules";
 
-const VAT_RATE = 0.18;
+const DELIVERY_FEE = 1500;
 const CART_KEY = "atlas.cart.v2";
 const MODE_KEY = "atlas.shoppingMode.v1";
 
@@ -255,4 +255,4 @@ export function useStore(): StoreContextValue {
   return context;
 }
 
-export { VAT_RATE };
+export { DELIVERY_FEE };

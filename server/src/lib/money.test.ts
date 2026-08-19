@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeTotals, lineTotal, VAT_RATE } from "./money";
+import { computeTotals, lineTotal, DELIVERY_FEE } from "./money";
 
 describe("lineTotal", () => {
   it("prices business-mode lines by the case", () => {
@@ -14,18 +14,18 @@ describe("lineTotal", () => {
 });
 
 describe("computeTotals", () => {
-  it("sums mixed-mode lines and applies VAT", () => {
+  it("sums mixed-mode lines and adds the flat delivery fee", () => {
     const lines = [
       { mode: "business", quantity: 2, casePrice: 6000, unitPrice: 1000 },
       { mode: "individual", quantity: 4, casePrice: 6000, unitPrice: 1000 }
     ];
-    const { subtotal, vat, total } = computeTotals(lines);
+    const { subtotal, deliveryFee, total } = computeTotals(lines);
     expect(subtotal).toBe(16000);
-    expect(vat).toBe(Math.round(16000 * VAT_RATE));
-    expect(total).toBe(subtotal + vat);
+    expect(deliveryFee).toBe(DELIVERY_FEE);
+    expect(total).toBe(subtotal + deliveryFee);
   });
 
   it("returns zero totals for an empty cart", () => {
-    expect(computeTotals([])).toEqual({ subtotal: 0, vat: 0, total: 0 });
+    expect(computeTotals([])).toEqual({ subtotal: 0, deliveryFee: 0, total: 0 });
   });
 });

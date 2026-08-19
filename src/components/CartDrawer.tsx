@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRightIcon, MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon, XIcon } from "lucide-react";
-import { useStore, VAT_RATE } from "../store/StoreContext";
+import { useStore, DELIVERY_FEE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
 
@@ -10,8 +10,7 @@ export function CartDrawer() {
   const { cart, getProduct, updateCartQty, removeFromCart, cartSubtotal, isCartOpen, closeCart } = useStore();
   const navigate = useNavigate();
 
-  const vat = cartSubtotal * VAT_RATE;
-  const total = cartSubtotal + vat;
+  const total = cartSubtotal + DELIVERY_FEE;
 
   const goTo = (path: string) => {
     closeCart();
@@ -115,8 +114,8 @@ export function CartDrawer() {
                     <span className="font-medium text-ink">{formatCurrency(cartSubtotal)}</span>
                   </div>
                   <div className="mt-1 flex justify-between text-sm text-ink/60">
-                    <span>VAT ({Math.round(VAT_RATE * 100)}%)</span>
-                    <span className="font-medium text-ink">{formatCurrency(vat)}</span>
+                    <span>Delivery fee</span>
+                    <span className="font-medium text-ink">{formatCurrency(DELIVERY_FEE)}</span>
                   </div>
                   <div className="mt-2 flex justify-between border-t border-burgundy-100 pt-2 font-serif text-lg font-semibold text-ink">
                     <span>Total</span>

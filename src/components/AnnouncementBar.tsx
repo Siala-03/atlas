@@ -4,10 +4,10 @@ import { CONTACT_PHONE_INTL } from "../lib/contact";
 
 export function AnnouncementBar() {
   return (
-    <div className="w-full bg-burgundy-950 text-cream/80">
-      <div className="mx-auto max-w-7xl px-4 py-1.5 text-xs sm:px-6 lg:px-8">
+    <div className="w-full bg-burgundy-950 text-cream">
+      <div className="mx-auto max-w-7xl px-4 py-2 text-sm sm:px-6 lg:px-8">
         <div className="flex items-center justify-between sm:hidden">
-          <span className="font-medium text-cream/90">We&apos;ve got you 24/7</span>
+          <span className="font-semibold text-cream">We&apos;ve got you 24/7</span>
           <div className="flex items-center gap-3">
             <a
               href={`tel:${CONTACT_PHONE_INTL}`}
@@ -28,11 +28,10 @@ export function AnnouncementBar() {
           </div>
         </div>
 
-        <div className="hidden sm:grid sm:grid-cols-3 sm:items-center">
-          <span>We&apos;ve got you 24/7</span>
-          <span className="text-center">Business orders: Same-day delivery before 4PM</span>
+        <div className="hidden sm:flex sm:items-center sm:justify-between">
+          <span className="font-semibold text-cream">We&apos;ve got you 24/7</span>
           <div className="flex items-center justify-end gap-3">
-            <span className="font-medium text-cream/90">Need help? Talk to us</span>
+            <span className="font-semibold text-cream">Need help? Talk to us</span>
             <a
               href={`tel:${CONTACT_PHONE_INTL}`}
               aria-label="Call us"

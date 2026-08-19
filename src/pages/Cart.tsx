@@ -5,7 +5,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ProductStrip } from "../components/ProductStrip";
 import { MomoPaymentCode } from "../components/MomoPaymentCode";
-import { useStore, VAT_RATE } from "../store/StoreContext";
+import { useStore, DELIVERY_FEE } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
 
@@ -13,8 +13,7 @@ export function Cart() {
   const { cart, products, getProduct, updateCartQty, removeFromCart, cartSubtotal } =
   useStore();
 
-  const vat = cartSubtotal * VAT_RATE;
-  const total = cartSubtotal + vat;
+  const total = cartSubtotal + DELIVERY_FEE;
 
   const crossSell = useMemo(() => {
     const cartCategories = new Set(
@@ -127,8 +126,8 @@ export function Cart() {
                   <dd className="font-medium">{formatCurrency(cartSubtotal)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-ink/60">VAT ({Math.round(VAT_RATE * 100)}%)</dt>
-                  <dd className="font-medium">{formatCurrency(vat)}</dd>
+                  <dt className="text-ink/60">Delivery fee</dt>
+                  <dd className="font-medium">{formatCurrency(DELIVERY_FEE)}</dd>
                 </div>
                 <div className="flex justify-between border-t border-burgundy-100 pt-3">
                   <dt className="font-serif text-lg font-semibold text-ink">Total</dt>

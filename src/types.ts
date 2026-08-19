@@ -101,6 +101,7 @@ export interface Order {
   payments?: Payment[];
   subtotal: number;
   vat: number;
+  deliveryFee: number;
   total: number;
 }
 

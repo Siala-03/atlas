@@ -4,7 +4,7 @@ import { CalendarDaysIcon, CreditCardIcon, LockIcon, ArrowLeftIcon, SmartphoneIc
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { LocationPicker } from "../components/LocationPicker";
-import { useStore, VAT_RATE, CheckoutDetails } from "../store/StoreContext";
+import { useStore, DELIVERY_FEE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { PaymentMethod } from "../types";
 import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
@@ -39,8 +39,7 @@ export function Checkout() {
   const [ebmModalOpen, setEbmModalOpen] = useState(false);
 
   const isBusiness = shoppingMode === "business";
-  const vat = cartSubtotal * VAT_RATE;
-  const total = cartSubtotal + vat;
+  const total = cartSubtotal + DELIVERY_FEE;
 
   if (cart.length === 0) {
     return (
@@ -288,8 +287,9 @@ export function Checkout() {
               })}
             </ul>
             <dl className="mt-5 space-y-2 border-t border-burgundy-100 pt-4 text-sm">
+              <div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(cartSubtotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(DELIVERY_FEE)}</dd></div>
               <div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(total)}</dd></div>
-              <p className="text-xs text-ink/40">VAT inclusive</p>
             </dl>
             {submitError && <p className="mt-4 text-sm font-medium text-red-600">{submitError}</p>}
             <button

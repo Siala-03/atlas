@@ -81,7 +81,7 @@ export async function createOrder(params: {
       });
     }
 
-    const { subtotal, vat, total } = computeTotals(lines);
+    const { subtotal, deliveryFee, total } = computeTotals(lines);
 
     const deliveryAddress = [
     details.neighborhood,
@@ -109,7 +109,7 @@ export async function createOrder(params: {
         ebmPurchaseCode: details.needsEbm ? details.ebmPurchaseCode : undefined,
         ebmInvoiceEmail: details.needsEbm ? details.ebmInvoiceEmail : undefined,
         subtotal,
-        vat,
+        deliveryFee,
         total,
         lines: { create: lines }
       },
