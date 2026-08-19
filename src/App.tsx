@@ -5,6 +5,7 @@ import { ToastProvider } from "./store/ToastContext";
 import { PortalGuard } from "./components/PortalGuard";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { CartDrawer } from "./components/CartDrawer";
+import { AgeGate } from "./components/AgeGate";
 import { Home } from "./pages/Home";
 import { Shop } from "./pages/Shop";
 import { ProductDetail } from "./pages/ProductDetail";
@@ -34,6 +35,7 @@ export function App() {
       <StoreProvider>
         <ToastProvider>
         <BrowserRouter>
+          <AgeGate />
           <CartDrawer />
           <Routes>
             <Route path="/" element={<Home />} />

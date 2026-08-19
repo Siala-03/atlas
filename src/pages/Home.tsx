@@ -20,7 +20,6 @@ import { useSEO } from "../lib/seo";
 
 const TAGLINES = [
 "Genuine imports, traceable supply",
-"Next-day delivery across the region",
 "Pay by card or MTN MoMo",
 "Live stock, no surprises at checkout"];
 
