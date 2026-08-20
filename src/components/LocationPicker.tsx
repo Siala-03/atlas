@@ -97,8 +97,7 @@ function MapModal({ value, onChange, onClose }: LocationPickerProps) {
     );
   };
 
-  const runSearch = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const runSearch = async () => {
     if (!query.trim()) return;
     setSearching(true);
     try {
@@ -131,15 +130,28 @@ function MapModal({ value, onChange, onClose }: LocationPickerProps) {
 
         <div className="border-b border-burgundy-100 p-3">
           <div className="flex gap-2">
-            <form onSubmit={runSearch} className="relative flex-1">
+            <div className="relative flex-1">
               <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    runSearch();
+                  }
+                }}
                 placeholder="Search for a place or address in Rwanda..."
                 className="w-full rounded-xl border border-burgundy-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
 
-            </form>
+            </div>
+            <button
+              type="button"
+              onClick={() => runSearch()}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-burgundy-200 bg-white px-3 py-2.5 text-sm font-medium text-burgundy-800 hover:bg-burgundy-50">
+
+              <SearchIcon className="h-4 w-4" />
+            </button>
             <button
               type="button"
               onClick={useMyLocation}

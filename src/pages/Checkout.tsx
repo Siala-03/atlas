@@ -82,7 +82,14 @@ export function Checkout() {
       nextErrors.ebmInvoiceEmail = true;
     }
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    const errorKeys = Object.keys(nextErrors);
+    if (errorKeys.length > 0) {
+      setSubmitError("Please fill in the highlighted required fields below.");
+      const firstErrorField = document.getElementById(`field-${errorKeys[0]}`);
+      firstErrorField?.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstErrorField?.focus();
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError("");
@@ -110,6 +117,7 @@ export function Checkout() {
   <div>
       <label className="mb-1.5 block text-sm font-medium text-ink/70">{label}</label>
       <input
+      id={`field-${key}`}
       value={form[key]}
       onChange={(event) => set(key, event.target.value)}
       className={`w-full rounded-xl border bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-burgundy-200 ${
