@@ -14,7 +14,7 @@ export function createApp() {
   split(",").
   map((origin) => origin.trim());
   app.use(cors({ origin: allowedOrigins }));
-  app.use(express.json());
+  app.use(express.json({ limit: "10mb" }));
 
   app.use(healthRouter);
   app.use("/api", productsRouter);

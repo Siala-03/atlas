@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   SearchIcon,
   PlusIcon,
@@ -6,13 +6,43 @@ import {
   XIcon,
   PencilIcon,
   AlertTriangleIcon,
-  FilterIcon } from
+  FilterIcon,
+  ImageUpIcon } from
 "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
 import { Category, Product } from "../../types";
 import { bottlePrice, hasCaseOption, isCaseStocked } from "../../lib/productRules";
+
+// Resizes/compresses an image file client-side before it's sent to the
+// server, so a raw multi-megabyte phone photo doesn't blow up the DB row
+// or the /products response size. Returns a JPEG data URL.
+function resizeImageFile(file: File, maxDim = 1000, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read file"));
+    reader.onload = () => {
+      img.onerror = () => reject(new Error("Could not read image"));
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas not supported"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export function Inventory() {
   const { products, updateProduct, restockProduct } = useStore();
@@ -27,7 +57,33 @@ export function Inventory() {
   });
   const [savingId, setSavingId] = useState<string | null>(null);
   const [restockingId, setRestockingId] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadTargetId = useRef<string | null>(null);
+
+  const triggerUpload = (productId: string) => {
+    uploadTargetId.current = productId;
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const productId = uploadTargetId.current;
+    event.target.value = "";
+    if (!file || !productId) return;
+
+    setUploadingId(productId);
+    setRowError(null);
+    try {
+      const dataUrl = await resizeImageFile(file);
+      await updateProduct(productId, { image: dataUrl });
+    } catch (error) {
+      setRowError(error instanceof Error ? error.message : "Could not upload image.");
+    } finally {
+      setUploadingId(null);
+    }
+  };
 
   const categories = useMemo(
     () => [...new Set(products.map((p) => p.category))].sort(),
@@ -112,12 +168,19 @@ export function Inventory() {
 
   return (
     <AdminLayout>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelected}
+        className="hidden" />
+
       <h1 className="font-serif text-4xl font-semibold text-ink">Inventory</h1>
       <p className="mt-1 text-ink/60">
         {products.length} products · stock value {formatCurrency(totalStockValue)}
       </p>
       <p className="mt-1 text-xs text-ink/40">
-        Wine &amp; spirits are priced and stocked per bottle · Beer is priced and stocked per case.
+        Wine &amp; spirits are priced and stocked per bottle · Beer is priced and stocked per case. Hover a product photo to replace it — changes show on the storefront immediately.
       </p>
       {rowError && <p className="mt-3 text-sm font-medium text-red-600">{rowError}</p>}
 
@@ -187,9 +250,22 @@ export function Inventory() {
                   <tr key={p.id} className="align-middle hover:bg-cream/50">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cream p-1">
+                        <button
+                        type="button"
+                        onClick={() => triggerUpload(p.id)}
+                        disabled={uploadingId === p.id}
+                        aria-label="Change product image"
+                        className="group relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-cream p-1 disabled:cursor-not-allowed">
+
                           <img src={p.image} alt="" className="h-full w-auto object-contain" />
-                        </div>
+                          <span className="absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all group-hover:bg-ink/50 group-hover:opacity-100">
+                            {uploadingId === p.id ?
+                            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" /> :
+
+                            <ImageUpIcon className="h-4 w-4 text-white" />
+                            }
+                          </span>
+                        </button>
                         <div>
                           <p className="font-medium text-ink">{p.name}</p>
                           <p className="text-xs text-ink/50">{p.brand}</p>

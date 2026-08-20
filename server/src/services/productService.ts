@@ -11,7 +11,7 @@ export async function getProduct(id: string) {
   return product;
 }
 
-export async function patchProduct(id: string, patch: { casePrice?: number; stockUnits?: number; lowStockThreshold?: number }) {
+export async function patchProduct(id: string, patch: { casePrice?: number; stockUnits?: number; lowStockThreshold?: number; image?: string }) {
   await getProduct(id);
   return prisma.product.update({ where: { id }, data: patch });
 }

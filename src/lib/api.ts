@@ -50,7 +50,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   getProducts: () => request<Product[]>("/products"),
 
-  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold">>) =>
+  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold" | "image">>) =>
   request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
 
   restockProduct: (id: string, units: number) =>

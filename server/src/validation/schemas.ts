@@ -57,7 +57,8 @@ export const CreateOrderSchema = z.object({
 export const ProductPatchSchema = z.object({
   casePrice: z.number().int().nonnegative().optional(),
   stockUnits: z.number().int().nonnegative().optional(),
-  lowStockThreshold: z.number().int().nonnegative().optional()
+  lowStockThreshold: z.number().int().nonnegative().optional(),
+  image: z.string().min(1).optional()
 });
 
 export const RestockSchema = z.object({
