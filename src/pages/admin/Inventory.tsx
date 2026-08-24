@@ -5,7 +5,6 @@ import {
   CheckIcon,
   XIcon,
   PencilIcon,
-  AlertTriangleIcon,
   FilterIcon,
   ImageUpIcon } from
 "lucide-react";
@@ -44,11 +43,16 @@ function resizeImageFile(file: File, maxDim = 1000, quality = 0.82): Promise<str
   });
 }
 
+type StatusFilter = "All" | "In stock" | "Low" | "Out";
+type SortKey = "name" | "stock-asc" | "stock-desc" | "price-asc" | "price-desc";
+
 export function Inventory() {
   const { products, updateProduct, restockProduct } = useStore();
   const [query, setQuery] = useState("");
-  const [onlyLow, setOnlyLow] = useState(false);
   const [category, setCategory] = useState<Category | "All">("All");
+  const [brand, setBrand] = useState<string>("All");
+  const [status, setStatus] = useState<StatusFilter>("All");
+  const [sort, setSort] = useState<SortKey>("name");
   const [editId, setEditId] = useState<string | null>(null);
   const [draft, setDraft] = useState<{price: string;stock: string;lowStockThreshold: string;}>({
     price: "",
@@ -89,10 +93,15 @@ export function Inventory() {
     () => [...new Set(products.map((p) => p.category))].sort(),
     [products]
   );
+  const brands = useMemo(
+    () => [...new Set(products.map((p) => p.brand))].sort(),
+    [products]
+  );
 
   const rows = useMemo(() => {
     let list = products;
     if (category !== "All") list = list.filter((p) => p.category === category);
+    if (brand !== "All") list = list.filter((p) => p.brand === brand);
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter(
@@ -100,9 +109,20 @@ export function Inventory() {
         p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
       );
     }
-    if (onlyLow) list = list.filter((p) => p.stockUnits <= p.lowStockThreshold);
-    return list;
-  }, [products, query, onlyLow, category]);
+    if (status === "Out") list = list.filter((p) => p.stockUnits === 0);
+    else if (status === "Low") list = list.filter((p) => p.stockUnits > 0 && p.stockUnits <= p.lowStockThreshold);
+    else if (status === "In stock") list = list.filter((p) => p.stockUnits > p.lowStockThreshold);
+
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "stock-asc") return a.stockUnits - b.stockUnits;
+      if (sort === "stock-desc") return b.stockUnits - a.stockUnits;
+      if (sort === "price-asc") return bottlePrice(a) - bottlePrice(b);
+      return bottlePrice(b) - bottlePrice(a);
+    });
+    return sorted;
+  }, [products, query, category, brand, status, sort]);
 
   const startEdit = (p: Product) => {
     const caseOnly = isCaseStocked(p.category);
@@ -184,43 +204,87 @@ export function Inventory() {
       </p>
       {rowError && <p className="mt-3 text-sm font-medium text-red-600">{rowError}</p>}
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button
-            onClick={() => setOnlyLow((v) => !v)}
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-            onlyLow ?
-            "bg-amber2-500 text-white" :
-            "border border-burgundy-200 bg-white text-ink/70 hover:bg-burgundy-50"}`
-            }>
-
-            <AlertTriangleIcon className="h-4 w-4" />
-            Low stock only ({lowCount})
-          </button>
-          <div className="relative">
-            <FilterIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as Category | "All")}
-              className="appearance-none rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-8 text-sm font-medium text-ink/70 outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200">
-
-              <option value="All">All categories</option>
-              {categories.map((c) =>
-              <option key={c} value={c}>{c}</option>
-              )}
-            </select>
-          </div>
-        </div>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="relative sm:w-64">
           <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products..."
+            placeholder="Search name or brand..."
             className="w-full rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
 
         </div>
+
+        <div className="relative">
+          <FilterIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as Category | "All")}
+            className="appearance-none rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-8 text-sm font-medium text-ink/70 outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200">
+
+            <option value="All">All categories</option>
+            {categories.map((c) =>
+            <option key={c} value={c}>{c}</option>
+            )}
+          </select>
+        </div>
+
+        <select
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          className="appearance-none rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-medium text-ink/70 outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200">
+
+          <option value="All">All brands</option>
+          {brands.map((b) =>
+          <option key={b} value={b}>{b}</option>
+          )}
+        </select>
+
+        <div className="flex rounded-full border border-burgundy-200 bg-white p-1 text-sm font-semibold">
+          {(["All", "In stock", "Low", "Out"] as StatusFilter[]).map((s) =>
+          <button
+            key={s}
+            onClick={() => setStatus(s)}
+            className={`rounded-full px-3 py-1.5 transition-colors ${
+            status === s ?
+            "bg-amber2-500 text-white" :
+            "text-ink/60 hover:bg-burgundy-50"}`
+            }>
+
+              {s === "Low" ? `Low (${lowCount})` : s}
+            </button>
+          )}
+        </div>
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortKey)}
+          className="appearance-none rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-medium text-ink/70 outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200">
+
+          <option value="name">Sort: Name A-Z</option>
+          <option value="stock-asc">Sort: Stock low-high</option>
+          <option value="stock-desc">Sort: Stock high-low</option>
+          <option value="price-asc">Sort: Price low-high</option>
+          <option value="price-desc">Sort: Price high-low</option>
+        </select>
+
+        {(query || category !== "All" || brand !== "All" || status !== "All" || sort !== "name") &&
+        <button
+          onClick={() => {
+            setQuery("");
+            setCategory("All");
+            setBrand("All");
+            setStatus("All");
+            setSort("name");
+          }}
+          className="text-sm font-semibold text-burgundy-800 underline underline-offset-2 hover:text-burgundy-900">
+
+            Clear filters
+          </button>
+        }
       </div>
+
+      <p className="mt-3 text-xs text-ink/40">{rows.length} of {products.length} products shown</p>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-burgundy-100 bg-white">
         <div className="thin-scroll overflow-x-auto">
