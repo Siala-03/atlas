@@ -93,3 +93,16 @@ model Setting {
   key   String @id
   value String
 }
+
+// Staff accounts, separate from the single owner login (which still uses
+// ADMIN_PASSWORD / the Setting table). role "admin" has full access
+// (prices, inventory, settings, team); "staff" can view/process orders
+// but not touch prices, stock, or team management.
+model AdminUser {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("staff")
+  createdAt    DateTime @default(now())
+}

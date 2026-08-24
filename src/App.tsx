@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StoreProvider } from "./store/StoreContext";
 import { ToastProvider } from "./store/ToastContext";
 import { PortalGuard } from "./components/PortalGuard";
+import { AdminOnlyGuard } from "./components/AdminOnlyGuard";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { CartDrawer } from "./components/CartDrawer";
 import { AgeGate } from "./components/AgeGate";
@@ -59,8 +60,10 @@ export function App() {
               <Route path="/portal" element={<Suspense fallback={null}><Dashboard /></Suspense>} />
               <Route path="/portal/orders" element={<Suspense fallback={null}><Orders /></Suspense>} />
               <Route path="/portal/orders/:id" element={<Suspense fallback={null}><OrderDetail /></Suspense>} />
-              <Route path="/portal/inventory" element={<Suspense fallback={null}><Inventory /></Suspense>} />
-              <Route path="/portal/settings" element={<Suspense fallback={null}><Settings /></Suspense>} />
+              <Route element={<AdminOnlyGuard />}>
+                <Route path="/portal/inventory" element={<Suspense fallback={null}><Inventory /></Suspense>} />
+                <Route path="/portal/settings" element={<Suspense fallback={null}><Settings /></Suspense>} />
+              </Route>
             </Route>
 
             <Route path="*" element={<NotFound />} />

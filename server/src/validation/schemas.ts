@@ -90,3 +90,10 @@ export const ChangePasswordSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: z.string().min(4, "New password must be at least 4 characters")
 });
+
+export const CreateStaffSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(4, "Password must be at least 4 characters"),
+  role: z.enum(["admin", "staff"])
+});

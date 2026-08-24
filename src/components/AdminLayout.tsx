@@ -12,14 +12,14 @@ import {
 "lucide-react";
 import { Logo } from "./Logo";
 import { BackendStatusBanner } from "./BackendStatusBanner";
-import { endPortalSession } from "../lib/portalAuth";
+import { endPortalSession, getPortalName, getPortalRole, isPortalAdmin } from "../lib/portalAuth";
 import { useStore } from "../store/StoreContext";
 
-const LINKS = [
-{ to: "/portal", label: "Dashboard", icon: LayoutDashboardIcon, end: true },
-{ to: "/portal/orders", label: "Orders", icon: ClipboardListIcon },
-{ to: "/portal/inventory", label: "Inventory", icon: BoxesIcon },
-{ to: "/portal/settings", label: "Settings", icon: SettingsIcon }];
+const ALL_LINKS = [
+{ to: "/portal", label: "Dashboard", icon: LayoutDashboardIcon, end: true, adminOnly: false },
+{ to: "/portal/orders", label: "Orders", icon: ClipboardListIcon, adminOnly: false },
+{ to: "/portal/inventory", label: "Inventory", icon: BoxesIcon, adminOnly: true },
+{ to: "/portal/settings", label: "Settings", icon: SettingsIcon, adminOnly: true }];
 
 
 export function AdminLayout({ children }: {children: React.ReactNode;}) {
@@ -27,6 +27,8 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isAdmin = isPortalAdmin();
+  const LINKS = ALL_LINKS.filter((l) => !l.adminOnly || isAdmin);
 
   useEffect(() => {
     loadOrders().catch(() => undefined);
@@ -82,6 +84,9 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
         </div>
         {nav}
         <div className="mt-auto space-y-1 px-3">
+          <p className="px-4 pb-1 text-xs text-cream/40">
+            Signed in as {getPortalName()} · {getPortalRole() === "admin" ? "Admin" : "Staff"}
+          </p>
           <Link
             to="/"
             className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-cream/70 hover:bg-burgundy-800/50 hover:text-cream">

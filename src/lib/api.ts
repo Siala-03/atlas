@@ -5,7 +5,8 @@ import {
   InvoiceStatus,
   PaymentMethod,
   Payment,
-  Product } from
+  Product,
+  StaffUser } from
 "../types";
 import type { CheckoutDetails } from "../store/StoreContext";
 import { endPortalSession, getPortalToken } from "./portalAuth";
@@ -60,11 +61,22 @@ export const api = {
 
   getOrder: (id: string) => request<Order>(`/orders/${id}`),
 
-  portalLogin: (password: string) =>
-  request<{ token: string }>("/portal/login", { method: "POST", body: JSON.stringify({ password }) }),
+  portalLogin: (password: string, email?: string) =>
+  request<{ token: string; role: "admin" | "staff"; name: string }>("/portal/login", {
+    method: "POST",
+    body: JSON.stringify(email ? { email, password } : { password })
+  }),
 
   changePortalPassword: (currentPassword: string, newPassword: string) =>
   request<{ ok: boolean }>("/portal/change-password", { method: "POST", body: JSON.stringify({ currentPassword, newPassword }) }),
+
+  getTeam: () => request<StaffUser[]>("/portal/team"),
+
+  addTeamMember: (params: { name: string; email: string; password: string; role: "admin" | "staff" }) =>
+  request<StaffUser>("/portal/team", { method: "POST", body: JSON.stringify(params) }),
+
+  removeTeamMember: (id: string) =>
+  request<{ ok: boolean }>(`/portal/team/${id}`, { method: "DELETE" }),
 
   placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
   request<Order>("/orders", { method: "POST", body: JSON.stringify(params) }),

@@ -1,7 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { checkAdminPassword, changeAdminPassword, hashPassword, verifyPasswordHash, issueToken, verifyToken } from "./adminAuth";
+import {
+  checkAdminPassword,
+  changeAdminPassword,
+  checkStaffLogin,
+  hashPassword,
+  verifyPasswordHash,
+  issueToken,
+  verifyToken } from
+"./adminAuth";
 
 const settingStore = new Map<string, string>();
+const staffStore = new Map<string, { id: string; name: string; email: string; passwordHash: string; role: string }>();
+let nextId = 1;
 
 vi.mock("../db", () => ({
   prisma: {
@@ -14,6 +24,16 @@ vi.mock("../db", () => ({
         settingStore.set(where.key, create.value);
         return { key: where.key, value: create.value };
       })
+    },
+    adminUser: {
+      findUnique: vi.fn(async ({ where }: { where: { email: string } }) => staffStore.get(where.email) ?? null),
+      create: vi.fn(
+        async ({ data }: { data: { name: string; email: string; passwordHash: string; role: string } }) => {
+          const user = { id: `u${nextId++}`, ...data };
+          staffStore.set(data.email, user);
+          return user;
+        }
+      )
     }
   }
 }));
@@ -22,6 +42,7 @@ beforeEach(() => {
   process.env.ADMIN_PASSWORD = "correct-horse";
   process.env.ADMIN_SESSION_SECRET = "test-secret";
   settingStore.clear();
+  staffStore.clear();
 });
 
 describe("hashPassword / verifyPasswordHash", () => {
@@ -68,29 +89,73 @@ describe("changeAdminPassword", () => {
   });
 });
 
+describe("checkStaffLogin", () => {
+  it("returns null for an email with no staff account", async () => {
+    expect(await checkStaffLogin("nobody@atlas.rw", "whatever")).toBeNull();
+  });
+
+  it("returns the user for correct credentials", async () => {
+    staffStore.set("staff@atlas.rw", {
+      id: "u1",
+      name: "Staff One",
+      email: "staff@atlas.rw",
+      passwordHash: hashPassword("s3cret"),
+      role: "staff"
+    });
+    expect(await checkStaffLogin("staff@atlas.rw", "s3cret")).toEqual({ id: "u1", name: "Staff One", role: "staff" });
+  });
+
+  it("rejects the wrong password for an existing account", async () => {
+    staffStore.set("staff@atlas.rw", {
+      id: "u1",
+      name: "Staff One",
+      email: "staff@atlas.rw",
+      passwordHash: hashPassword("s3cret"),
+      role: "staff"
+    });
+    expect(await checkStaffLogin("staff@atlas.rw", "wrong")).toBeNull();
+  });
+
+  it("is case-insensitive on email", async () => {
+    staffStore.set("staff@atlas.rw", {
+      id: "u1",
+      name: "Staff One",
+      email: "staff@atlas.rw",
+      passwordHash: hashPassword("s3cret"),
+      role: "staff"
+    });
+    expect(await checkStaffLogin("STAFF@atlas.rw", "s3cret")).not.toBeNull();
+  });
+});
+
 describe("issueToken / verifyToken", () => {
-  it("accepts a freshly issued token", () => {
-    const token = issueToken();
-    expect(verifyToken(token)).toBe(true);
+  it("accepts a freshly issued token and carries the role through", () => {
+    const token = issueToken({ role: "admin" });
+    expect(verifyToken(token)).toEqual({ role: "admin" });
+  });
+
+  it("carries a staff userId through", () => {
+    const token = issueToken({ role: "staff", userId: "u1" });
+    expect(verifyToken(token)).toEqual({ role: "staff", userId: "u1" });
   });
 
   it("rejects a tampered token", () => {
     const token = issueToken();
     const [expiry] = token.split(".");
-    expect(verifyToken(`${expiry}.deadbeef`)).toBe(false);
+    expect(verifyToken(`${expiry}.deadbeef.deadbeef`)).toBeNull();
   });
 
   it("rejects an expired token", () => {
     const expiredExpiry = String(Date.now() - 1000);
     const token = issueToken().replace(/^\d+/, expiredExpiry);
-    expect(verifyToken(token)).toBe(false);
+    expect(verifyToken(token)).toBeNull();
   });
 
   it("rejects a missing token", () => {
-    expect(verifyToken(undefined)).toBe(false);
+    expect(verifyToken(undefined)).toBeNull();
   });
 
   it("rejects a malformed token", () => {
-    expect(verifyToken("not-a-real-token")).toBe(false);
+    expect(verifyToken("not-a-real-token")).toBeNull();
   });
 });

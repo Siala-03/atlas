@@ -3,7 +3,7 @@ import { NotFoundError, StockConflictError } from "../errors";
 import { computeTotals } from "../lib/money";
 import { generateReference } from "../lib/reference";
 import { bottlePrice, caseTotalPrice, resolveMode } from "../lib/productRules";
-import { sendOrderConfirmationEmail } from "../lib/mailer";
+import { sendOrderConfirmationEmail, sendOrderNotificationEmail } from "../lib/mailer";
 import { z } from "zod";
 import { CartItemSchema, CheckoutDetailsSchema } from "../validation/schemas";
 
@@ -118,6 +118,9 @@ export async function createOrder(params: {
 
     sendOrderConfirmationEmail(order).catch((error) => {
       console.error(`Failed to send order confirmation email for ${order.reference}:`, error);
+    });
+    sendOrderNotificationEmail(order).catch((error) => {
+      console.error(`Failed to send order notification email for ${order.reference}:`, error);
     });
 
     return order;

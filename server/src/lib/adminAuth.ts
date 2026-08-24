@@ -4,6 +4,13 @@ import { prisma } from "../db";
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const PASSWORD_SETTING_KEY = "adminPasswordHash";
 
+export type Role = "admin" | "staff";
+
+export interface TokenPayload {
+  role: Role;
+  userId?: string;
+}
+
 function sign(payload: string): string {
   const secret = process.env.ADMIN_SESSION_SECRET ?? "";
   return createHmac("sha256", secret).update(payload).digest("hex");
@@ -35,9 +42,10 @@ function checkAgainstEnvPassword(password: string): boolean {
   return safeEqual(password, expected);
 }
 
-// The password lives in the database once someone changes it from the
-// default; until then, the ADMIN_PASSWORD environment variable is the
-// bootstrap password.
+// The owner password lives in the database once someone changes it from
+// the default; until then, the ADMIN_PASSWORD environment variable is the
+// bootstrap password. This is the single "owner" login (no email), which
+// always grants the admin role.
 export async function checkAdminPassword(password: string): Promise<boolean> {
   if (!password) return false;
   const stored = await prisma.setting.findUnique({ where: { key: PASSWORD_SETTING_KEY } });
@@ -57,16 +65,59 @@ export async function changeAdminPassword(currentPassword: string, newPassword: 
   return true;
 }
 
-export function issueToken(): string {
-  const expiry = String(Date.now() + TOKEN_TTL_MS);
-  return `${expiry}.${sign(expiry)}`;
+// Named staff accounts, separate from the owner login above.
+export async function checkStaffLogin(
+  email: string,
+  password: string
+): Promise<{ id: string; name: string; role: Role } | null> {
+  const user = await prisma.adminUser.findUnique({ where: { email: email.toLowerCase().trim() } });
+  if (!user || !verifyPasswordHash(password, user.passwordHash)) return null;
+  return { id: user.id, name: user.name, role: user.role as Role };
 }
 
-export function verifyToken(token: string | undefined): boolean {
-  if (!token || !(process.env.ADMIN_SESSION_SECRET ?? "")) return false;
-  const [expiry, signature] = token.split(".");
-  if (!expiry || !signature) return false;
-  if (Number(expiry) < Date.now()) return false;
+export async function createStaffUser(name: string, email: string, password: string, role: Role) {
+  return prisma.adminUser.create({
+    data: { name, email: email.toLowerCase().trim(), passwordHash: hashPassword(password), role },
+    select: { id: true, name: true, email: true, role: true, createdAt: true }
+  });
+}
 
-  return safeEqual(signature, sign(expiry));
+export function listStaffUsers() {
+  return prisma.adminUser.findMany({
+    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    orderBy: { createdAt: "asc" }
+  });
+}
+
+export async function deleteStaffUser(id: string) {
+  await prisma.adminUser.delete({ where: { id } });
+}
+
+function encodePayload(payload: TokenPayload): string {
+  return Buffer.from(JSON.stringify(payload)).toString("base64url");
+}
+
+function decodePayload(encoded: string): TokenPayload | null {
+  try {
+    const parsed = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
+    if (parsed?.role === "admin" || parsed?.role === "staff") return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function issueToken(payload: TokenPayload = { role: "admin" }): string {
+  const expiry = String(Date.now() + TOKEN_TTL_MS);
+  const encoded = encodePayload(payload);
+  return `${expiry}.${encoded}.${sign(`${expiry}.${encoded}`)}`;
+}
+
+export function verifyToken(token: string | undefined): TokenPayload | null {
+  if (!token || !(process.env.ADMIN_SESSION_SECRET ?? "")) return null;
+  const [expiry, encoded, signature] = token.split(".");
+  if (!expiry || !encoded || !signature) return null;
+  if (Number(expiry) < Date.now()) return null;
+  if (!safeEqual(signature, sign(`${expiry}.${encoded}`))) return null;
+  return decodePayload(encoded);
 }

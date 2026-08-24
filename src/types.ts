@@ -118,3 +118,13 @@ export const INVOICE_STATUSES: InvoiceStatus[] = [
 "To invoice",
 "Invoiced",
 "Paid"];
+
+export type AdminRole = "admin" | "staff";
+
+export interface StaffUser {
+  id: string;
+  name: string;
+  email: string;
+  role: AdminRole;
+  createdAt: string;
+}

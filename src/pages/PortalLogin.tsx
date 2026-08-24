@@ -12,26 +12,32 @@ interface LocationState {
 export function PortalLogin() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isStaff, setIsStaff] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!password.trim()) {
-      setError("Enter your operations password.");
+    if (!password.trim() || (isStaff && !email.trim())) {
+      setError(isStaff ? "Enter your email and password." : "Enter your operations password.");
       return;
     }
 
     setSubmitting(true);
     setError("");
     try {
-      const { token } = await api.portalLogin(password);
-      startPortalSession(token);
+      const { token, role, name } = await api.portalLogin(password, isStaff ? email : undefined);
+      startPortalSession(token, role, name);
       const state = location.state as LocationState | null;
       navigate(state?.from ?? "/portal", { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? "Incorrect password." : "Could not sign in. Try again.");
+      setError(
+        err instanceof ApiError && err.status === 401 ?
+        isStaff ? "Incorrect email or password." : "Incorrect password." :
+        "Could not sign in. Try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -58,7 +64,40 @@ export function PortalLogin() {
             Sign in to manage incoming orders, fulfilment and warehouse stock.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-4" noValidate>
+          <div className="mt-6 flex rounded-full border border-burgundy-200 bg-burgundy-50/50 p-1 text-sm font-semibold">
+            <button
+              type="button"
+              onClick={() => setIsStaff(false)}
+              className={`flex-1 rounded-full py-2 transition-colors ${!isStaff ? "bg-burgundy-800 text-cream" : "text-ink/60"}`}>
+
+              Owner
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsStaff(true)}
+              className={`flex-1 rounded-full py-2 transition-colors ${isStaff ? "bg-burgundy-800 text-cream" : "text-ink/60"}`}>
+
+              Staff
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4" noValidate>
+            {isStaff &&
+            <div>
+                <label htmlFor="portal-email" className="mb-1.5 block text-sm font-medium text-ink/70">
+                  Email
+                </label>
+                <input
+                id="portal-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="username"
+                className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none transition focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-100"
+                placeholder="you@atlassupplies.rw" />
+
+              </div>
+            }
             <div>
               <label htmlFor="portal-password" className="mb-1.5 block text-sm font-medium text-ink/70">
                 Password
