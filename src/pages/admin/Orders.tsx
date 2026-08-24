@@ -35,7 +35,10 @@ export function Orders() {
       list = list.filter(
         (o) =>
         o.reference.toLowerCase().includes(q) ||
-        o.contactName.toLowerCase().includes(q)
+        o.contactName.toLowerCase().includes(q) ||
+        o.email.toLowerCase().includes(q) ||
+        o.phone.toLowerCase().includes(q) ||
+        o.lines.some((l) => l.name.toLowerCase().includes(q) || l.brand.toLowerCase().includes(q))
       );
     }
     const dir = sortDir === "asc" ? 1 : -1;
@@ -99,7 +102,7 @@ export function Orders() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search ref, customer..."
+            placeholder="Search ref, customer, phone, product..."
             className="w-full rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
           
         </div>
@@ -114,6 +117,7 @@ export function Orders() {
                 <th className="px-5 py-3"><SortHeader field="contactName" label="Customer" /></th>
                 <th className="px-5 py-3"><SortHeader field="createdAt" label="Date" /></th>
                 <th className="px-5 py-3">Items</th>
+                <th className="px-5 py-3">Payment</th>
                 <th className="px-5 py-3"><SortHeader field="total" label="Total" /></th>
                 <th className="px-5 py-3"><SortHeader field="status" label="Status" /></th>
               </tr>
@@ -121,7 +125,7 @@ export function Orders() {
             <tbody className="divide-y divide-burgundy-50">
               {rows.length === 0 ?
               <tr>
-                  <td colSpan={6} className="px-5 py-16 text-center text-ink/50">
+                  <td colSpan={7} className="px-5 py-16 text-center text-ink/50">
                     No orders match your filters.
                   </td>
                 </tr> :
@@ -143,6 +147,20 @@ export function Orders() {
                     <td className="px-5 py-4 text-ink/70">{formatDate(o.createdAt)}</td>
                     <td className="px-5 py-4 text-ink/70">
                       {o.lines.reduce((s, l) => s + (l.mode === "business" ? l.quantity * l.unitsPerCase : l.quantity), 0)} pieces
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-cream px-2.5 py-1 text-xs font-medium text-ink/70">
+                        {o.paymentMethod === "card" ? "Card" : "MTN MoMo"}
+                        {o.paymentMethod === "card" && o.payments?.[0] &&
+                        <span className={`h-1.5 w-1.5 rounded-full ${
+                        o.payments[0].status === "paid" ?
+                        "bg-emerald-500" :
+                        o.payments[0].status === "failed" ?
+                        "bg-red-500" :
+                        "bg-amber2-500"}`
+                        } />
+                        }
+                      </span>
                     </td>
                     <td className="px-5 py-4 font-semibold text-ink">
                       {formatCurrency(o.total)}

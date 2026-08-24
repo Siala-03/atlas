@@ -55,14 +55,48 @@ export const CreateOrderSchema = z.object({
 });
 
 export const ProductPatchSchema = z.object({
+  name: z.string().min(1).optional(),
+  brand: z.string().min(1).optional(),
+  category: z.string().min(1).optional(),
+  subtype: z.string().min(1).optional().nullable(),
+  abv: z.number().nonnegative().optional(),
+  volume: z.string().min(1).optional(),
+  origin: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
   casePrice: z.number().int().nonnegative().optional(),
+  unitsPerCase: z.number().int().positive().optional(),
   stockUnits: z.number().int().nonnegative().optional(),
   lowStockThreshold: z.number().int().nonnegative().optional(),
   image: z.string().min(1).optional()
 });
 
+export const ProductCreateSchema = z.object({
+  name: z.string().min(1),
+  brand: z.string().min(1),
+  category: z.string().min(1),
+  subtype: z.string().min(1).optional(),
+  abv: z.number().nonnegative(),
+  volume: z.string().min(1),
+  origin: z.string().min(1),
+  description: z.string().min(1),
+  casePrice: z.number().int().nonnegative(),
+  unitsPerCase: z.number().int().positive(),
+  stockUnits: z.number().int().nonnegative(),
+  lowStockThreshold: z.number().int().nonnegative(),
+  image: z.string().min(1)
+});
+
 export const RestockSchema = z.object({
   units: z.number().int().positive()
+});
+
+export const OrderDetailsPatchSchema = z.object({
+  contactName: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().min(1).optional(),
+  deliveryAddress: z.string().min(1).optional(),
+  deliveryDate: z.string().optional().nullable(),
+  notes: z.string().optional()
 });
 
 export const OrderStatusSchema = z.object({

@@ -72,8 +72,20 @@ interface StoreContextValue {
   reorderOrder: (orderId: string) => Promise<{ addedUnits: number; unavailable: string[] }>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   updateOrderInternalNotes: (orderId: string, notes: string) => Promise<void>;
+  updateOrderDetails: (
+  orderId: string,
+  patch: Partial<Pick<Order, "contactName" | "email" | "phone" | "deliveryAddress" | "deliveryDate" | "notes">>)
+  => Promise<void>;
   updateInvoiceStatus: (orderId: string, status: InvoiceStatus) => Promise<void>;
-  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold" | "image">>) => Promise<void>;
+  updateProduct: (
+  id: string,
+  patch: Partial<
+    Pick<
+      Product,
+      "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
+      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image">>)
+  => Promise<void>;
+  createProduct: (data: Omit<Product, "id">) => Promise<void>;
   restockProduct: (id: string, units: number) => Promise<void>;
   initiatePayment: (orderId: string) => Promise<{ redirectUrl: string; providerRef: string }>;
   getPaymentStatus: (orderId: string) => Promise<Payment | null>;
@@ -222,9 +234,29 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     setOrders((previous) => previous.map((item) => item.id === orderId ? order : item));
   };
 
-  const updateProduct = async (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold" | "image">>) => {
+  const updateOrderDetails = async (
+  orderId: string,
+  patch: Partial<Pick<Order, "contactName" | "email" | "phone" | "deliveryAddress" | "deliveryDate" | "notes">>) =>
+  {
+    const order = await api.updateOrderDetails(orderId, patch);
+    setOrders((previous) => previous.map((item) => item.id === orderId ? order : item));
+  };
+
+  const updateProduct = async (
+  id: string,
+  patch: Partial<
+    Pick<
+      Product,
+      "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
+      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image">>) =>
+  {
     const product = await api.updateProduct(id, patch);
     setProducts((previous) => previous.map((item) => item.id === id ? product : item));
+  };
+
+  const createProduct = async (data: Omit<Product, "id">) => {
+    const product = await api.createProduct(data);
+    setProducts((previous) => [...previous, product]);
   };
 
   const restockProduct = async (id: string, units: number) => {
@@ -241,8 +273,8 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
       isCartOpen, openCart, closeCart,
       loading, backendError, addToCart, updateCartQty,
       removeFromCart, clearCart, getProduct, loadOrders, fetchOrder, placeOrder,
-      reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateInvoiceStatus,
-      updateProduct, restockProduct, initiatePayment, getPaymentStatus
+      reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateOrderDetails, updateInvoiceStatus,
+      updateProduct, createProduct, restockProduct, initiatePayment, getPaymentStatus
     }}>
       {children}
     </StoreContext.Provider>);

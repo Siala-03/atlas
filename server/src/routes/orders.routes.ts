@@ -7,6 +7,7 @@ import {
   CreateOrderSchema,
   InternalNotesSchema,
   InvoiceStatusSchema,
+  OrderDetailsPatchSchema,
   OrderStatusSchema } from
 "../validation/schemas";
 
@@ -39,6 +40,11 @@ ordersRouter.post("/orders", asyncHandler(async (req, res) => {
   const body = CreateOrderSchema.parse(req.body);
   const order = await orderService.createOrder(body);
   res.status(201).json(order);
+}));
+
+ordersRouter.patch("/orders/:id/details", requireAdmin, asyncHandler(async (req, res) => {
+  const patch = OrderDetailsPatchSchema.parse(req.body);
+  res.json(await orderService.updateOrderDetails(req.params.id, patch));
 }));
 
 ordersRouter.patch("/orders/:id/status", requireAdmin, asyncHandler(async (req, res) => {

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { requireRole } from "../middleware/requireAdmin";
 import * as productService from "../services/productService";
-import { ProductPatchSchema, RestockSchema } from "../validation/schemas";
+import { ProductCreateSchema, ProductPatchSchema, RestockSchema } from "../validation/schemas";
 
 export const productsRouter = Router();
 
@@ -12,6 +12,11 @@ productsRouter.get("/products", asyncHandler(async (_req, res) => {
 
 productsRouter.get("/products/:id", asyncHandler(async (req, res) => {
   res.json(await productService.getProduct(req.params.id));
+}));
+
+productsRouter.post("/products", requireRole("admin"), asyncHandler(async (req, res) => {
+  const data = ProductCreateSchema.parse(req.body);
+  res.status(201).json(await productService.createProduct(data));
 }));
 
 productsRouter.patch("/products/:id", requireRole("admin"), asyncHandler(async (req, res) => {

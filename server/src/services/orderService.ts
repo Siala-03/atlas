@@ -154,6 +154,20 @@ export async function updateInvoiceStatus(id: string, invoiceStatus: string) {
   return prisma.order.update({ where: { id }, data: { invoiceStatus }, include: ORDER_INCLUDE });
 }
 
+interface OrderDetailsPatch {
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  deliveryAddress?: string;
+  deliveryDate?: string | null;
+  notes?: string;
+}
+
+export async function updateOrderDetails(id: string, patch: OrderDetailsPatch) {
+  await getOrder(id);
+  return prisma.order.update({ where: { id }, data: patch, include: ORDER_INCLUDE });
+}
+
 export async function reorder(id: string) {
   const order = await getOrder(id);
   const unavailable: string[] = [];

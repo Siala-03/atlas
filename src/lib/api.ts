@@ -51,8 +51,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   getProducts: () => request<Product[]>("/products"),
 
-  updateProduct: (id: string, patch: Partial<Pick<Product, "casePrice" | "stockUnits" | "lowStockThreshold" | "image">>) =>
+  updateProduct: (
+  id: string,
+  patch: Partial<
+    Pick<
+      Product,
+      "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
+      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image">>)
+  : Promise<Product> =>
   request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
+
+  createProduct: (data: Omit<Product, "id">) =>
+  request<Product>("/products", { method: "POST", body: JSON.stringify(data) }),
 
   restockProduct: (id: string, units: number) =>
   request<Product>(`/products/${id}/restock`, { method: "POST", body: JSON.stringify({ units }) }),
@@ -80,6 +90,11 @@ export const api = {
 
   placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
   request<Order>("/orders", { method: "POST", body: JSON.stringify(params) }),
+
+  updateOrderDetails: (
+  id: string,
+  patch: Partial<Pick<Order, "contactName" | "email" | "phone" | "deliveryAddress" | "deliveryDate" | "notes">>) =>
+  request<Order>(`/orders/${id}/details`, { method: "PATCH", body: JSON.stringify(patch) }),
 
   updateOrderStatus: (id: string, status: OrderStatus) =>
   request<Order>(`/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),

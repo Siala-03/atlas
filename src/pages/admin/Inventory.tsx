@@ -11,7 +11,7 @@ import {
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
-import { Category, Product } from "../../types";
+import { Category, Product, Subtype } from "../../types";
 import { bottlePrice, hasCaseOption, isCaseStocked } from "../../lib/productRules";
 
 // Resizes/compresses an image file client-side before it's sent to the
@@ -43,28 +43,209 @@ function resizeImageFile(file: File, maxDim = 1000, quality = 0.82): Promise<str
   });
 }
 
+const ALL_CATEGORIES: Category[] = [
+"Whisky", "Vodka", "Wine", "Beer", "Gin", "Rum",
+"Cognac", "Liqueur", "Tequila", "Aperitif", "Bitters", "RTD", "Mixer"];
+
+const SUBTYPE_OPTIONS: Partial<Record<Category, string[]>> = {
+  Wine: ["Red", "White", "Rose", "Sparkling"],
+  Beer: ["Imported", "Local"]
+};
+
 type StatusFilter = "All" | "In stock" | "Low" | "Out";
 type SortKey = "name" | "stock-asc" | "stock-desc" | "price-asc" | "price-desc";
 
+interface ProductDraft {
+  name: string;
+  brand: string;
+  category: Category;
+  subtype: string;
+  abv: string;
+  volume: string;
+  unitsPerCase: string;
+  origin: string;
+  description: string;
+  price: string;
+  stock: string;
+  lowStockThreshold: string;
+  image: string;
+}
+
+function draftFromProduct(p: Product): ProductDraft {
+  const caseOnly = isCaseStocked(p.category);
+  return {
+    name: p.name,
+    brand: p.brand,
+    category: p.category,
+    subtype: p.subtype ?? "",
+    abv: String(p.abv),
+    volume: p.volume,
+    unitsPerCase: String(p.unitsPerCase),
+    origin: p.origin,
+    description: p.description,
+    price: String(caseOnly ? p.casePrice : bottlePrice(p)),
+    stock: String(caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits),
+    lowStockThreshold: String(caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold),
+    image: p.image
+  };
+}
+
+const BLANK_DRAFT: ProductDraft = {
+  name: "",
+  brand: "",
+  category: "Whisky",
+  subtype: "",
+  abv: "",
+  volume: "",
+  unitsPerCase: "12",
+  origin: "",
+  description: "",
+  price: "",
+  stock: "",
+  lowStockThreshold: "",
+  image: ""
+};
+
+function draftToFields(draft: ProductDraft) {
+  const unitsPerCase = parseInt(draft.unitsPerCase, 10) || 1;
+  const caseOnly = isCaseStocked(draft.category);
+  const enteredPrice = parseFloat(draft.price) || 0;
+  const enteredStock = parseInt(draft.stock, 10) || 0;
+  const enteredThreshold = parseInt(draft.lowStockThreshold, 10) || 0;
+  const casePrice = caseOnly ?
+  enteredPrice :
+  hasCaseOption(draft.category) ?
+  Math.round(enteredPrice * unitsPerCase) :
+  enteredPrice;
+  return {
+    name: draft.name.trim(),
+    brand: draft.brand.trim(),
+    category: draft.category,
+    subtype: draft.subtype ? draft.subtype as Subtype : undefined,
+    abv: parseFloat(draft.abv) || 0,
+    volume: draft.volume.trim(),
+    unitsPerCase,
+    origin: draft.origin.trim(),
+    description: draft.description.trim(),
+    casePrice,
+    stockUnits: caseOnly ? enteredStock * unitsPerCase : enteredStock,
+    lowStockThreshold: caseOnly ? enteredThreshold * unitsPerCase : enteredThreshold,
+    image: draft.image
+  };
+}
+
+function ProductFormModal({
+  mode,
+  draft,
+  setDraft,
+  saving,
+  error,
+  onSave,
+  onClose
+
+
+
+}: {mode: "create" | "edit";draft: ProductDraft;setDraft: React.Dispatch<React.SetStateAction<ProductDraft>>;saving: boolean;error: string | null;onSave: () => void;onClose: () => void;}) {
+  const subtypes = SUBTYPE_OPTIONS[draft.category];
+  const caseOnly = isCaseStocked(draft.category);
+  const priceUnit = caseOnly ? "case" : "bottle";
+  const field = (key: keyof ProductDraft, value: string) => setDraft((d) => ({ ...d, [key]: value }));
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-ink/60 p-4">
+      <div className="thin-scroll max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="font-serif text-2xl font-semibold text-ink">{mode === "create" ? "Add product" : "Edit product"}</h2>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-ink/50 hover:bg-cream" aria-label="Close"><XIcon className="h-5 w-5" /></button>
+        </div>
+
+        {error && <p className="mt-3 text-sm font-medium text-red-600">{error}</p>}
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-xs font-medium text-ink/60">Name</label>
+            <input value={draft.name} onChange={(e) => field("name", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Brand</label>
+            <input value={draft.brand} onChange={(e) => field("brand", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Origin</label>
+            <input value={draft.origin} onChange={(e) => field("origin", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Category</label>
+            <select value={draft.category} onChange={(e) => field("category", e.target.value)} className="w-full rounded-lg border border-burgundy-200 bg-white px-3 py-2 text-sm outline-none focus:border-burgundy-500">
+              {ALL_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Subtype</label>
+            <select value={draft.subtype} onChange={(e) => field("subtype", e.target.value)} disabled={!subtypes} className="w-full rounded-lg border border-burgundy-200 bg-white px-3 py-2 text-sm outline-none focus:border-burgundy-500 disabled:bg-cream disabled:text-ink/40">
+              <option value="">None</option>
+              {subtypes?.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">ABV %</label>
+            <input value={draft.abv} onChange={(e) => field("abv", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Volume (e.g. 750ml)</label>
+            <input value={draft.volume} onChange={(e) => field("volume", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Units per case</label>
+            <input value={draft.unitsPerCase} onChange={(e) => field("unitsPerCase", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-xs font-medium text-ink/60">Description</label>
+            <textarea rows={3} value={draft.description} onChange={(e) => field("description", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Price / {priceUnit} (RWF)</label>
+            <input value={draft.price} onChange={(e) => field("price", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Stock ({priceUnit}s)</label>
+            <input value={draft.stock} onChange={(e) => field("stock", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Low stock at ({priceUnit}s)</label>
+            <input value={draft.lowStockThreshold} onChange={(e) => field("lowStockThreshold", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+        </div>
+
+        <div className="mt-5 flex gap-2">
+          <button onClick={onSave} disabled={saving} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:opacity-60">
+            <CheckIcon className="h-4 w-4" /> {saving ? "Saving…" : mode === "create" ? "Add product" : "Save changes"}
+          </button>
+          <button onClick={onClose} disabled={saving} className="rounded-full border border-burgundy-200 px-4 py-2.5 text-sm font-semibold text-ink/60 hover:bg-burgundy-50">Cancel</button>
+        </div>
+      </div>
+    </div>);
+
+}
+
 export function Inventory() {
-  const { products, updateProduct, restockProduct } = useStore();
+  const { products, updateProduct, createProduct, restockProduct } = useStore();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "All">("All");
   const [brand, setBrand] = useState<string>("All");
   const [status, setStatus] = useState<StatusFilter>("All");
   const [sort, setSort] = useState<SortKey>("name");
-  const [editId, setEditId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<{price: string;stock: string;lowStockThreshold: string;}>({
-    price: "",
-    stock: "",
-    lowStockThreshold: ""
-  });
-  const [savingId, setSavingId] = useState<string | null>(null);
   const [restockingId, setRestockingId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadTargetId = useRef<string | null>(null);
+
+  const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
+  const [formTargetId, setFormTargetId] = useState<string | null>(null);
+  const [formDraft, setFormDraft] = useState<ProductDraft>(BLANK_DRAFT);
+  const [formSaving, setFormSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const triggerUpload = (productId: string) => {
     uploadTargetId.current = productId;
@@ -124,43 +305,43 @@ export function Inventory() {
     return sorted;
   }, [products, query, category, brand, status, sort]);
 
-  const startEdit = (p: Product) => {
-    const caseOnly = isCaseStocked(p.category);
-    setEditId(p.id);
-    setDraft({
-      price: String(caseOnly ? p.casePrice : bottlePrice(p)),
-      stock: String(caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits),
-      lowStockThreshold: String(caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold)
-    });
+  const openCreate = () => {
+    setFormMode("create");
+    setFormTargetId(null);
+    setFormDraft(BLANK_DRAFT);
+    setFormError(null);
   };
 
-  const saveEdit = async (p: Product) => {
-    const caseOnly = isCaseStocked(p.category);
-    setSavingId(p.id);
-    setRowError(null);
+  const openEdit = (p: Product) => {
+    setFormMode("edit");
+    setFormTargetId(p.id);
+    setFormDraft(draftFromProduct(p));
+    setFormError(null);
+  };
+
+  const closeForm = () => {
+    if (formSaving) return;
+    setFormMode(null);
+    setFormTargetId(null);
+  };
+
+  const saveForm = async () => {
+    setFormSaving(true);
+    setFormError(null);
     try {
-      const enteredPrice = parseFloat(draft.price) || 0;
-      const enteredStock = parseInt(draft.stock, 10) || 0;
-      const enteredThreshold = parseInt(draft.lowStockThreshold, 10) || 0;
-      // Categories with a real case price (Wine/Beer/RTD/Mixer) store
-      // casePrice as a true case total, so a bottle-entered price needs
-      // multiplying back up. Spirits have no case concept at all — the
-      // entered bottle price is stored directly.
-      const nextCasePrice = caseOnly ?
-      enteredPrice :
-      hasCaseOption(p.category) ?
-      Math.round(enteredPrice * p.unitsPerCase) :
-      enteredPrice;
-      await updateProduct(p.id, {
-        casePrice: nextCasePrice,
-        stockUnits: caseOnly ? enteredStock * p.unitsPerCase : enteredStock,
-        lowStockThreshold: caseOnly ? enteredThreshold * p.unitsPerCase : enteredThreshold
-      });
-      setEditId(null);
+      const fields = draftToFields(formDraft);
+      if (!fields.name || !fields.brand) throw new Error("Name and brand are required.");
+      if (formMode === "create") {
+        await createProduct({ ...fields, image: fields.image || "/products/placeholder.jpg" });
+      } else if (formTargetId) {
+        await updateProduct(formTargetId, fields);
+      }
+      setFormMode(null);
+      setFormTargetId(null);
     } catch (error) {
-      setRowError(error instanceof Error ? error.message : "Could not save changes.");
+      setFormError(error instanceof Error ? error.message : "Could not save product.");
     } finally {
-      setSavingId(null);
+      setFormSaving(false);
     }
   };
 
@@ -195,13 +376,23 @@ export function Inventory() {
         onChange={handleFileSelected}
         className="hidden" />
 
-      <h1 className="font-serif text-4xl font-semibold text-ink">Inventory</h1>
-      <p className="mt-1 text-ink/60">
-        {products.length} products · stock value {formatCurrency(totalStockValue)}
-      </p>
-      <p className="mt-1 text-xs text-ink/40">
-        Wine &amp; spirits are priced and stocked per bottle · Beer is priced and stocked per case. Hover a product photo to replace it — changes show on the storefront immediately.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-4xl font-semibold text-ink">Inventory</h1>
+          <p className="mt-1 text-ink/60">
+            {products.length} products · stock value {formatCurrency(totalStockValue)}
+          </p>
+          <p className="mt-1 text-xs text-ink/40">
+            Wine &amp; spirits are priced and stocked per bottle · Beer is priced and stocked per case. Hover a product photo to replace it — changes show on the storefront immediately.
+          </p>
+        </div>
+        <button
+          onClick={openCreate}
+          className="inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900">
+
+          <PlusIcon className="h-4 w-4" /> Add product
+        </button>
+      </div>
       {rowError && <p className="mt-3 text-sm font-medium text-red-600">{rowError}</p>}
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -302,7 +493,6 @@ export function Inventory() {
             </thead>
             <tbody className="divide-y divide-burgundy-50">
               {rows.map((p) => {
-                const editing = editId === p.id;
                 const caseOnly = isCaseStocked(p.category);
                 const unitLabel = caseOnly ? "case" : "bottle";
                 const low = p.stockUnits <= p.lowStockThreshold;
@@ -336,54 +526,17 @@ export function Inventory() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-ink/70">{p.category}</td>
+                    <td className="px-5 py-4 text-ink/70">{p.category}{p.subtype ? ` · ${p.subtype}` : ""}</td>
                     <td className="px-5 py-4">
-                      {editing ?
-                      <input
-                        value={draft.price}
-                        onChange={(e) =>
-                        setDraft((d) => ({ ...d, price: e.target.value }))
-                        }
-                        className="w-24 rounded-lg border border-burgundy-300 px-2 py-1 text-sm outline-none focus:border-burgundy-500" /> :
-
-
-                      <>
-                          <span className="font-medium">{formatCurrency(displayPrice)}</span>
-                          <span className="ml-1 text-xs text-ink/40">/{unitLabel}</span>
-                        </>
-                      }
+                      <span className="font-medium">{formatCurrency(displayPrice)}</span>
+                      <span className="ml-1 text-xs text-ink/40">/{unitLabel}</span>
                     </td>
                     <td className="px-5 py-4">
-                      {editing ?
-                      <input
-                        value={draft.stock}
-                        onChange={(e) =>
-                        setDraft((d) => ({ ...d, stock: e.target.value }))
-                        }
-                        className="w-20 rounded-lg border border-burgundy-300 px-2 py-1 text-sm outline-none focus:border-burgundy-500" /> :
-
-
-                      <>
-                          <span className="font-medium">{displayStock}</span>
-                          <span className="ml-1 text-xs text-ink/40">{unitLabel}{displayStock === 1 ? "" : "s"}</span>
-                        </>
-                      }
+                      <span className="font-medium">{displayStock}</span>
+                      <span className="ml-1 text-xs text-ink/40">{unitLabel}{displayStock === 1 ? "" : "s"}</span>
                     </td>
                     <td className="px-5 py-4">
-                      {editing ?
-                      <input
-                        value={draft.lowStockThreshold}
-                        onChange={(e) =>
-                        setDraft((d) => ({
-                          ...d,
-                          lowStockThreshold: e.target.value
-                        }))
-                        }
-                        className="w-20 rounded-lg border border-burgundy-300 px-2 py-1 text-sm outline-none focus:border-burgundy-500" /> :
-
-
                       <span className="text-ink/60">{displayThreshold} {unitLabel}{displayThreshold === 1 ? "" : "s"}</span>
-                      }
                     </td>
                     <td className="px-5 py-4">
                       <span
@@ -400,43 +553,20 @@ export function Inventory() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1.5">
-                        {editing ?
-                        <>
-                            <button
-                            onClick={() => saveEdit(p)}
-                            disabled={savingId === p.id}
-                            className="rounded-lg bg-emerald-600 p-2 text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-                            aria-label="Save">
+                        <button
+                          onClick={() => restock(p)}
+                          disabled={restockingId === p.id}
+                          className="inline-flex items-center gap-1 rounded-lg border border-burgundy-200 px-2.5 py-2 text-xs font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
 
-                              <CheckIcon className="h-4 w-4" />
-                            </button>
-                            <button
-                            onClick={() => setEditId(null)}
-                            disabled={savingId === p.id}
-                            className="rounded-lg border border-burgundy-200 p-2 text-ink/60 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60"
-                            aria-label="Cancel">
+                          <PlusIcon className="h-3.5 w-3.5" /> {caseOnly ? "+12 cases" : `+${p.unitsPerCase} bottles`}
+                        </button>
+                        <button
+                          onClick={() => openEdit(p)}
+                          className="rounded-lg border border-burgundy-200 p-2 text-ink/60 hover:bg-burgundy-50"
+                          aria-label="Edit">
 
-                              <XIcon className="h-4 w-4" />
-                            </button>
-                          </> :
-
-                        <>
-                            <button
-                            onClick={() => restock(p)}
-                            disabled={restockingId === p.id}
-                            className="inline-flex items-center gap-1 rounded-lg border border-burgundy-200 px-2.5 py-2 text-xs font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
-
-                              <PlusIcon className="h-3.5 w-3.5" /> {caseOnly ? "+12 cases" : `+${p.unitsPerCase} bottles`}
-                            </button>
-                            <button
-                            onClick={() => startEdit(p)}
-                            className="rounded-lg border border-burgundy-200 p-2 text-ink/60 hover:bg-burgundy-50"
-                            aria-label="Edit">
-
-                              <PencilIcon className="h-4 w-4" />
-                            </button>
-                          </>
-                        }
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>);
@@ -453,6 +583,18 @@ export function Inventory() {
           </table>
         </div>
       </div>
+
+      {formMode &&
+      <ProductFormModal
+        mode={formMode}
+        draft={formDraft}
+        setDraft={setFormDraft}
+        saving={formSaving}
+        error={formError}
+        onSave={saveForm}
+        onClose={closeForm} />
+
+      }
     </AdminLayout>);
 
 }

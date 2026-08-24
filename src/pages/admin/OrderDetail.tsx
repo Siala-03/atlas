@@ -1,23 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeftIcon,
   BuildingIcon,
   CalendarDaysIcon,
   CreditCardIcon,
-  FileTextIcon,
   MailIcon,
   MapPinIcon,
+  PencilIcon,
   PhoneIcon,
   PrinterIcon,
+  ReceiptIcon,
   SaveIcon,
-  StickyNoteIcon } from
+  SmartphoneIcon,
+  StickyNoteIcon,
+  XIcon } from
 "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { StatusBadge } from "../../components/StatusBadge";
 import { formatCurrency, formatDate, formatDateTime } from "../../lib/format";
 import { useStore } from "../../store/StoreContext";
-import { INVOICE_STATUSES, InvoiceStatus, Payment, ORDER_STATUSES } from "../../types";
+import { INVOICE_STATUSES, InvoiceStatus, ORDER_STATUSES } from "../../types";
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "../../lib/contact";
 
 const TIMESTAMPS = [
 { key: "confirmedAt", label: "Confirmed" },
@@ -26,26 +30,130 @@ const TIMESTAMPS = [
 { key: "deliveredAt", label: "Delivered" }] as
 const;
 
-export function OrderDetail() {
+function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof useOrder>>;onBack: () => void;}) {
+  return (
+    <AdminLayout>
+      <div className="print:hidden">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800">
+          <ArrowLeftIcon className="h-4 w-4" /> Back to order
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900">
+
+          <PrinterIcon className="h-4 w-4" /> Print / save PDF
+        </button>
+      </div>
+
+      <div className="mx-auto mt-6 max-w-2xl rounded-2xl border border-burgundy-100 bg-white p-8 print:mt-0 print:border-0 print:p-0">
+        <div className="flex items-start justify-between border-b border-burgundy-100 pb-6">
+          <div>
+            <p className="font-serif text-2xl font-semibold text-ink">Atlas Supplies Ltd</p>
+            <p className="mt-1 text-sm text-ink/60">{CONTACT_ADDRESS}</p>
+            <p className="text-sm text-ink/60">{CONTACT_PHONE_DISPLAY} · {CONTACT_EMAIL}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Invoice</p>
+            <p className="mt-1 font-serif text-xl font-semibold text-ink">{order.reference}</p>
+            <p className="mt-1 text-sm text-ink/60">{formatDate(order.createdAt)}</p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-ink/40">Billed to</p>
+            {order.companyName ?
+            <>
+                <p className="mt-1.5 font-medium text-ink">{order.companyName}</p>
+                <p className="text-sm text-ink/60">TIN: {order.tin}</p>
+              </> :
+
+            <p className="mt-1.5 font-medium text-ink">{order.contactName}</p>
+            }
+            <p className="text-sm text-ink/60">{order.email}</p>
+            <p className="text-sm text-ink/60">{order.phone}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-ink/40">Delivered to</p>
+            <p className="mt-1.5 text-sm text-ink/70">{order.deliveryAddress}</p>
+          </div>
+        </div>
+
+        <table className="mt-8 w-full text-left text-sm">
+          <thead className="border-b border-burgundy-100 text-xs uppercase tracking-wider text-ink/50">
+            <tr>
+              <th className="py-2">Item</th>
+              <th className="py-2 text-right">Qty</th>
+              <th className="py-2 text-right">Unit price</th>
+              <th className="py-2 text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-burgundy-50">
+            {order.lines.map((line) => {
+              const unitPrice = line.mode === "business" ? line.casePrice : line.unitPrice;
+              return (
+                <tr key={`${line.productId}-${line.mode}`}>
+                  <td className="py-3">
+                    <p className="font-medium text-ink">{line.name}</p>
+                    <p className="text-xs text-ink/50">{line.brand}</p>
+                  </td>
+                  <td className="py-3 text-right text-ink/70">{line.quantity} {line.mode === "business" ? "case(s)" : "pc(s)"}</td>
+                  <td className="py-3 text-right text-ink/70">{formatCurrency(unitPrice)}</td>
+                  <td className="py-3 text-right font-medium text-ink">{formatCurrency(unitPrice * line.quantity)}</td>
+                </tr>);
+
+            })}
+          </tbody>
+        </table>
+
+        <div className="mt-4 flex justify-end">
+          <dl className="w-56 space-y-2 text-sm">
+            <div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div>
+            <div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div>
+            <div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div>
+          </dl>
+        </div>
+
+        <p className="mt-8 text-xs text-ink/40">Prices are VAT-inclusive. Payment method: {order.paymentMethod === "card" ? "Card" : "MTN MoMo"}.</p>
+      </div>
+    </AdminLayout>);
+
+}
+
+function useOrder() {
   const { id } = useParams();
-  const { orders, updateInvoiceStatus, updateOrderInternalNotes, updateOrderStatus, getPaymentStatus } = useStore();
-  const order = orders.find((item) => item.id === id);
+  const { orders } = useStore();
+  return orders.find((item) => item.id === id);
+}
+
+export function OrderDetail() {
+  const order = useOrder();
+  const { updateInvoiceStatus, updateOrderInternalNotes, updateOrderStatus, updateOrderDetails } = useStore();
   const [notes, setNotes] = useState(order?.internalNotes ?? "");
   const [saved, setSaved] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [updatingInvoice, setUpdatingInvoice] = useState(false);
   const [actionError, setActionError] = useState("");
-  const [payment, setPayment] = useState<Payment | null>(null);
+  const [showInvoice, setShowInvoice] = useState(false);
 
-  useEffect(() => {
-    if (!order || order.paymentMethod !== "card") return;
-    getPaymentStatus(order.id).then(setPayment).catch(() => undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [order?.id, order?.paymentMethod, getPaymentStatus]);
+  const [editingDetails, setEditingDetails] = useState(false);
+  const [detailsDraft, setDetailsDraft] = useState({
+    contactName: order?.contactName ?? "",
+    email: order?.email ?? "",
+    phone: order?.phone ?? "",
+    deliveryAddress: order?.deliveryAddress ?? "",
+    deliveryDate: order?.deliveryDate ?? "",
+    notes: order?.notes ?? ""
+  });
+  const [savingDetails, setSavingDetails] = useState(false);
 
   if (!order) {
     return <AdminLayout><h1 className="font-serif text-3xl text-ink">Order not found</h1><Link to="/portal/orders" className="mt-4 inline-block text-burgundy-800 underline">Back to orders</Link></AdminLayout>;
+  }
+
+  if (showInvoice) {
+    return <InvoiceView order={order} onBack={() => setShowInvoice(false)} />;
   }
 
   const totalUnits = order.lines.reduce((sum, line) => sum + (line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity), 0);
@@ -88,12 +196,40 @@ export function OrderDetail() {
     }
   };
 
+  const startEditDetails = () => {
+    setDetailsDraft({
+      contactName: order.contactName,
+      email: order.email,
+      phone: order.phone,
+      deliveryAddress: order.deliveryAddress,
+      deliveryDate: order.deliveryDate ?? "",
+      notes: order.notes ?? ""
+    });
+    setEditingDetails(true);
+  };
+
+  const saveDetails = async () => {
+    setSavingDetails(true);
+    setActionError("");
+    try {
+      await updateOrderDetails(order.id, detailsDraft);
+      setEditingDetails(false);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Could not save order details.");
+    } finally {
+      setSavingDetails(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
-        <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><PrinterIcon className="h-4 w-4" /> Print packing slip</button>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><PrinterIcon className="h-4 w-4" /> Print packing slip</button>
+          <button onClick={() => setShowInvoice(true)} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><ReceiptIcon className="h-4 w-4" /> View invoice</button>
+        </div>
       </div>
 
       {actionError && <p className="mt-4 text-sm font-medium text-red-600 print:hidden">{actionError}</p>}
@@ -109,17 +245,39 @@ export function OrderDetail() {
           <div className="flex items-center justify-between"><h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalUnits} pieces</h2></div>
           <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div>)}</div>
           <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
+
+          <div className="mt-6 border-t border-burgundy-100 pt-5 print:hidden">
+            <h3 className="font-semibold text-ink">Payment</h3>
+            <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-cream p-3 text-sm">
+              {order.paymentMethod === "card" ? <CreditCardIcon className="h-4 w-4 text-burgundy-700" /> : <SmartphoneIcon className="h-4 w-4 text-burgundy-700" />}
+              <span className="text-ink/70">{order.paymentMethod === "card" ? "Card via Pesapal" : "MTN MoMo (customer dials manually)"}</span>
+            </div>
+            {order.payments && order.payments.length > 0 ?
+            <ul className="mt-3 space-y-2">
+                {order.payments.map((p) =>
+              <li key={p.id} className="flex items-center justify-between rounded-xl border border-burgundy-100 px-3 py-2 text-sm">
+                    <span className="text-ink/70">{p.provider} · {formatDateTime(p.createdAt)}</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                p.status === "paid" ? "bg-emerald-100 text-emerald-700" : p.status === "failed" ? "bg-red-100 text-red-700" : "bg-amber2-100 text-amber2-800"}`
+                }>
+                      {formatCurrency(p.amount)} · {p.status}
+                    </span>
+                  </li>
+              )}
+              </ul> :
+
+            <p className="mt-2 text-xs text-ink/50">
+                {order.paymentMethod === "momo" ?
+              "No payment record — MoMo isn't automatically tracked yet. Confirm receipt with the customer directly." :
+              "No payment record yet."}
+              </p>
+            }
+          </div>
         </section>
 
         <aside className="space-y-6">
           <section className="rounded-2xl border border-burgundy-100 bg-white p-6 print:hidden">
             <h2 className="font-serif text-2xl font-semibold text-ink">Commercial</h2>
-            {order.paymentMethod === "card" &&
-            <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-cream p-3 text-sm">
-                <CreditCardIcon className="h-4 w-4 text-burgundy-700" />
-                <span className="text-ink/70">Paid by card{payment ? ` · ${payment.status}` : ""}</span>
-              </div>
-            }
             <label className="mt-4 block text-sm font-medium text-ink/70">Invoice status</label>
             <select
               value={order.invoiceStatus ?? "To invoice"}
@@ -131,7 +289,51 @@ export function OrderDetail() {
             <p className="mt-3 text-xs leading-relaxed text-ink/50">Customer account payment terms are handled separately from fulfilment status.</p>
           </section>
           <section className="rounded-2xl border border-burgundy-100 bg-white p-6 print:hidden"><h2 className="font-serif text-2xl font-semibold text-ink">Internal handover</h2><textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={4} placeholder="Substitutions, picker notes, delivery call outcome..." className="mt-4 w-full rounded-xl border border-burgundy-200 px-3 py-2.5 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-100" /><button onClick={saveNotes} disabled={savingNotes} className="mt-3 inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2 text-sm font-semibold text-cream hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:opacity-60"><SaveIcon className="h-4 w-4" /> {saved ? "Saved" : savingNotes ? "Saving…" : "Save note"}</button></section>
-          <section className="rounded-2xl border border-burgundy-100 bg-white p-6"><h2 className="font-serif text-2xl font-semibold text-ink">Customer & delivery</h2><ul className="mt-4 space-y-3 text-sm"><li className="flex items-start gap-2.5"><BuildingIcon className="mt-0.5 h-4 w-4 text-burgundy-700" /><div><p className="font-medium text-ink">{order.contactName}</p></div></li><li className="flex items-center gap-2.5"><MailIcon className="h-4 w-4 text-burgundy-700" />{order.email}</li><li className="flex items-center gap-2.5"><PhoneIcon className="h-4 w-4 text-burgundy-700" />{order.phone}</li><li className="flex items-start gap-2.5"><MapPinIcon className="mt-0.5 h-4 w-4 text-burgundy-700" /><span className="whitespace-pre-line">{order.deliveryAddress}</span></li>{order.deliveryLat != null && order.deliveryLng != null && <li className="pl-6"><a href={`https://www.openstreetmap.org/?mlat=${order.deliveryLat}&mlon=${order.deliveryLng}#map=17/${order.deliveryLat}/${order.deliveryLng}`} target="_blank" rel="noreferrer" className="text-xs font-semibold text-burgundy-800 underline underline-offset-2">View dropped pin on map</a></li>}{order.deliveryDate && <li className="flex items-center gap-2.5"><CalendarDaysIcon className="h-4 w-4 text-burgundy-700" />Requested {formatDate(order.deliveryDate)}</li>}</ul>{order.companyName && <div className="mt-4 rounded-xl bg-burgundy-50 p-4 text-sm"><p className="font-semibold text-ink">{order.companyName}</p><p className="text-ink/60">TIN: {order.tin}</p>{order.needsEbm && <p className="mt-2 text-xs text-burgundy-800">EBM invoice requested · Purchase code: {order.ebmPurchaseCode} · Invoice email: {order.ebmInvoiceEmail}</p>}</div>}</section>
+
+          <section className="rounded-2xl border border-burgundy-100 bg-white p-6">
+            <div className="flex items-center justify-between print:hidden">
+              <h2 className="font-serif text-2xl font-semibold text-ink">Customer & delivery</h2>
+              {!editingDetails &&
+              <button onClick={startEditDetails} aria-label="Edit customer & delivery" className="rounded-lg p-1.5 text-ink/50 hover:bg-burgundy-50 hover:text-burgundy-800">
+                  <PencilIcon className="h-4 w-4" />
+                </button>
+              }
+            </div>
+
+            {editingDetails ?
+            <div className="mt-4 space-y-3 print:hidden">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-ink/60">Full name</label>
+                  <input value={detailsDraft.contactName} onChange={(e) => setDetailsDraft((d) => ({ ...d, contactName: e.target.value }))} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-ink/60">Email</label>
+                  <input type="email" value={detailsDraft.email} onChange={(e) => setDetailsDraft((d) => ({ ...d, email: e.target.value }))} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-ink/60">Phone</label>
+                  <input value={detailsDraft.phone} onChange={(e) => setDetailsDraft((d) => ({ ...d, phone: e.target.value }))} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-ink/60">Delivery address</label>
+                  <textarea rows={2} value={detailsDraft.deliveryAddress} onChange={(e) => setDetailsDraft((d) => ({ ...d, deliveryAddress: e.target.value }))} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-ink/60">Delivery date</label>
+                  <input type="date" value={detailsDraft.deliveryDate ?? ""} onChange={(e) => setDetailsDraft((d) => ({ ...d, deliveryDate: e.target.value }))} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <button onClick={saveDetails} disabled={savingDetails} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-burgundy-800 px-4 py-2 text-sm font-semibold text-cream hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:opacity-60"><SaveIcon className="h-4 w-4" /> {savingDetails ? "Saving…" : "Save"}</button>
+                  <button onClick={() => setEditingDetails(false)} disabled={savingDetails} className="rounded-full border border-burgundy-200 p-2 text-ink/60 hover:bg-burgundy-50" aria-label="Cancel"><XIcon className="h-4 w-4" /></button>
+                </div>
+              </div> :
+
+            <>
+                <ul className="mt-4 space-y-3 text-sm"><li className="flex items-start gap-2.5"><BuildingIcon className="mt-0.5 h-4 w-4 text-burgundy-700" /><div><p className="font-medium text-ink">{order.contactName}</p></div></li><li className="flex items-center gap-2.5"><MailIcon className="h-4 w-4 text-burgundy-700" />{order.email}</li><li className="flex items-center gap-2.5"><PhoneIcon className="h-4 w-4 text-burgundy-700" />{order.phone}</li><li className="flex items-start gap-2.5"><MapPinIcon className="mt-0.5 h-4 w-4 text-burgundy-700" /><span className="whitespace-pre-line">{order.deliveryAddress}</span></li>{order.deliveryLat != null && order.deliveryLng != null && <li className="pl-6"><a href={`https://www.openstreetmap.org/?mlat=${order.deliveryLat}&mlon=${order.deliveryLng}#map=17/${order.deliveryLat}/${order.deliveryLng}`} target="_blank" rel="noreferrer" className="text-xs font-semibold text-burgundy-800 underline underline-offset-2 print:hidden">View dropped pin on map</a></li>}{order.deliveryDate && <li className="flex items-center gap-2.5"><CalendarDaysIcon className="h-4 w-4 text-burgundy-700" />Requested {formatDate(order.deliveryDate)}</li>}</ul>
+                {order.companyName && <div className="mt-4 rounded-xl bg-burgundy-50 p-4 text-sm"><p className="font-semibold text-ink">{order.companyName}</p><p className="text-ink/60">TIN: {order.tin}</p>{order.needsEbm && <p className="mt-2 text-xs text-burgundy-800">EBM invoice requested · Purchase code: {order.ebmPurchaseCode} · Invoice email: {order.ebmInvoiceEmail}</p>}</div>}
+              </>
+            }
+          </section>
           {order.notes && <section className="rounded-2xl border border-amber2-200 bg-amber2-50 p-6"><h3 className="flex items-center gap-2 font-semibold text-amber2-900"><StickyNoteIcon className="h-4 w-4" /> Customer delivery notes</h3><p className="mt-2 text-sm text-amber2-900/80">{order.notes}</p></section>}
         </aside>
       </div>
