@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from "react";
-
-const STORAGE_KEY = "atlas_age_verified";
+import React, { useState } from "react";
 
 export function AgeGate() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [denied, setDenied] = useState(false);
 
-  useEffect(() => {
-    if (localStorage.getItem(STORAGE_KEY) !== "true") setOpen(true);
-  }, []);
-
   const confirm = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
     setOpen(false);
   };
 
