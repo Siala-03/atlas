@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export function AgeGate() {
+  const location = useLocation();
   const [open, setOpen] = useState(true);
   const [denied, setDenied] = useState(false);
 
@@ -8,6 +10,7 @@ export function AgeGate() {
     setOpen(false);
   };
 
+  if (location.pathname.startsWith("/portal")) return null;
   if (!open) return null;
 
   return (
