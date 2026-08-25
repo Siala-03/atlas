@@ -56,7 +56,7 @@ function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof us
         </button>
       </div>
 
-      <div className="mx-auto mt-6 w-[58mm] bg-white p-3 font-mono text-[11px] leading-relaxed text-ink shadow-sm print:mt-0 print:w-full print:p-2 print:shadow-none">
+      <div className="mx-auto mt-6 w-full max-w-xs rounded-xl border border-burgundy-100 bg-white p-6 font-mono text-[13px] leading-relaxed text-ink shadow-sm print:mt-0 print:w-full print:max-w-none print:rounded-none print:border-0 print:p-2 print:text-[11px] print:shadow-none">
         <div className="text-center">
           <p className="text-sm font-bold">Atlas Supplies Ltd</p>
           <p className="mt-0.5 text-ink/70">{CONTACT_ADDRESS}</p>
@@ -217,10 +217,11 @@ export function OrderDetail() {
 
   return (
     <AdminLayout>
-      <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
-      <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-        <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${orderCategory(order) === "Business" ? "bg-amber2-100 text-amber2-800" : "bg-cream text-ink/70"}`}>{orderCategory(order)}</span></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
-        <div className="flex flex-wrap gap-2">
+      <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800 print:hidden"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
+      <p className="hidden text-xs font-semibold uppercase tracking-widest text-ink/50 print:block">Packing slip</p>
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-4 print:mt-2">
+        <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600 print:hidden">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${orderCategory(order) === "Business" ? "bg-amber2-100 text-amber2-800" : "bg-cream text-ink/70"}`}>{orderCategory(order)}</span></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
+        <div className="flex flex-wrap gap-2 print:hidden">
           <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><PrinterIcon className="h-4 w-4" /> Print packing slip</button>
           <button onClick={() => setShowInvoice(true)} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><ReceiptIcon className="h-4 w-4" /> View invoice</button>
         </div>
@@ -237,8 +238,8 @@ export function OrderDetail() {
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-burgundy-100 bg-white p-6 lg:col-span-2">
           <div className="flex items-center justify-between"><h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalUnits} pieces</h2></div>
-          <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div>)}</div>
-          <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
+          <div className="mt-4 divide-y divide-burgundy-50 print:mt-2">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center gap-4 py-4 print:items-start print:gap-3 print:py-3"><span className="hidden h-5 w-5 shrink-0 rounded border border-ink/40 print:block" /><div className="flex flex-1 items-center justify-between gap-5"><div><p className="font-medium text-ink print:text-base">{line.name}</p><p className="text-xs text-ink/50 print:text-sm">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink print:text-base">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50 print:hidden">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div></div>)}</div>
+          <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm print:hidden"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
 
           <div className="mt-6 border-t border-burgundy-100 pt-5 print:hidden">
             <h3 className="font-semibold text-ink">Payment</h3>
