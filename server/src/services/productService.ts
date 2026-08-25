@@ -10,8 +10,11 @@ function slugify(value: string): string {
   replace(/^-+|-+$/g, "");
 }
 
-export function listProducts() {
-  return prisma.product.findMany({ orderBy: { name: "asc" } });
+export function listProducts(opts: {includeUnpublished?: boolean;} = {}) {
+  return prisma.product.findMany({
+    where: opts.includeUnpublished ? undefined : { published: true },
+    orderBy: { name: "asc" }
+  });
 }
 
 export async function getProduct(id: string) {
@@ -34,6 +37,7 @@ interface ProductPatch {
   stockUnits?: number;
   lowStockThreshold?: number;
   image?: string;
+  published?: boolean;
 }
 
 export async function patchProduct(id: string, patch: ProductPatch) {

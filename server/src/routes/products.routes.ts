@@ -1,13 +1,19 @@
 import { Router } from "express";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { requireRole } from "../middleware/requireAdmin";
+import { verifyToken } from "../lib/adminAuth";
 import * as productService from "../services/productService";
 import { ProductCreateSchema, ProductPatchSchema, RestockSchema } from "../validation/schemas";
 
 export const productsRouter = Router();
 
-productsRouter.get("/products", asyncHandler(async (_req, res) => {
-  res.json(await productService.listProducts());
+// Unpublished products are only included for authenticated staff/admin
+// sessions (the portal), so the public storefront never sees them.
+productsRouter.get("/products", asyncHandler(async (req, res) => {
+  const header = req.headers.authorization ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : undefined;
+  const isStaff = !!verifyToken(token);
+  res.json(await productService.listProducts({ includeUnpublished: isStaff }));
 }));
 
 productsRouter.get("/products/:id", asyncHandler(async (req, res) => {

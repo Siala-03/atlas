@@ -76,6 +76,7 @@ interface StoreContextValue {
   orderId: string,
   patch: Partial<Pick<Order, "contactName" | "email" | "phone" | "deliveryAddress" | "deliveryDate" | "notes">>)
   => Promise<void>;
+  updateOrderLines: (orderId: string, lines: {productId: string;mode: ShoppingMode;quantity: number;}[]) => Promise<void>;
   updateInvoiceStatus: (orderId: string, status: InvoiceStatus) => Promise<void>;
   updateProduct: (
   id: string,
@@ -83,7 +84,7 @@ interface StoreContextValue {
     Pick<
       Product,
       "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
-      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image">>)
+      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>)
   => Promise<void>;
   createProduct: (data: Omit<Product, "id">) => Promise<void>;
   restockProduct: (id: string, units: number) => Promise<void>;
@@ -242,13 +243,19 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     setOrders((previous) => previous.map((item) => item.id === orderId ? order : item));
   };
 
+  const updateOrderLines = async (orderId: string, lines: {productId: string;mode: ShoppingMode;quantity: number;}[]) => {
+    const order = await api.updateOrderLines(orderId, lines);
+    setOrders((previous) => previous.map((item) => item.id === orderId ? order : item));
+    api.getProducts().then(setProducts).catch(() => undefined);
+  };
+
   const updateProduct = async (
   id: string,
   patch: Partial<
     Pick<
       Product,
       "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
-      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image">>) =>
+      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>) =>
   {
     const product = await api.updateProduct(id, patch);
     setProducts((previous) => previous.map((item) => item.id === id ? product : item));
@@ -273,7 +280,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
       isCartOpen, openCart, closeCart,
       loading, backendError, addToCart, updateCartQty,
       removeFromCart, clearCart, getProduct, loadOrders, fetchOrder, placeOrder,
-      reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateOrderDetails, updateInvoiceStatus,
+      reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateOrderDetails, updateOrderLines, updateInvoiceStatus,
       updateProduct, createProduct, restockProduct, initiatePayment, getPaymentStatus
     }}>
       {children}

@@ -1,15 +1,18 @@
 import {
   CartItem,
+  Customer,
   Order,
   OrderStatus,
   InvoiceStatus,
   PaymentMethod,
   Payment,
   Product,
+  ShoppingMode,
   StaffUser } from
 "../types";
 import type { CheckoutDetails } from "../store/StoreContext";
 import { endPortalSession, getPortalToken } from "./portalAuth";
+import { getCustomerToken } from "./customerAuth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000/api";
 
@@ -57,7 +60,7 @@ export const api = {
     Pick<
       Product,
       "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
-      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image">>)
+      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>)
   : Promise<Product> =>
   request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
 
@@ -88,13 +91,22 @@ export const api = {
   removeTeamMember: (id: string) =>
   request<{ ok: boolean }>(`/portal/team/${id}`, { method: "DELETE" }),
 
-  placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) =>
-  request<Order>("/orders", { method: "POST", body: JSON.stringify(params) }),
+  placeOrder: (params: { details: CheckoutDetails; cart: CartItem[]; paymentMethod: PaymentMethod }) => {
+    const customerToken = getCustomerToken();
+    return request<Order>("/orders", {
+      method: "POST",
+      body: JSON.stringify(params),
+      headers: customerToken ? { "X-Customer-Token": customerToken } : {}
+    });
+  },
 
   updateOrderDetails: (
   id: string,
   patch: Partial<Pick<Order, "contactName" | "email" | "phone" | "deliveryAddress" | "deliveryDate" | "notes">>) =>
   request<Order>(`/orders/${id}/details`, { method: "PATCH", body: JSON.stringify(patch) }),
+
+  updateOrderLines: (id: string, lines: { productId: string; mode: ShoppingMode; quantity: number }[]) =>
+  request<Order>(`/orders/${id}/lines`, { method: "PATCH", body: JSON.stringify({ lines }) }),
 
   updateOrderStatus: (id: string, status: OrderStatus) =>
   request<Order>(`/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
@@ -120,5 +132,16 @@ export const api = {
     body: JSON.stringify({ providerRef, outcome })
   }),
 
-  getPaymentStatus: (orderId: string) => request<Payment | null>(`/payments/order/${orderId}`)
+  getPaymentStatus: (orderId: string) => request<Payment | null>(`/payments/order/${orderId}`),
+
+  customerSignup: (params: { name: string; email: string; password: string; phone?: string }) =>
+  request<{ token: string; customer: Customer }>("/customers/signup", { method: "POST", body: JSON.stringify(params) }),
+
+  customerLogin: (email: string, password: string) =>
+  request<{ token: string; customer: Customer }>("/customers/login", { method: "POST", body: JSON.stringify({ email, password }) }),
+
+  getMyOrders: () => {
+    const token = getCustomerToken();
+    return request<Order[]>("/customers/me/orders", { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  }
 };

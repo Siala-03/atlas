@@ -23,6 +23,7 @@ model Product {
   image             String
   description       String
   origin            String
+  published         Boolean     @default(true)
   orderLines        OrderLine[]
 }
 
@@ -55,8 +56,23 @@ model Order {
   vat             Int         @default(0)
   deliveryFee     Int         @default(0)
   total           Int
+  customerId      String?
+  customer        Customer?   @relation(fields: [customerId], references: [id])
   lines           OrderLine[]
   payments        Payment[]
+}
+
+// Basic customer accounts (guest checkout remains the default path).
+// customerId on Order is only set when the shopper was logged in at
+// checkout; existing guest orders are never retroactively linked.
+model Customer {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  createdAt    DateTime @default(now())
+  orders       Order[]
 }
 
 model OrderLine {

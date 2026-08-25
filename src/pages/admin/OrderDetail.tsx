@@ -9,18 +9,20 @@ import {
   MapPinIcon,
   PencilIcon,
   PhoneIcon,
+  PlusIcon,
   PrinterIcon,
   ReceiptIcon,
   SaveIcon,
   SmartphoneIcon,
   StickyNoteIcon,
+  Trash2Icon,
   XIcon } from
 "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { StatusBadge } from "../../components/StatusBadge";
 import { formatCurrency, formatDate, formatDateTime, orderCategory } from "../../lib/format";
 import { useStore } from "../../store/StoreContext";
-import { INVOICE_STATUSES, InvoiceStatus, ORDER_STATUSES } from "../../types";
+import { INVOICE_STATUSES, InvoiceStatus, ORDER_STATUSES, ShoppingMode } from "../../types";
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "../../lib/contact";
 
 const TIMESTAMPS = [
@@ -80,6 +82,7 @@ function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof us
         }
         <p className="text-ink/70">{order.phone}</p>
         <p className="break-all text-ink/70">{order.email}</p>
+        <p className="whitespace-pre-line text-ink/70">{order.deliveryAddress}</p>
 
         <Divider />
 
@@ -192,7 +195,7 @@ function useOrder() {
 
 export function OrderDetail() {
   const order = useOrder();
-  const { updateInvoiceStatus, updateOrderInternalNotes, updateOrderStatus, updateOrderDetails } = useStore();
+  const { products, updateInvoiceStatus, updateOrderInternalNotes, updateOrderStatus, updateOrderDetails, updateOrderLines } = useStore();
   const [notes, setNotes] = useState(order?.internalNotes ?? "");
   const [saved, setSaved] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
@@ -212,6 +215,12 @@ export function OrderDetail() {
     notes: order?.notes ?? ""
   });
   const [savingDetails, setSavingDetails] = useState(false);
+
+  const [editingLines, setEditingLines] = useState(false);
+  const [linesDraft, setLinesDraft] = useState<{productId: string;mode: ShoppingMode;quantity: number;}[]>([]);
+  const [addProductId, setAddProductId] = useState("");
+  const [savingLines, setSavingLines] = useState(false);
+  const [linesError, setLinesError] = useState("");
 
   if (!order) {
     return <AdminLayout><h1 className="font-serif text-3xl text-ink">Order not found</h1><Link to="/portal/orders" className="mt-4 inline-block text-burgundy-800 underline">Back to orders</Link></AdminLayout>;
@@ -290,6 +299,53 @@ export function OrderDetail() {
     }
   };
 
+  const canEditLines = !["Dispatched", "Delivered", "Cancelled"].includes(order.status);
+
+  const startEditLines = () => {
+    setLinesDraft(order.lines.map((line) => ({ productId: line.productId, mode: line.mode, quantity: line.quantity })));
+    setAddProductId("");
+    setLinesError("");
+    setEditingLines(true);
+  };
+
+  const setLineQuantity = (index: number, quantity: number) => {
+    setLinesDraft((previous) => previous.map((line, i) => i === index ? { ...line, quantity: Math.max(1, quantity) } : line));
+  };
+
+  const removeLine = (index: number) => {
+    setLinesDraft((previous) => previous.filter((_, i) => i !== index));
+  };
+
+  const addLine = () => {
+    if (!addProductId) return;
+    const product = products.find((p) => p.id === addProductId);
+    if (!product) return;
+    const existing = linesDraft.find((l) => l.productId === addProductId);
+    if (existing) {
+      setLinesDraft((previous) => previous.map((line) => line.productId === addProductId ? { ...line, quantity: line.quantity + 1 } : line));
+    } else {
+      setLinesDraft((previous) => [...previous, { productId: addProductId, mode: "individual", quantity: 1 }]);
+    }
+    setAddProductId("");
+  };
+
+  const saveLines = async () => {
+    if (linesDraft.length === 0) {
+      setLinesError("An order needs at least one item — remove the order instead of clearing every item.");
+      return;
+    }
+    setSavingLines(true);
+    setLinesError("");
+    try {
+      await updateOrderLines(order.id, linesDraft);
+      setEditingLines(false);
+    } catch (error) {
+      setLinesError(error instanceof Error ? error.message : "Could not save item changes.");
+    } finally {
+      setSavingLines(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
@@ -311,9 +367,75 @@ export function OrderDetail() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-burgundy-100 bg-white p-6 lg:col-span-2">
-          <div className="flex items-center justify-between"><h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalUnits} pieces</h2></div>
-          <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div>)}</div>
-          <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
+          <div className="flex items-center justify-between">
+            <h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalUnits} pieces</h2>
+            {canEditLines && !editingLines &&
+            <button onClick={startEditLines} className="inline-flex items-center gap-1.5 rounded-lg border border-burgundy-200 px-3 py-1.5 text-xs font-semibold text-burgundy-800 hover:bg-burgundy-50">
+                <PencilIcon className="h-3.5 w-3.5" /> Edit items
+              </button>
+            }
+          </div>
+
+          {linesError && <p className="mt-3 text-sm font-medium text-red-600">{linesError}</p>}
+
+          {editingLines ?
+          <div className="mt-4">
+              <div className="divide-y divide-burgundy-50">
+                {linesDraft.map((line, index) => {
+                  const product = products.find((p) => p.id === line.productId);
+                  return (
+                    <div key={`${line.productId}-${line.mode}-${index}`} className="flex items-center justify-between gap-3 py-3">
+                      <div>
+                        <p className="font-medium text-ink">{product?.name ?? line.productId}</p>
+                        <p className="text-xs text-ink/50">{product?.brand} · {line.mode === "business" ? "case(s)" : "piece(s)"}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                        type="number"
+                        min={1}
+                        value={line.quantity}
+                        onChange={(e) => setLineQuantity(index, parseInt(e.target.value, 10) || 1)}
+                        className="w-16 rounded-lg border border-burgundy-200 px-2 py-1.5 text-sm outline-none focus:border-burgundy-500" />
+
+                        <button onClick={() => removeLine(index)} aria-label="Remove item" className="rounded-lg border border-burgundy-200 p-1.5 text-red-600 hover:bg-red-50">
+                          <Trash2Icon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>);
+
+                })}
+                {linesDraft.length === 0 && <p className="py-3 text-sm text-ink/50">No items — add one below or cancel.</p>}
+              </div>
+
+              <div className="mt-4 flex items-center gap-2 border-t border-burgundy-100 pt-4">
+                <select
+                value={addProductId}
+                onChange={(e) => setAddProductId(e.target.value)}
+                className="flex-1 rounded-lg border border-burgundy-200 bg-white px-3 py-2 text-sm outline-none focus:border-burgundy-500">
+
+                  <option value="">Add a product...</option>
+                  {products.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.brand})</option>)}
+                </select>
+                <button onClick={addLine} disabled={!addProductId} className="inline-flex items-center gap-1.5 rounded-lg border border-burgundy-200 px-3 py-2 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
+                  <PlusIcon className="h-4 w-4" /> Add
+                </button>
+              </div>
+
+              <p className="mt-3 text-xs text-ink/50">Prices and stock are recalculated using current catalogue prices when you save.</p>
+
+              <div className="mt-4 flex gap-2">
+                <button onClick={saveLines} disabled={savingLines} className="inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2 text-sm font-semibold text-cream hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:opacity-60">
+                  <SaveIcon className="h-4 w-4" /> {savingLines ? "Saving…" : "Save changes"}
+                </button>
+                <button onClick={() => setEditingLines(false)} disabled={savingLines} className="rounded-full border border-burgundy-200 px-4 py-2 text-sm font-semibold text-ink/60 hover:bg-burgundy-50">Cancel</button>
+              </div>
+            </div> :
+
+          <>
+              <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div>)}</div>
+              <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
+            </>
+          }
 
           <div className="mt-6 border-t border-burgundy-100 pt-5">
             <h3 className="font-semibold text-ink">Payment</h3>

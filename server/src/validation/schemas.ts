@@ -27,12 +27,12 @@ refine((data) => !data.isBusinessCheckout || !!data.companyName?.trim(), {
   message: "Company name is required for business orders",
   path: ["companyName"]
 }).
-refine((data) => !data.isBusinessCheckout || !!data.tin?.trim(), {
-  message: "TIN is required for business orders",
+refine((data) => !data.isBusinessCheckout || /^1\d{8}$/.test(data.tin?.trim() ?? ""), {
+  message: "TIN must be 9 digits starting with 1",
   path: ["tin"]
 }).
-refine((data) => !data.needsEbm || !!data.ebmPurchaseCode?.trim(), {
-  message: "Purchase code is required when an EBM invoice is requested",
+refine((data) => !data.needsEbm || /^\d{4,6}$/.test(data.ebmPurchaseCode?.trim() ?? ""), {
+  message: "Purchase code must be 4 to 6 digits",
   path: ["ebmPurchaseCode"]
 }).
 refine((data) => !data.needsEbm || z.string().email().safeParse(data.ebmInvoiceEmail).success, {
@@ -67,7 +67,8 @@ export const ProductPatchSchema = z.object({
   unitsPerCase: z.number().int().positive().optional(),
   stockUnits: z.number().int().nonnegative().optional(),
   lowStockThreshold: z.number().int().nonnegative().optional(),
-  image: z.string().min(1).optional()
+  image: z.string().min(1).optional(),
+  published: z.boolean().optional()
 });
 
 export const ProductCreateSchema = z.object({
@@ -97,6 +98,14 @@ export const OrderDetailsPatchSchema = z.object({
   deliveryAddress: z.string().min(1).optional(),
   deliveryDate: z.string().optional().nullable(),
   notes: z.string().optional()
+});
+
+export const OrderLinesPatchSchema = z.object({
+  lines: z.array(z.object({
+    productId: z.string().min(1),
+    mode: z.enum(SHOPPING_MODES),
+    quantity: z.number().int().positive()
+  })).min(1)
 });
 
 export const OrderStatusSchema = z.object({
@@ -130,4 +139,16 @@ export const CreateStaffSchema = z.object({
   email: z.string().email(),
   password: z.string().min(4, "Password must be at least 4 characters"),
   role: z.enum(["admin", "staff"])
+});
+
+export const CustomerSignupSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(4, "Password must be at least 4 characters"),
+  phone: z.string().optional()
+});
+
+export const CustomerLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1)
 });

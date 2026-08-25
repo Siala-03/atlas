@@ -7,6 +7,7 @@ export interface FilterState {
   abvMin: number | null;
   abvMax: number | null;
   brands: Set<string>;
+  origins: Set<string>;
 }
 
 export const EMPTY_FILTERS: FilterState = {
@@ -14,7 +15,8 @@ export const EMPTY_FILTERS: FilterState = {
   priceMax: null,
   abvMin: null,
   abvMax: null,
-  brands: new Set()
+  brands: new Set(),
+  origins: new Set()
 };
 
 export function isFilterActive(filters: FilterState): boolean {
@@ -23,7 +25,8 @@ export function isFilterActive(filters: FilterState): boolean {
     filters.priceMax !== null ||
     filters.abvMin !== null ||
     filters.abvMax !== null ||
-    filters.brands.size > 0);
+    filters.brands.size > 0 ||
+    filters.origins.size > 0);
 
 }
 
@@ -34,6 +37,7 @@ export function applyFilters(products: Product[], filters: FilterState): Product
     if (filters.abvMin !== null && product.abv < filters.abvMin) return false;
     if (filters.abvMax !== null && product.abv > filters.abvMax) return false;
     if (filters.brands.size > 0 && !filters.brands.has(product.brand)) return false;
+    if (filters.origins.size > 0 && !filters.origins.has(product.origin)) return false;
     return true;
   });
 }
@@ -49,11 +53,21 @@ export function ProductFilters({ products, filters, onChange }: ProductFiltersPr
     () => [...new Set(products.map((p) => p.brand))].sort(),
     [products]
   );
+  const origins = useMemo(
+    () => [...new Set(products.map((p) => p.origin))].sort(),
+    [products]
+  );
 
   const toggleBrand = (brand: string) => {
     const next = new Set(filters.brands);
     if (next.has(brand)) next.delete(brand);else next.add(brand);
     onChange({ ...filters, brands: next });
+  };
+
+  const toggleOrigin = (origin: string) => {
+    const next = new Set(filters.origins);
+    if (next.has(origin)) next.delete(origin);else next.add(origin);
+    onChange({ ...filters, origins: next });
   };
 
   const numberField = (
@@ -104,6 +118,23 @@ export function ProductFilters({ products, filters, onChange }: ProductFiltersPr
               className="h-4 w-4 rounded border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
 
               {brand}
+            </label>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-ink/50">Country of origin</p>
+        <div className="mt-2 space-y-1.5">
+          {origins.map((origin) =>
+          <label key={origin} className="flex cursor-pointer items-center gap-2 text-sm text-ink/70">
+              <input
+              type="checkbox"
+              checked={filters.origins.has(origin)}
+              onChange={() => toggleOrigin(origin)}
+              className="h-4 w-4 rounded border-burgundy-300 text-burgundy-800 focus:ring-burgundy-500" />
+
+              {origin}
             </label>
           )}
         </div>

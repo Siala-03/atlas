@@ -4,6 +4,7 @@ import {
   LayoutDashboardIcon,
   ClipboardListIcon,
   BoxesIcon,
+  BarChart3Icon,
   StoreIcon,
   MenuIcon,
   XIcon,
@@ -18,6 +19,7 @@ import { useStore } from "../store/StoreContext";
 const ALL_LINKS = [
 { to: "/portal", label: "Dashboard", icon: LayoutDashboardIcon, end: true, adminOnly: false },
 { to: "/portal/orders", label: "Orders", icon: ClipboardListIcon, adminOnly: false },
+{ to: "/portal/reports", label: "Reports", icon: BarChart3Icon, adminOnly: false },
 { to: "/portal/inventory", label: "Inventory", icon: BoxesIcon, adminOnly: true },
 { to: "/portal/settings", label: "Settings", icon: SettingsIcon, adminOnly: true }];
 

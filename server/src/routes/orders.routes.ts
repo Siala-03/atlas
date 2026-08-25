@@ -2,12 +2,14 @@ import { Router } from "express";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { requireAdmin } from "../middleware/requireAdmin";
 import { verifyToken } from "../lib/adminAuth";
+import { verifyCustomerToken } from "../lib/customerAuth";
 import * as orderService from "../services/orderService";
 import {
   CreateOrderSchema,
   InternalNotesSchema,
   InvoiceStatusSchema,
   OrderDetailsPatchSchema,
+  OrderLinesPatchSchema,
   OrderStatusSchema } from
 "../validation/schemas";
 
@@ -38,13 +40,20 @@ ordersRouter.get("/orders/:id", asyncHandler(async (req, res) => {
 
 ordersRouter.post("/orders", asyncHandler(async (req, res) => {
   const body = CreateOrderSchema.parse(req.body);
-  const order = await orderService.createOrder(body);
+  const customerToken = req.headers["x-customer-token"];
+  const customerPayload = typeof customerToken === "string" ? verifyCustomerToken(customerToken) : null;
+  const order = await orderService.createOrder(body, customerPayload?.customerId);
   res.status(201).json(order);
 }));
 
 ordersRouter.patch("/orders/:id/details", requireAdmin, asyncHandler(async (req, res) => {
   const patch = OrderDetailsPatchSchema.parse(req.body);
   res.json(await orderService.updateOrderDetails(req.params.id, patch));
+}));
+
+ordersRouter.patch("/orders/:id/lines", requireAdmin, asyncHandler(async (req, res) => {
+  const { lines } = OrderLinesPatchSchema.parse(req.body);
+  res.json(await orderService.updateOrderLines(req.params.id, lines));
 }));
 
 ordersRouter.patch("/orders/:id/status", requireAdmin, asyncHandler(async (req, res) => {

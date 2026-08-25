@@ -6,7 +6,9 @@ import {
   XIcon,
   PencilIcon,
   FilterIcon,
-  ImageUpIcon } from
+  ImageUpIcon,
+  EyeIcon,
+  EyeOffIcon } from
 "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
@@ -276,6 +278,7 @@ export function Inventory() {
   const [status, setStatus] = useState<StatusFilter>("All");
   const [sort, setSort] = useState<SortKey>("name");
   const [restockingId, setRestockingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -397,6 +400,18 @@ export function Inventory() {
       setRowError(error instanceof Error ? error.message : "Could not restock.");
     } finally {
       setRestockingId(null);
+    }
+  };
+
+  const togglePublish = async (p: Product) => {
+    setTogglingId(p.id);
+    setRowError(null);
+    try {
+      await updateProduct(p.id, { published: p.published === false });
+    } catch (error) {
+      setRowError(error instanceof Error ? error.message : "Could not update product.");
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -540,8 +555,9 @@ export function Inventory() {
                 const displayPrice = caseOnly ? p.casePrice : bottlePrice(p);
                 const displayStock = caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits;
                 const displayThreshold = caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold;
+                const unpublished = p.published === false;
                 return (
-                  <tr key={p.id} className="align-middle hover:bg-cream/50">
+                  <tr key={p.id} className={`align-middle hover:bg-cream/50 ${unpublished ? "opacity-50" : ""}`}>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <button
@@ -590,6 +606,11 @@ export function Inventory() {
 
                         {out ? "Out" : low ? "Low" : "In stock"}
                       </span>
+                      {unpublished &&
+                      <span className="ml-1.5 inline-flex rounded-full bg-ink/10 px-2.5 py-0.5 text-xs font-semibold text-ink/60">
+                          Unpublished
+                        </span>
+                      }
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1.5">
@@ -599,6 +620,15 @@ export function Inventory() {
                           className="inline-flex items-center gap-1 rounded-lg border border-burgundy-200 px-2.5 py-2 text-xs font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
 
                           <PlusIcon className="h-3.5 w-3.5" /> {caseOnly ? "+12 cases" : `+${p.unitsPerCase} bottles`}
+                        </button>
+                        <button
+                          onClick={() => togglePublish(p)}
+                          disabled={togglingId === p.id}
+                          aria-label={unpublished ? "Publish" : "Unpublish"}
+                          title={unpublished ? "Publish to storefront" : "Unpublish from storefront"}
+                          className="rounded-lg border border-burgundy-200 p-2 text-ink/60 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
+
+                          {unpublished ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                         </button>
                         <button
                           onClick={() => openEdit(p)}

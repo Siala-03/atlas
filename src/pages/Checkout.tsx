@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CalendarDaysIcon, CreditCardIcon, LockIcon, ArrowLeftIcon, SmartphoneIcon, UserIcon, Building2Icon, XIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
@@ -8,6 +8,7 @@ import { useStore, DELIVERY_FEE, CheckoutDetails } from "../store/StoreContext";
 import { formatCurrency } from "../lib/format";
 import { PaymentMethod } from "../types";
 import { bottlePrice, caseTotalPrice, unitLabels } from "../lib/productRules";
+import { getCustomerProfile } from "../lib/customerAuth";
 
 const EMPTY: CheckoutDetails = {
   contactName: "",
@@ -38,6 +39,17 @@ export function Checkout() {
   const [submitError, setSubmitError] = useState("");
   const [ebmModalOpen, setEbmModalOpen] = useState(false);
 
+  useEffect(() => {
+    const profile = getCustomerProfile();
+    if (!profile) return;
+    setForm((previous) => ({
+      ...previous,
+      contactName: previous.contactName || profile.name,
+      email: previous.email || profile.email,
+      phone: previous.phone || profile.phone || ""
+    }));
+  }, []);
+
   const isBusiness = shoppingMode === "business";
   const total = cartSubtotal + DELIVERY_FEE;
 
@@ -67,6 +79,8 @@ export function Checkout() {
 
   const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const PHONE_PATTERN = /^[+\d][\d\s()-]{6,}$/;
+  const TIN_PATTERN = /^1\d{8}$/;
+  const PURCHASE_CODE_PATTERN = /^\d{4,6}$/;
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -78,6 +92,10 @@ export function Checkout() {
     required.forEach((key) => {if (!form[key].trim()) nextErrors[key] = true;});
     if (form.email.trim() && !EMAIL_PATTERN.test(form.email.trim())) nextErrors.email = true;
     if (form.phone.trim() && !PHONE_PATTERN.test(form.phone.trim())) nextErrors.phone = true;
+    if (isBusiness && form.tin.trim() && !TIN_PATTERN.test(form.tin.trim())) nextErrors.tin = true;
+    if (form.needsEbm && form.ebmPurchaseCode.trim() && !PURCHASE_CODE_PATTERN.test(form.ebmPurchaseCode.trim())) {
+      nextErrors.ebmPurchaseCode = true;
+    }
     if (form.needsEbm && form.ebmInvoiceEmail.trim() && !EMAIL_PATTERN.test(form.ebmInvoiceEmail.trim())) {
       nextErrors.ebmInvoiceEmail = true;
     }
@@ -127,9 +145,10 @@ export function Checkout() {
 
       {errors[key] &&
       <p className="mt-1 text-xs text-red-600">
-          {form[key].trim() && key === "email" ? "Enter a valid email address" :
+          {form[key].trim() && (key === "email" || key === "ebmInvoiceEmail") ? "Enter a valid email address" :
           form[key].trim() && key === "phone" ? "Enter a valid phone number" :
-          form[key].trim() && key === "ebmInvoiceEmail" ? "Enter a valid email address" :
+          form[key].trim() && key === "tin" ? "TIN must be 9 digits starting with 1" :
+          form[key].trim() && key === "ebmPurchaseCode" ? "Purchase code must be 4 to 6 digits" :
           "This field is required"}
         </p>
       }
@@ -176,7 +195,7 @@ export function Checkout() {
 
                 <div className="mt-6 grid gap-5 sm:grid-cols-2">
                   {field("companyName", "Company name")}
-                  {field("tin", "TIN")}
+                  {field("tin", "TIN", { placeholder: "9 digits, starting with 1", maxLength: 9 })}
                 </div>
 
                 <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-burgundy-200 bg-burgundy-50/50 p-4 text-sm">
@@ -331,7 +350,7 @@ export function Checkout() {
             <p className="mt-1 text-sm text-ink/60">We'll use these to issue your EBM-compliant invoice.</p>
             <div className="mt-5 space-y-4">
               <div>
-                {field("ebmPurchaseCode", "Purchase code")}
+                {field("ebmPurchaseCode", "Purchase code", { placeholder: "4 to 6 digits", maxLength: 6 })}
                 <p className="mt-1.5 text-xs text-ink/50">Our TIN: <span className="font-medium text-ink">154674995</span></p>
               </div>
               {field("ebmInvoiceEmail", "Invoice email", { type: "email" })}

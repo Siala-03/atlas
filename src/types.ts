@@ -23,6 +23,7 @@ export interface Product {
   image: string;
   description: string;
   origin: string;
+  published?: boolean;
 }
 
 export function unitPrice(product: Pick<Product, "casePrice" | "unitsPerCase">): number {
@@ -93,6 +94,7 @@ export interface Order {
   needsEbm: boolean;
   ebmPurchaseCode?: string;
   ebmInvoiceEmail?: string;
+  customerId?: string;
   confirmedAt?: string;
   packedAt?: string;
   dispatchedAt?: string;
@@ -126,5 +128,13 @@ export interface StaffUser {
   name: string;
   email: string;
   role: AdminRole;
+  createdAt: string;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
   createdAt: string;
 }

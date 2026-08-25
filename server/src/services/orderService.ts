@@ -1,11 +1,13 @@
 import { prisma } from "../db";
-import { NotFoundError, StockConflictError } from "../errors";
+import { NotFoundError, StockConflictError, ValidationError } from "../errors";
 import { computeTotals } from "../lib/money";
 import { generateReference } from "../lib/reference";
 import { bottlePrice, caseTotalPrice, resolveMode } from "../lib/productRules";
 import { sendOrderConfirmationEmail, sendOrderNotificationEmail } from "../lib/mailer";
 import { z } from "zod";
 import { CartItemSchema, CheckoutDetailsSchema } from "../validation/schemas";
+
+const UNEDITABLE_STATUSES = ["Dispatched", "Delivered", "Cancelled"];
 
 type CheckoutDetails = z.infer<typeof CheckoutDetailsSchema>;
 type CartItem = z.infer<typeof CartItemSchema>;
@@ -37,11 +39,22 @@ export async function getOrder(id: string) {
   return order;
 }
 
-export async function createOrder(params: {
+export function listOrdersForCustomer(customerId: string) {
+  return prisma.order.findMany({
+    where: { customerId },
+    include: ORDER_INCLUDE,
+    orderBy: { createdAt: "desc" }
+  });
+}
+
+export async function createOrder(
+params: {
   details: CheckoutDetails;
   cart: CartItem[];
   paymentMethod: "card" | "momo";
-}) {
+},
+customerId?: string)
+{
   const { details, cart, paymentMethod } = params;
 
   return prisma.$transaction(async (tx) => {
@@ -108,6 +121,7 @@ export async function createOrder(params: {
         needsEbm: details.needsEbm ?? false,
         ebmPurchaseCode: details.needsEbm ? details.ebmPurchaseCode : undefined,
         ebmInvoiceEmail: details.needsEbm ? details.ebmInvoiceEmail : undefined,
+        customerId,
         subtotal,
         deliveryFee,
         total,
@@ -166,6 +180,75 @@ interface OrderDetailsPatch {
 export async function updateOrderDetails(id: string, patch: OrderDetailsPatch) {
   await getOrder(id);
   return prisma.order.update({ where: { id }, data: patch, include: ORDER_INCLUDE });
+}
+
+interface OrderLineInput {
+  productId: string;
+  mode: "individual" | "business";
+  quantity: number;
+}
+
+// Restores stock from the order's current lines, then re-decrements for the
+// new line set — this handles add/remove/quantity-change uniformly without
+// needing to diff old vs new, and rolls back cleanly if stock runs out.
+export async function updateOrderLines(id: string, newLines: OrderLineInput[]) {
+  return prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({ where: { id }, include: { lines: true } });
+    if (!order) throw new NotFoundError("Order");
+    if (UNEDITABLE_STATUSES.includes(order.status)) {
+      throw new ValidationError("This order can no longer be edited.");
+    }
+
+    for (const line of order.lines) {
+      const units = line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity;
+      await tx.product.update({ where: { id: line.productId }, data: { stockUnits: { increment: units } } });
+    }
+
+    const builtLines: {
+      productId: string;
+      name: string;
+      brand: string;
+      mode: string;
+      quantity: number;
+      unitsPerCase: number;
+      casePrice: number;
+      unitPrice: number;
+    }[] = [];
+
+    for (const item of newLines) {
+      const product = await tx.product.findUnique({ where: { id: item.productId } });
+      if (!product) throw new StockConflictError([item.productId]);
+
+      const mode = resolveMode(product.category, item.mode);
+      const unitsNeeded = mode === "business" ? item.quantity * product.unitsPerCase : item.quantity;
+
+      const result = await tx.product.updateMany({
+        where: { id: item.productId, stockUnits: { gte: unitsNeeded } },
+        data: { stockUnits: { decrement: unitsNeeded } }
+      });
+      if (result.count === 0) throw new StockConflictError([product.name]);
+
+      builtLines.push({
+        productId: product.id,
+        name: product.name,
+        brand: product.brand,
+        mode,
+        quantity: item.quantity,
+        unitsPerCase: product.unitsPerCase,
+        casePrice: caseTotalPrice(product),
+        unitPrice: bottlePrice(product)
+      });
+    }
+
+    const { subtotal, deliveryFee, total } = computeTotals(builtLines);
+
+    await tx.orderLine.deleteMany({ where: { orderId: id } });
+    return tx.order.update({
+      where: { id },
+      data: { subtotal, deliveryFee, total, lines: { create: builtLines } },
+      include: ORDER_INCLUDE
+    });
+  });
 }
 
 export async function reorder(id: string) {

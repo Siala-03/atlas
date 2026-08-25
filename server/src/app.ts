@@ -6,6 +6,7 @@ import { productsRouter } from "./routes/products.routes";
 import { ordersRouter } from "./routes/orders.routes";
 import { paymentsRouter } from "./routes/payments.routes";
 import { portalRouter } from "./routes/portal.routes";
+import { customersRouter } from "./routes/customers.routes";
 
 export function createApp() {
   const app = express();
@@ -21,6 +22,7 @@ export function createApp() {
   app.use("/api", ordersRouter);
   app.use("/api", paymentsRouter);
   app.use("/api", portalRouter);
+  app.use("/api", customersRouter);
 
   app.use(errorHandler);
 
