@@ -248,7 +248,11 @@ export async function updateOrderLines(id: string, newLines: OrderLineInput[]) {
       data: { subtotal, deliveryFee, total, lines: { create: builtLines } },
       include: ORDER_INCLUDE
     });
-  });
+    // Default 5s interactive-transaction timeout is too tight here: this does
+    // a stock round-trip per old line plus per new line, which can exceed it
+    // against a pooled connection (e.g. Neon) once an order has more than a
+    // couple of items.
+  }, { timeout: 15000 });
 }
 
 export async function reorder(id: string) {
