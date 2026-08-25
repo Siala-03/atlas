@@ -78,7 +78,7 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
   return (
     <div className="flex min-h-screen w-full bg-cream">
       {/* Sidebar desktop */}
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-burgundy-950 py-6 lg:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-burgundy-950 py-6 lg:flex print:hidden">
         <div className="mx-4 mb-8 rounded-xl bg-cream p-3">
           <Logo className="h-9" />
         </div>
@@ -108,7 +108,7 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-burgundy-950 px-4 lg:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-burgundy-950 px-4 lg:hidden print:hidden">
         <div className="rounded-lg bg-cream px-2 py-1">
           <Logo className="h-7" />
         </div>
@@ -147,10 +147,10 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
 
       <main
         key={location.pathname}
-        className="w-full flex-1 pt-16 lg:ml-64 lg:pt-0">
+        className="w-full flex-1 pt-16 lg:ml-64 lg:pt-0 print:ml-0 print:pt-0">
 
         <BackendStatusBanner />
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 print:max-w-none print:p-0">
           {children}
         </div>
       </main>

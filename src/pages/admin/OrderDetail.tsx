@@ -30,9 +30,20 @@ const TIMESTAMPS = [
 { key: "deliveredAt", label: "Delivered" }] as
 const;
 
+function Divider() {
+  return <div className="my-2 border-t border-dashed border-ink/30" />;
+}
+
 function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof useOrder>>;onBack: () => void;}) {
   return (
     <AdminLayout>
+      <style>{`
+        @page { size: 58mm 400mm; margin: 0; }
+        @media print {
+          html, body { width: 58mm; }
+        }
+      `}</style>
+
       <div className="print:hidden">
         <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800">
           <ArrowLeftIcon className="h-4 w-4" /> Back to order
@@ -41,80 +52,63 @@ function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof us
           onClick={() => window.print()}
           className="mt-4 inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900">
 
-          <PrinterIcon className="h-4 w-4" /> Print / save PDF
+          <PrinterIcon className="h-4 w-4" /> Print receipt
         </button>
       </div>
 
-      <div className="mx-auto mt-6 max-w-2xl rounded-2xl border border-burgundy-100 bg-white p-8 print:mt-0 print:border-0 print:p-0">
-        <div className="flex items-start justify-between border-b border-burgundy-100 pb-6">
-          <div>
-            <p className="font-serif text-2xl font-semibold text-ink">Atlas Supplies Ltd</p>
-            <p className="mt-1 text-sm text-ink/60">{CONTACT_ADDRESS}</p>
-            <p className="text-sm text-ink/60">{CONTACT_PHONE_DISPLAY} · {CONTACT_EMAIL}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Invoice</p>
-            <p className="mt-1 font-serif text-xl font-semibold text-ink">{order.reference}</p>
-            <p className="mt-1 text-sm text-ink/60">{formatDate(order.createdAt)}</p>
-          </div>
+      <div className="mx-auto mt-6 w-[58mm] bg-white p-3 font-mono text-[11px] leading-relaxed text-ink shadow-sm print:mt-0 print:w-full print:p-2 print:shadow-none">
+        <div className="text-center">
+          <p className="text-sm font-bold">Atlas Supplies Ltd</p>
+          <p className="mt-0.5 text-ink/70">{CONTACT_ADDRESS}</p>
+          <p className="text-ink/70">{CONTACT_PHONE_DISPLAY}</p>
         </div>
 
-        <div className="mt-6 grid gap-6 sm:grid-cols-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-ink/40">Billed to</p>
-            {order.companyName ?
-            <>
-                <p className="mt-1.5 font-medium text-ink">{order.companyName}</p>
-                <p className="text-sm text-ink/60">TIN: {order.tin}</p>
-              </> :
+        <Divider />
 
-            <p className="mt-1.5 font-medium text-ink">{order.contactName}</p>
-            }
-            <p className="text-sm text-ink/60">{order.email}</p>
-            <p className="text-sm text-ink/60">{order.phone}</p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-ink/40">Delivered to</p>
-            <p className="mt-1.5 text-sm text-ink/70">{order.deliveryAddress}</p>
-          </div>
-        </div>
+        <div className="flex justify-between"><span className="font-bold">INVOICE</span><span>{order.reference}</span></div>
+        <p className="text-ink/70">{formatDateTime(order.createdAt)}</p>
 
-        <table className="mt-8 w-full text-left text-sm">
-          <thead className="border-b border-burgundy-100 text-xs uppercase tracking-wider text-ink/50">
-            <tr>
-              <th className="py-2">Item</th>
-              <th className="py-2 text-right">Qty</th>
-              <th className="py-2 text-right">Unit price</th>
-              <th className="py-2 text-right">Amount</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-burgundy-50">
-            {order.lines.map((line) => {
-              const unitPrice = line.mode === "business" ? line.casePrice : line.unitPrice;
-              return (
-                <tr key={`${line.productId}-${line.mode}`}>
-                  <td className="py-3">
-                    <p className="font-medium text-ink">{line.name}</p>
-                    <p className="text-xs text-ink/50">{line.brand}</p>
-                  </td>
-                  <td className="py-3 text-right text-ink/70">{line.quantity} {line.mode === "business" ? "case(s)" : "pc(s)"}</td>
-                  <td className="py-3 text-right text-ink/70">{formatCurrency(unitPrice)}</td>
-                  <td className="py-3 text-right font-medium text-ink">{formatCurrency(unitPrice * line.quantity)}</td>
-                </tr>);
+        <Divider />
 
-            })}
-          </tbody>
-        </table>
+        {order.companyName ?
+        <>
+            <p className="font-bold">{order.companyName}</p>
+            <p className="text-ink/70">TIN: {order.tin}</p>
+          </> :
 
-        <div className="mt-4 flex justify-end">
-          <dl className="w-56 space-y-2 text-sm">
-            <div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div>
-            <div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div>
-            <div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div>
-          </dl>
-        </div>
+        <p className="font-bold">{order.contactName}</p>
+        }
+        <p className="text-ink/70">{order.phone}</p>
+        <p className="break-all text-ink/70">{order.email}</p>
 
-        <p className="mt-8 text-xs text-ink/40">Prices are VAT-inclusive. Payment method: {order.paymentMethod === "card" ? "Card" : "MTN MoMo"}.</p>
+        <Divider />
+
+        {order.lines.map((line) => {
+          const unitPrice = line.mode === "business" ? line.casePrice : line.unitPrice;
+          const unitLabel = line.mode === "business" ? "case" : "pc";
+          return (
+            <div key={`${line.productId}-${line.mode}`} className="mb-1.5">
+              <p className="font-medium">{line.name}</p>
+              <div className="flex justify-between text-ink/70">
+                <span>{line.quantity} {unitLabel} x {formatCurrency(unitPrice)}</span>
+                <span className="shrink-0 pl-2 text-ink">{formatCurrency(unitPrice * line.quantity)}</span>
+              </div>
+            </div>);
+
+        })}
+
+        <Divider />
+
+        <div className="flex justify-between text-ink/70"><span>Subtotal</span><span>{formatCurrency(order.subtotal)}</span></div>
+        <div className="flex justify-between text-ink/70"><span>Delivery</span><span>{formatCurrency(order.deliveryFee)}</span></div>
+        <div className="mt-1 flex justify-between text-sm font-bold"><span>TOTAL</span><span>{formatCurrency(order.total)}</span></div>
+
+        <Divider />
+
+        <p>Payment: {order.paymentMethod === "card" ? "Card" : "MTN MoMo"}</p>
+        <p className="text-ink/60">Prices are VAT-inclusive.</p>
+
+        <p className="mt-4 text-center">Thank you for your order!</p>
       </div>
     </AdminLayout>);
 
