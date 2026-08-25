@@ -18,7 +18,7 @@ import {
 "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { StatusBadge } from "../../components/StatusBadge";
-import { formatCurrency, formatDate, formatDateTime } from "../../lib/format";
+import { formatCurrency, formatDate, formatDateTime, orderCategory } from "../../lib/format";
 import { useStore } from "../../store/StoreContext";
 import { INVOICE_STATUSES, InvoiceStatus, ORDER_STATUSES } from "../../types";
 import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "../../lib/contact";
@@ -225,7 +225,7 @@ export function OrderDetail() {
     <AdminLayout>
       <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-        <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
+        <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${orderCategory(order) === "Business" ? "bg-amber2-100 text-amber2-800" : "bg-cream text-ink/70"}`}>{orderCategory(order)}</span></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
         <div className="flex flex-wrap gap-2">
           <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><PrinterIcon className="h-4 w-4" /> Print packing slip</button>
           <button onClick={() => setShowInvoice(true)} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><ReceiptIcon className="h-4 w-4" /> View invoice</button>

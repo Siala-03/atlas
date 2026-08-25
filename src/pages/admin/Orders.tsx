@@ -4,7 +4,7 @@ import { SearchIcon, ChevronUpIcon, ChevronDownIcon } from "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useStore } from "../../store/StoreContext";
-import { formatCurrency, formatDate } from "../../lib/format";
+import { formatCurrency, formatDate, orderCategory } from "../../lib/format";
 import { ORDER_STATUSES, OrderStatus } from "../../types";
 
 type SortField = "createdAt" | "total" | "contactName" | "status";
@@ -115,6 +115,7 @@ export function Orders() {
               <tr>
                 <th className="px-5 py-3">Reference</th>
                 <th className="px-5 py-3"><SortHeader field="contactName" label="Customer" /></th>
+                <th className="px-5 py-3">Type</th>
                 <th className="px-5 py-3"><SortHeader field="createdAt" label="Date" /></th>
                 <th className="px-5 py-3">Items</th>
                 <th className="px-5 py-3">Payment</th>
@@ -125,7 +126,7 @@ export function Orders() {
             <tbody className="divide-y divide-burgundy-50">
               {rows.length === 0 ?
               <tr>
-                  <td colSpan={7} className="px-5 py-16 text-center text-ink/50">
+                  <td colSpan={8} className="px-5 py-16 text-center text-ink/50">
                     No orders match your filters.
                   </td>
                 </tr> :
@@ -143,6 +144,15 @@ export function Orders() {
                     <td className="px-5 py-4">
                       <p className="font-medium text-ink">{o.contactName}</p>
                       <p className="text-xs text-ink/50">{o.email}</p>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                      orderCategory(o) === "Business" ?
+                      "bg-amber2-100 text-amber2-800" :
+                      "bg-cream text-ink/70"}`
+                      }>
+                        {orderCategory(o)}
+                      </span>
                     </td>
                     <td className="px-5 py-4 text-ink/70">{formatDate(o.createdAt)}</td>
                     <td className="px-5 py-4 text-ink/70">

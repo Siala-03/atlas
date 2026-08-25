@@ -151,6 +151,26 @@ function ProductFormModal({
   const priceUnit = caseOnly ? "case" : "bottle";
   const field = (key: keyof ProductDraft, value: string) => setDraft((d) => ({ ...d, [key]: value }));
 
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+
+  const handleImageSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setImageUploading(true);
+    setImageError(null);
+    try {
+      const dataUrl = await resizeImageFile(file);
+      setDraft((d) => ({ ...d, image: dataUrl }));
+    } catch (error) {
+      setImageError(error instanceof Error ? error.message : "Could not read image.");
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-ink/60 p-4">
       <div className="thin-scroll max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
@@ -160,6 +180,26 @@ function ProductFormModal({
         </div>
 
         {error && <p className="mt-3 text-sm font-medium text-red-600">{error}</p>}
+        {imageError && <p className="mt-3 text-sm font-medium text-red-600">{imageError}</p>}
+
+        <div className="mt-4 flex items-center gap-4">
+          <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelected} className="hidden" />
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-cream p-1">
+            {draft.image ?
+            <img src={draft.image} alt="" className="h-full w-full object-contain" /> :
+
+            <ImageUpIcon className="h-6 w-6 text-ink/30" />
+            }
+          </div>
+          <button
+            type="button"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={imageUploading}
+            className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 px-4 py-2 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
+
+            <ImageUpIcon className="h-4 w-4" /> {imageUploading ? "Uploading…" : draft.image ? "Change photo" : "Upload photo"}
+          </button>
+        </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <div className="sm:col-span-2">

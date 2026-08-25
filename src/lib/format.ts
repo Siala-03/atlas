@@ -1,3 +1,7 @@
+export function orderCategory(order: {companyName?: string;}): "Business" | "Individual" {
+  return order.companyName ? "Business" : "Individual";
+}
+
 export function formatCurrency(value: number): string {
   return `RWF ${Math.round(value).toLocaleString("en-US")}`;
 }
