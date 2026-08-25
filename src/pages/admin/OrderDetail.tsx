@@ -44,13 +44,13 @@ function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof us
         }
       `}</style>
 
-      <div className="print:hidden">
+      <div className="flex flex-col items-start gap-3 print:hidden">
         <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800">
           <ArrowLeftIcon className="h-4 w-4" /> Back to order
         </button>
         <button
           onClick={() => window.print()}
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900">
+          className="inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900">
 
           <PrinterIcon className="h-4 w-4" /> Print receipt
         </button>
@@ -114,6 +114,76 @@ function InvoiceView({ order, onBack }: {order: NonNullable<ReturnType<typeof us
 
 }
 
+function PackingSlipView({ order, onBack }: {order: NonNullable<ReturnType<typeof useOrder>>;onBack: () => void;}) {
+  const totalUnits = order.lines.reduce((sum, line) => sum + (line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity), 0);
+
+  return (
+    <AdminLayout>
+      <style>{`
+        @page { size: 58mm 400mm; margin: 0; }
+        @media print {
+          html, body { width: 58mm; }
+        }
+      `}</style>
+
+      <div className="flex flex-col items-start gap-3 print:hidden">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800">
+          <ArrowLeftIcon className="h-4 w-4" /> Back to order
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900">
+
+          <PrinterIcon className="h-4 w-4" /> Print packing slip
+        </button>
+      </div>
+
+      <div className="mx-auto mt-6 w-full max-w-xs rounded-xl border border-burgundy-100 bg-white p-6 font-mono text-[13px] leading-relaxed text-ink shadow-sm print:mt-0 print:w-full print:max-w-none print:rounded-none print:border-0 print:p-2 print:text-[11px] print:shadow-none">
+        <div className="text-center">
+          <p className="text-sm font-bold">Atlas Supplies Ltd</p>
+        </div>
+
+        <Divider />
+
+        <div className="flex justify-between"><span className="font-bold">PACKING SLIP</span><span>{order.reference}</span></div>
+        <p className="text-ink/70">{formatDateTime(order.createdAt)}</p>
+
+        <Divider />
+
+        {order.companyName ?
+        <p className="font-bold">{order.companyName}</p> :
+        <p className="font-bold">{order.contactName}</p>
+        }
+        <p className="text-ink/70">{order.phone}</p>
+        <p className="whitespace-pre-line text-ink/70">{order.deliveryAddress}</p>
+        {order.deliveryDate && <p className="text-ink/70">Requested: {formatDate(order.deliveryDate)}</p>}
+
+        <Divider />
+
+        {order.lines.map((line) => {
+          const unitLabel = line.mode === "business" ? "case(s)" : "pc(s)";
+          return (
+            <div key={`${line.productId}-${line.mode}`} className="mb-2 flex items-start gap-2">
+              <span className="mt-0.5 h-3.5 w-3.5 shrink-0 border border-ink/50" />
+              <div className="flex-1">
+                <p className="font-medium">{line.name}</p>
+                <div className="flex justify-between text-ink/70">
+                  <span>{line.brand}</span>
+                  <span className="shrink-0 pl-2 font-semibold text-ink">{line.quantity} {unitLabel}</span>
+                </div>
+              </div>
+            </div>);
+
+        })}
+
+        <Divider />
+
+        <p className="text-center text-ink/70">{totalUnits} pieces total</p>
+      </div>
+    </AdminLayout>);
+
+}
+
 function useOrder() {
   const { id } = useParams();
   const { orders } = useStore();
@@ -130,6 +200,7 @@ export function OrderDetail() {
   const [updatingInvoice, setUpdatingInvoice] = useState(false);
   const [actionError, setActionError] = useState("");
   const [showInvoice, setShowInvoice] = useState(false);
+  const [showPackingSlip, setShowPackingSlip] = useState(false);
 
   const [editingDetails, setEditingDetails] = useState(false);
   const [detailsDraft, setDetailsDraft] = useState({
@@ -148,6 +219,10 @@ export function OrderDetail() {
 
   if (showInvoice) {
     return <InvoiceView order={order} onBack={() => setShowInvoice(false)} />;
+  }
+
+  if (showPackingSlip) {
+    return <PackingSlipView order={order} onBack={() => setShowPackingSlip(false)} />;
   }
 
   const totalUnits = order.lines.reduce((sum, line) => sum + (line.mode === "business" ? line.quantity * line.unitsPerCase : line.quantity), 0);
@@ -217,19 +292,18 @@ export function OrderDetail() {
 
   return (
     <AdminLayout>
-      <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800 print:hidden"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
-      <p className="hidden text-xs font-semibold uppercase tracking-widest text-ink/50 print:block">Packing slip</p>
-      <div className="mt-4 flex flex-wrap items-end justify-between gap-4 print:mt-2">
-        <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600 print:hidden">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${orderCategory(order) === "Business" ? "bg-amber2-100 text-amber2-800" : "bg-cream text-ink/70"}`}>{orderCategory(order)}</span></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
-        <div className="flex flex-wrap gap-2 print:hidden">
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><PrinterIcon className="h-4 w-4" /> Print packing slip</button>
+      <Link to="/portal/orders" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-burgundy-800"><ArrowLeftIcon className="h-4 w-4" /> All orders</Link>
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+        <div><p className="text-xs font-semibold uppercase tracking-widest text-amber2-600">Fulfilment order</p><div className="mt-1 flex items-center gap-3"><h1 className="font-serif text-4xl font-semibold text-ink">{order.reference}</h1><StatusBadge status={order.status} /><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${orderCategory(order) === "Business" ? "bg-amber2-100 text-amber2-800" : "bg-cream text-ink/70"}`}>{orderCategory(order)}</span></div><p className="mt-1 text-ink/60">Placed {formatDateTime(order.createdAt)}</p></div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => setShowPackingSlip(true)} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><PrinterIcon className="h-4 w-4" /> Print packing slip</button>
           <button onClick={() => setShowInvoice(true)} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50"><ReceiptIcon className="h-4 w-4" /> View invoice</button>
         </div>
       </div>
 
-      {actionError && <p className="mt-4 text-sm font-medium text-red-600 print:hidden">{actionError}</p>}
+      {actionError && <p className="mt-4 text-sm font-medium text-red-600">{actionError}</p>}
 
-      <section className="mt-6 rounded-2xl border border-burgundy-100 bg-white p-5 print:hidden">
+      <section className="mt-6 rounded-2xl border border-burgundy-100 bg-white p-5">
         <p className="text-sm font-semibold text-ink">Advance fulfilment</p>
         <div className="mt-3 flex flex-wrap gap-2">{ORDER_STATUSES.map((status) => <button key={status} onClick={() => changeStatus(status)} disabled={updatingStatus} className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${order.status === status ? "bg-burgundy-800 text-cream" : "border border-burgundy-200 text-ink/70 hover:bg-burgundy-50"}`}>{status}</button>)}</div>
         <div className="mt-5 grid gap-3 border-t border-burgundy-100 pt-4 sm:grid-cols-4">{TIMESTAMPS.map((timestamp) => <div key={timestamp.key}><p className="text-xs uppercase tracking-wider text-ink/40">{timestamp.label}</p><p className="mt-1 text-sm font-medium text-ink">{order[timestamp.key] ? formatDateTime(order[timestamp.key] as string) : "—"}</p></div>)}</div>
@@ -238,10 +312,10 @@ export function OrderDetail() {
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-burgundy-100 bg-white p-6 lg:col-span-2">
           <div className="flex items-center justify-between"><h2 className="font-serif text-2xl font-semibold text-ink">Pick list · {totalUnits} pieces</h2></div>
-          <div className="mt-4 divide-y divide-burgundy-50 print:mt-2">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center gap-4 py-4 print:items-start print:gap-3 print:py-3"><span className="hidden h-5 w-5 shrink-0 rounded border border-ink/40 print:block" /><div className="flex flex-1 items-center justify-between gap-5"><div><p className="font-medium text-ink print:text-base">{line.name}</p><p className="text-xs text-ink/50 print:text-sm">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink print:text-base">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50 print:hidden">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div></div>)}</div>
-          <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm print:hidden"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
+          <div className="mt-4 divide-y divide-burgundy-50">{order.lines.map((line) => <div key={`${line.productId}-${line.mode}`} className="flex items-center justify-between gap-5 py-4"><div><p className="font-medium text-ink">{line.name}</p><p className="text-xs text-ink/50">{line.brand} · {line.unitsPerCase} per case</p></div><div className="text-right"><p className="font-semibold text-ink">{line.quantity} {line.mode === "business" ? "case(s)" : "piece(s)"}</p><p className="text-xs text-ink/50">{formatCurrency((line.mode === "business" ? line.casePrice : line.unitPrice) * line.quantity)}</p></div></div>)}</div>
+          <dl className="mt-4 space-y-2 border-t border-burgundy-100 pt-4 text-sm"><div className="flex justify-between"><dt className="text-ink/60">Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div><div className="flex justify-between"><dt className="text-ink/60">Delivery fee</dt><dd>{formatCurrency(order.deliveryFee)}</dd></div><div className="flex justify-between border-t border-burgundy-100 pt-2"><dt className="font-serif text-lg font-semibold">Total</dt><dd className="font-serif text-lg font-semibold text-burgundy-800">{formatCurrency(order.total)}</dd></div></dl>
 
-          <div className="mt-6 border-t border-burgundy-100 pt-5 print:hidden">
+          <div className="mt-6 border-t border-burgundy-100 pt-5">
             <h3 className="font-semibold text-ink">Payment</h3>
             <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-cream p-3 text-sm">
               {order.paymentMethod === "card" ? <CreditCardIcon className="h-4 w-4 text-burgundy-700" /> : <SmartphoneIcon className="h-4 w-4 text-burgundy-700" />}
