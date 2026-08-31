@@ -5,6 +5,7 @@ import { CheckCircleIcon, ArrowRightIcon, ClipboardListIcon, CreditCardIcon, Tru
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { MomoPaymentCode } from "../components/MomoPaymentCode";
+import { StatusBadge } from "../components/StatusBadge";
 import { useStore } from "../store/StoreContext";
 import { formatCurrency, formatDateTime } from "../lib/format";
 import { Order, Payment } from "../types";
@@ -66,9 +67,11 @@ export function OrderConfirmation() {
           Order received
         </h1>
         <p className="mt-3 text-center text-ink/60">
-          Thank you, {order.contactName}. Your order has landed with the Atlas team and
-          is now <span className="font-semibold text-amber2-700">pending confirmation</span>.
+          Thank you, {order.contactName}. Your order has landed with the Atlas team.
         </p>
+        <div className="mt-3 flex justify-center">
+          <StatusBadge status={order.status} />
+        </div>
 
         {order.paymentMethod === "card" &&
         <div className="mx-auto mt-5 flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium shadow-sm">

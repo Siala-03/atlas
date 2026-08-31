@@ -70,6 +70,7 @@ interface StoreContextValue {
   fetchOrder: (id: string) => Promise<Order | undefined>;
   placeOrder: (details: CheckoutDetails, paymentMethod?: PaymentMethod) => Promise<Order>;
   reorderOrder: (orderId: string) => Promise<{ addedUnits: number; unavailable: string[] }>;
+  reorderMyOrder: (orderId: string) => Promise<{ addedUnits: number; unavailable: string[] }>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   updateOrderInternalNotes: (orderId: string, notes: string) => Promise<void>;
   updateOrderDetails: (
@@ -220,6 +221,12 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     return { addedUnits: result.addedUnits, unavailable: result.unavailable };
   };
 
+  const reorderMyOrder = async (orderId: string) => {
+    const result = await api.reorderMyOrder(orderId);
+    setCart(result.cart);
+    return { addedUnits: result.addedUnits, unavailable: result.unavailable };
+  };
+
   const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
     const order = await api.updateOrderStatus(orderId, status);
     setOrders((previous) => previous.map((item) => item.id === orderId ? order : item));
@@ -280,7 +287,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
       isCartOpen, openCart, closeCart,
       loading, backendError, addToCart, updateCartQty,
       removeFromCart, clearCart, getProduct, loadOrders, fetchOrder, placeOrder,
-      reorderOrder, updateOrderStatus, updateOrderInternalNotes, updateOrderDetails, updateOrderLines, updateInvoiceStatus,
+      reorderOrder, reorderMyOrder, updateOrderStatus, updateOrderInternalNotes, updateOrderDetails, updateOrderLines, updateInvoiceStatus,
       updateProduct, createProduct, restockProduct, initiatePayment, getPaymentStatus
     }}>
       {children}

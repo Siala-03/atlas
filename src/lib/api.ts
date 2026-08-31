@@ -143,5 +143,15 @@ export const api = {
   getMyOrders: () => {
     const token = getCustomerToken();
     return request<Order[]>("/customers/me/orders", { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-  }
+  },
+
+  reorderMyOrder: (orderId: string) => {
+    const token = getCustomerToken();
+    return request<{ cart: CartItem[]; addedUnits: number; unavailable: string[] }>(`/customers/me/orders/${orderId}/reorder`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+  },
+
+  getCustomers: () => request<Customer[]>("/customers")
 };

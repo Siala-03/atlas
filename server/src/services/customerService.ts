@@ -22,3 +22,7 @@ export async function login(email: string, password: string) {
 export function getCustomer(id: string) {
   return prisma.customer.findUnique({ where: { id }, select: PROFILE_SELECT });
 }
+
+export function listCustomers() {
+  return prisma.customer.findMany({ select: PROFILE_SELECT, orderBy: { createdAt: "desc" } });
+}

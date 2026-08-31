@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
@@ -42,6 +42,13 @@ function periodRange(type: PeriodType, anchor: Date): {start: Date;end: Date;lab
   const start = new Date(anchor.getFullYear(), 0, 1);
   const end = new Date(anchor.getFullYear() + 1, 0, 1);
   return { start, end, label: String(anchor.getFullYear()) };
+}
+
+function toDateInputValue(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function shiftAnchor(type: PeriodType, anchor: Date, direction: 1 | -1): Date {
@@ -114,13 +121,29 @@ export function Reports() {
           <button onClick={() => setAnchor((a) => shiftAnchor(periodType, a, -1))} aria-label="Previous period" className="rounded-full p-1.5 text-ink/60 hover:bg-burgundy-50">
             <ChevronLeftIcon className="h-4 w-4" />
           </button>
+          {periodType === "day" ?
+          <label className="flex min-w-[10rem] items-center justify-center gap-1.5 text-sm font-semibold text-ink">
+              <CalendarIcon className="h-3.5 w-3.5 text-ink/40" />
+              <input
+              type="date"
+              value={toDateInputValue(anchor)}
+              onChange={(e) => {
+                if (!e.target.value) return;
+                const [y, m, d] = e.target.value.split("-").map(Number);
+                setAnchor(new Date(y, m - 1, d));
+              }}
+              className="bg-transparent text-sm font-semibold text-ink outline-none [color-scheme:light]" />
+
+            </label> :
+
           <span className="min-w-[10rem] text-center text-sm font-semibold text-ink">{label}</span>
+          }
           <button onClick={() => setAnchor((a) => shiftAnchor(periodType, a, 1))} aria-label="Next period" className="rounded-full p-1.5 text-ink/60 hover:bg-burgundy-50">
             <ChevronRightIcon className="h-4 w-4" />
           </button>
         </div>
 
-        <button onClick={() => setAnchor(new Date())} className="text-sm font-semibold text-burgundy-800 underline underline-offset-2 hover:text-burgundy-900">
+        <button onClick={() => setAnchor(new Date())} className="rounded-full border border-burgundy-200 bg-white px-4 py-1.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50">
           Today
         </button>
       </div>

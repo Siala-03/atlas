@@ -1,7 +1,7 @@
 import { prisma } from "../db";
 import { NotFoundError, StockConflictError, ValidationError } from "../errors";
 import { computeTotals } from "../lib/money";
-import { generateReference } from "../lib/reference";
+import { generateReference, referencePrefix } from "../lib/reference";
 import { bottlePrice, caseTotalPrice, resolveMode } from "../lib/productRules";
 import { sendOrderConfirmationEmail, sendOrderNotificationEmail } from "../lib/mailer";
 import { z } from "zod";
@@ -102,9 +102,11 @@ customerId?: string)
     details.houseNumber ? `House ${details.houseNumber}` : null].
     filter(Boolean).join(", ");
 
+    const todaysOrderCount = await tx.order.count({ where: { reference: { startsWith: referencePrefix() } } });
+
     const order = await tx.order.create({
       data: {
-        reference: generateReference(),
+        reference: generateReference(todaysOrderCount + 1),
         status: "Pending",
         contactName: details.contactName,
         email: details.email,

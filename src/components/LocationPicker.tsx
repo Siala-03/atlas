@@ -33,6 +33,7 @@ function MapModal({ value, onChange, onClose }: LocationPickerProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [locateError, setLocateError] = useState("");
 
   const moveTo = (lat: number, lng: number, zoom = 16) => {
     const map = mapRef.current;
@@ -85,14 +86,25 @@ function MapModal({ value, onChange, onClose }: LocationPickerProps) {
   }, []);
 
   const useMyLocation = () => {
-    if (!navigator.geolocation) return;
+    setLocateError("");
+    if (!navigator.geolocation) {
+      setLocateError("Your browser doesn't support location — search or tap the map instead.");
+      return;
+    }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         moveTo(position.coords.latitude, position.coords.longitude, 16);
         setLocating(false);
       },
-      () => setLocating(false),
+      (error) => {
+        setLocating(false);
+        setLocateError(
+          error.code === error.PERMISSION_DENIED ?
+          "Location access was denied — allow it in your browser settings, or search/tap the map instead." :
+          "Couldn't get your location — search or tap the map instead."
+        );
+      },
       { enableHighAccuracy: true, timeout: 8000 }
     );
   };
@@ -163,6 +175,7 @@ function MapModal({ value, onChange, onClose }: LocationPickerProps) {
             </button>
           </div>
           {searching && <p className="mt-1.5 text-xs text-ink/50">Searching…</p>}
+          {locateError && <p className="mt-1.5 text-xs text-red-600">{locateError}</p>}
           {results.length > 0 &&
           <ul className="mt-2 max-h-40 divide-y divide-burgundy-50 overflow-y-auto rounded-xl border border-burgundy-100">
               {results.map((result) =>

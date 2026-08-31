@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserIcon, LogOutIcon, PackageIcon } from "lucide-react";
+import { UserIcon, LogOutIcon, PackageIcon, RotateCcwIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { StatusBadge } from "../components/StatusBadge";
 import { formatCurrency, formatDate } from "../lib/format";
 import { api } from "../lib/api";
 import { endCustomerSession, getCustomerProfile, getCustomerToken, startCustomerSession } from "../lib/customerAuth";
+import { useStore } from "../store/StoreContext";
 import { Order } from "../types";
 
 export function Account() {
+  const { reorderMyOrder, openCart } = useStore();
   const [profile, setProfile] = useState(getCustomerProfile());
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
@@ -18,6 +20,8 @@ export function Account() {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [reorderingId, setReorderingId] = useState<string | null>(null);
+  const [reorderNote, setReorderNote] = useState("");
 
   useEffect(() => {
     if (!profile || !getCustomerToken()) return;
@@ -44,6 +48,24 @@ export function Account() {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const reorder = async (orderId: string) => {
+    setReorderingId(orderId);
+    setReorderNote("");
+    try {
+      const result = await reorderMyOrder(orderId);
+      setReorderNote(
+        result.unavailable.length > 0 ?
+        `Added what's still in stock. Not available: ${result.unavailable.join(", ")}.` :
+        `Added ${result.addedUnits} item${result.addedUnits === 1 ? "" : "s"} to your cart.`
+      );
+      openCart();
+    } catch (err) {
+      setReorderNote(err instanceof Error ? err.message : "Could not reorder this order.");
+    } finally {
+      setReorderingId(null);
     }
   };
 
@@ -127,6 +149,7 @@ export function Account() {
         </div>
 
         <h2 className="mt-8 font-serif text-2xl font-semibold text-ink">My orders</h2>
+        {reorderNote && <p className="mt-3 text-sm font-medium text-burgundy-800">{reorderNote}</p>}
         {loadingOrders ?
         <p className="mt-3 text-sm text-ink/50">Loading…</p> :
         orders.length === 0 ?
@@ -139,13 +162,20 @@ export function Account() {
         <div className="mt-3 divide-y divide-burgundy-50 overflow-hidden rounded-2xl border border-burgundy-100 bg-white">
             {orders.map((order) =>
           <div key={order.id} className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <div>
-                  <p className="font-semibold text-ink">{order.reference}</p>
+                <Link to={`/my-orders/${order.id}`} className="min-w-0 flex-1">
+                  <p className="font-semibold text-burgundy-800 hover:underline">{order.reference}</p>
                   <p className="text-xs text-ink/50">{formatDate(order.createdAt)} · {order.lines.length} item{order.lines.length === 1 ? "" : "s"}</p>
-                </div>
+                </Link>
                 <div className="flex items-center gap-3">
                   <span className="font-medium text-ink">{formatCurrency(order.total)}</span>
                   <StatusBadge status={order.status} />
+                  <button
+                  onClick={() => reorder(order.id)}
+                  disabled={reorderingId === order.id}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-burgundy-200 px-3 py-1.5 text-xs font-semibold text-burgundy-800 hover:bg-burgundy-50 disabled:cursor-not-allowed disabled:opacity-60">
+
+                    <RotateCcwIcon className="h-3.5 w-3.5" /> {reorderingId === order.id ? "Adding…" : "Reorder"}
+                  </button>
                 </div>
               </div>
           )}

@@ -27,6 +27,7 @@ const PortalLogin = lazy(() => import("./pages/PortalLogin").then((m) => ({ defa
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then((m) => ({ default: m.Dashboard })));
 const Orders = lazy(() => import("./pages/admin/Orders").then((m) => ({ default: m.Orders })));
 const Reports = lazy(() => import("./pages/admin/Reports").then((m) => ({ default: m.Reports })));
+const Customers = lazy(() => import("./pages/admin/Customers").then((m) => ({ default: m.Customers })));
 const OrderDetail = lazy(() => import("./pages/admin/OrderDetail").then((m) => ({ default: m.OrderDetail })));
 const Inventory = lazy(() => import("./pages/admin/Inventory").then((m) => ({ default: m.Inventory })));
 const Settings = lazy(() => import("./pages/admin/Settings").then((m) => ({ default: m.Settings })));
@@ -51,6 +52,7 @@ export function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmed/:id" element={<OrderConfirmation />} />
+            <Route path="/my-orders/:id" element={<OrderConfirmation />} />
             <Route path="/mock-payment/:providerRef" element={<MockPayment />} />
 
             <Route
@@ -61,6 +63,7 @@ export function App() {
               <Route path="/portal" element={<Suspense fallback={null}><Dashboard /></Suspense>} />
               <Route path="/portal/orders" element={<Suspense fallback={null}><Orders /></Suspense>} />
               <Route path="/portal/reports" element={<Suspense fallback={null}><Reports /></Suspense>} />
+              <Route path="/portal/customers" element={<Suspense fallback={null}><Customers /></Suspense>} />
               <Route path="/portal/orders/:id" element={<Suspense fallback={null}><OrderDetail /></Suspense>} />
               <Route element={<AdminOnlyGuard />}>
                 <Route path="/portal/inventory" element={<Suspense fallback={null}><Inventory /></Suspense>} />

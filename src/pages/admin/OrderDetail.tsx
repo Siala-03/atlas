@@ -23,7 +23,7 @@ import { StatusBadge } from "../../components/StatusBadge";
 import { formatCurrency, formatDate, formatDateTime, orderCategory } from "../../lib/format";
 import { useStore } from "../../store/StoreContext";
 import { INVOICE_STATUSES, InvoiceStatus, ORDER_STATUSES, ShoppingMode } from "../../types";
-import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "../../lib/contact";
+import { CONTACT_ADDRESS, CONTACT_PHONE_DISPLAY } from "../../lib/contact";
 
 const TIMESTAMPS = [
 { key: "confirmedAt", label: "Confirmed" },
@@ -324,7 +324,10 @@ export function OrderDetail() {
     if (existing) {
       setLinesDraft((previous) => previous.map((line) => line.productId === addProductId ? { ...line, quantity: line.quantity + 1 } : line));
     } else {
-      setLinesDraft((previous) => [...previous, { productId: addProductId, mode: "individual", quantity: 1 }]);
+      // New items match how the rest of this order is being purchased —
+      // business orders add by the case, not by the single bottle.
+      const orderMode: ShoppingMode = linesDraft[0]?.mode ?? order.lines[0]?.mode ?? "individual";
+      setLinesDraft((previous) => [...previous, { productId: addProductId, mode: orderMode, quantity: 1 }]);
     }
     setAddProductId("");
   };

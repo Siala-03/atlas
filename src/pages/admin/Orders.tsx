@@ -5,17 +5,24 @@ import { AdminLayout } from "../../components/AdminLayout";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency, formatDate, orderCategory } from "../../lib/format";
-import { ORDER_STATUSES, OrderStatus } from "../../types";
+import { ORDER_STATUSES, OrderStatus, PaymentMethod } from "../../types";
 
 type SortField = "createdAt" | "total" | "contactName" | "status";
 type SortDir = "asc" | "desc";
+type PaymentFilter = PaymentMethod | "All";
 
 export function Orders() {
   const { orders } = useStore();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "All">("All");
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("All");
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const paymentCounts = useMemo(
+    () => orders.reduce((acc, o) => ({ ...acc, [o.paymentMethod]: (acc[o.paymentMethod] ?? 0) + 1 }), {} as Record<PaymentMethod, number>),
+    [orders]
+  );
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
@@ -30,6 +37,7 @@ export function Orders() {
     let list = orders.filter((o) =>
     statusFilter === "All" ? true : o.status === statusFilter
     );
+    if (paymentFilter !== "All") list = list.filter((o) => o.paymentMethod === paymentFilter);
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter(
@@ -57,7 +65,7 @@ export function Orders() {
 
       }
     });
-  }, [orders, query, statusFilter, sortField, sortDir]);
+  }, [orders, query, statusFilter, paymentFilter, sortField, sortDir]);
 
   const SortHeader = ({ field, label }: {field: SortField;label: string;}) =>
   <button
@@ -92,7 +100,7 @@ export function Orders() {
             "bg-burgundy-800 text-cream" :
             "border border-burgundy-200 bg-white text-ink/60 hover:bg-burgundy-50"}`
             }>
-            
+
               {s}
             </button>
           )}
@@ -104,8 +112,25 @@ export function Orders() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search ref, customer, phone, product..."
             className="w-full rounded-full border border-burgundy-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
-          
+
         </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold uppercase tracking-widest text-ink/40">Payment</span>
+        {(["All", "card", "momo"] as PaymentFilter[]).map((p) =>
+        <button
+          key={p}
+          onClick={() => setPaymentFilter(p)}
+          className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+          paymentFilter === p ?
+          "bg-amber2-500 text-white" :
+          "border border-burgundy-200 bg-white text-ink/60 hover:bg-burgundy-50"}`
+          }>
+
+            {p === "All" ? "All" : p === "card" ? "Card" : "MTN MoMo"} ({p === "All" ? orders.length : paymentCounts[p as PaymentMethod] ?? 0})
+          </button>
+        )}
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-burgundy-100 bg-white">
