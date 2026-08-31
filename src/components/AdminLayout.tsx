@@ -83,8 +83,8 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
     <div className="flex min-h-screen w-full bg-cream">
       {/* Sidebar desktop */}
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-burgundy-950 py-6 lg:flex print:hidden">
-        <div className="mx-4 mb-8 flex items-center justify-center rounded-xl bg-cream p-4">
-          <Logo className="h-14" />
+        <div className="mx-4 mb-8 flex items-center justify-center rounded-xl bg-cream p-3">
+          <Logo className="h-20" />
         </div>
         {nav}
         <div className="mt-auto space-y-1 px-3">
@@ -113,8 +113,8 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
 
       {/* Mobile top bar */}
       <div className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-burgundy-950 px-4 lg:hidden print:hidden">
-        <div className="rounded-lg bg-cream px-3 py-1.5">
-          <Logo className="h-9" />
+        <div className="rounded-lg bg-cream px-3 py-1">
+          <Logo className="h-11" />
         </div>
         <button
           onClick={() => setOpen((v) => !v)}
