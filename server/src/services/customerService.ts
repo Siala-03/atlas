@@ -2,13 +2,35 @@ import { prisma } from "../db";
 import { ValidationError } from "../errors";
 import { hashPassword, verifyPasswordHash } from "../lib/customerAuth";
 
-const PROFILE_SELECT = { id: true, name: true, email: true, phone: true, createdAt: true };
+const PROFILE_SELECT = {
+  id: true, name: true, email: true, phone: true,
+  isBusiness: true, companyName: true, tin: true, createdAt: true
+};
 
-export async function signup(name: string, email: string, password: string, phone?: string) {
-  const existing = await prisma.customer.findUnique({ where: { email: email.toLowerCase().trim() } });
+interface SignupParams {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  isBusiness?: boolean;
+  companyName?: string;
+  tin?: string;
+}
+
+export async function signup(params: SignupParams) {
+  const email = params.email.toLowerCase().trim();
+  const existing = await prisma.customer.findUnique({ where: { email } });
   if (existing) throw new ValidationError("An account with this email already exists.");
   return prisma.customer.create({
-    data: { name, email: email.toLowerCase().trim(), passwordHash: hashPassword(password), phone },
+    data: {
+      name: params.name,
+      email,
+      passwordHash: hashPassword(params.password),
+      phone: params.phone,
+      isBusiness: params.isBusiness ?? false,
+      companyName: params.isBusiness ? params.companyName : undefined,
+      tin: params.isBusiness ? params.tin : undefined
+    },
     select: PROFILE_SELECT
   });
 }

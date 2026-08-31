@@ -15,8 +15,8 @@ customersRouter.get("/customers", requireAdmin, asyncHandler(async (_req, res) =
 }));
 
 customersRouter.post("/customers/signup", asyncHandler(async (req, res) => {
-  const { name, email, password, phone } = CustomerSignupSchema.parse(req.body);
-  const customer = await customerService.signup(name, email, password, phone);
+  const params = CustomerSignupSchema.parse(req.body);
+  const customer = await customerService.signup(params);
   res.status(201).json({ token: issueCustomerToken(customer.id), customer });
 }));
 
@@ -29,7 +29,11 @@ customersRouter.post("/customers/login", asyncHandler(async (req, res) => {
   }
   res.json({
     token: issueCustomerToken(customer.id),
-    customer: { id: customer.id, name: customer.name, email: customer.email, phone: customer.phone, createdAt: customer.createdAt }
+    customer: {
+      id: customer.id, name: customer.name, email: customer.email, phone: customer.phone,
+      isBusiness: customer.isBusiness, companyName: customer.companyName, tin: customer.tin,
+      createdAt: customer.createdAt
+    }
   });
 }));
 

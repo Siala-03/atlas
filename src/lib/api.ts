@@ -134,7 +134,15 @@ export const api = {
 
   getPaymentStatus: (orderId: string) => request<Payment | null>(`/payments/order/${orderId}`),
 
-  customerSignup: (params: { name: string; email: string; password: string; phone?: string }) =>
+  customerSignup: (params: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    isBusiness?: boolean;
+    companyName?: string;
+    tin?: string;
+  }) =>
   request<{ token: string; customer: Customer }>("/customers/signup", { method: "POST", body: JSON.stringify(params) }),
 
   customerLogin: (email: string, password: string) =>

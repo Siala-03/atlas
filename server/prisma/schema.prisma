@@ -71,6 +71,9 @@ model Customer {
   email        String   @unique
   passwordHash String
   phone        String?
+  isBusiness   Boolean  @default(false)
+  companyName  String?
+  tin          String?
   createdAt    DateTime @default(now())
   orders       Order[]
 }

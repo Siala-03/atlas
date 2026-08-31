@@ -136,5 +136,8 @@ export interface Customer {
   name: string;
   email: string;
   phone?: string;
+  isBusiness: boolean;
+  companyName?: string;
+  tin?: string;
   createdAt: string;
 }

@@ -145,7 +145,18 @@ export const CustomerSignupSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(4, "Password must be at least 4 characters"),
-  phone: z.string().optional()
+  phone: z.string().optional(),
+  isBusiness: z.boolean().optional().default(false),
+  companyName: z.string().optional(),
+  tin: z.string().optional()
+}).
+refine((data) => !data.isBusiness || !!data.companyName?.trim(), {
+  message: "Company name is required for business accounts",
+  path: ["companyName"]
+}).
+refine((data) => !data.isBusiness || /^1\d{8}$/.test(data.tin?.trim() ?? ""), {
+  message: "TIN must be 9 digits starting with 1",
+  path: ["tin"]
 });
 
 export const CustomerLoginSchema = z.object({

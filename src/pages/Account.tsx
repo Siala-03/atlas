@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserIcon, LogOutIcon, PackageIcon, RotateCcwIcon } from "lucide-react";
+import { UserIcon, LogOutIcon, PackageIcon, RotateCcwIcon, Building2Icon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { StatusBadge } from "../components/StatusBadge";
@@ -14,7 +14,8 @@ export function Account() {
   const { reorderMyOrder, openCart } = useStore();
   const [profile, setProfile] = useState(getCustomerProfile());
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", companyName: "", tin: "" });
+  const [isBusiness, setIsBusiness] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -37,10 +38,28 @@ export function Account() {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
+    if (mode === "signup" && isBusiness) {
+      if (!form.companyName.trim()) {
+        setError("Company name is required for business accounts.");
+        return;
+      }
+      if (!/^1\d{8}$/.test(form.tin.trim())) {
+        setError("TIN must be 9 digits starting with 1.");
+        return;
+      }
+    }
     setSubmitting(true);
     try {
       const result = mode === "signup" ?
-      await api.customerSignup({ name: form.name, email: form.email, password: form.password, phone: form.phone || undefined }) :
+      await api.customerSignup({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        phone: form.phone || undefined,
+        isBusiness,
+        companyName: isBusiness ? form.companyName : undefined,
+        tin: isBusiness ? form.tin : undefined
+      }) :
       await api.customerLogin(form.email, form.password);
       startCustomerSession(result.token, result.customer);
       setProfile(result.customer);
@@ -95,10 +114,16 @@ export function Account() {
 
           <form onSubmit={submit} className="mt-8 space-y-4 rounded-2xl border border-burgundy-100 bg-white p-6">
             {mode === "signup" &&
-            <div>
-                <label className="mb-1.5 block text-sm font-medium text-ink/70">Full name</label>
-                <input required value={form.name} onChange={(e) => set("name", e.target.value)} className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
-              </div>
+            <>
+                <div className="flex rounded-full border border-burgundy-200 bg-cream p-1 text-sm font-semibold">
+                  <button type="button" onClick={() => setIsBusiness(false)} className={`flex-1 rounded-full py-2 transition-colors ${!isBusiness ? "bg-burgundy-800 text-cream" : "text-ink/60"}`}>Individual</button>
+                  <button type="button" onClick={() => setIsBusiness(true)} className={`flex-1 rounded-full py-2 transition-colors ${isBusiness ? "bg-burgundy-800 text-cream" : "text-ink/60"}`}>Business</button>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-ink/70">Full name</label>
+                  <input required value={form.name} onChange={(e) => set("name", e.target.value)} className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
+                </div>
+              </>
             }
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink/70">Email</label>
@@ -109,6 +134,18 @@ export function Account() {
                 <label className="mb-1.5 block text-sm font-medium text-ink/70">Phone (optional)</label>
                 <input value={form.phone} onChange={(e) => set("phone", e.target.value)} className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
               </div>
+            }
+            {mode === "signup" && isBusiness &&
+            <>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-ink/70">Company name</label>
+                  <input required value={form.companyName} onChange={(e) => set("companyName", e.target.value)} className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-ink/70">TIN</label>
+                  <input required placeholder="9 digits, starting with 1" maxLength={9} value={form.tin} onChange={(e) => set("tin", e.target.value)} className="w-full rounded-xl border border-burgundy-200 px-4 py-3 text-sm outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200" />
+                </div>
+              </>
             }
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink/70">Password</label>
@@ -139,8 +176,15 @@ export function Account() {
               <UserIcon className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-serif text-xl font-semibold text-ink">{profile.name}</p>
-              <p className="text-sm text-ink/60">{profile.email}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-serif text-xl font-semibold text-ink">{profile.name}</p>
+                {profile.isBusiness &&
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber2-100 px-2.5 py-0.5 text-xs font-semibold text-amber2-800">
+                    <Building2Icon className="h-3 w-3" /> Business
+                  </span>
+                }
+              </div>
+              <p className="text-sm text-ink/60">{profile.companyName || profile.email}</p>
             </div>
           </div>
           <button onClick={signOut} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 px-4 py-2 text-sm font-semibold text-ink/70 hover:bg-burgundy-50">

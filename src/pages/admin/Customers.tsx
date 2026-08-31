@@ -47,7 +47,7 @@ export function Customers() {
         phone: account.phone,
         registered: true,
         createdAt: account.createdAt,
-        type: "Individual",
+        type: account.isBusiness ? "Business" : "Individual",
         orderCount: 0,
         totalSpent: 0
       });
@@ -62,7 +62,9 @@ export function Customers() {
         existing.orderCount += 1;
         existing.totalSpent += order.total;
         if (isNewer) {
-          existing.type = type;
+          // A registered account's own signup type is authoritative;
+          // guests are typed from their most recent order instead.
+          if (!existing.registered) existing.type = type;
           existing.lastOrderAt = order.createdAt;
           existing.name = existing.name || order.contactName;
         }
