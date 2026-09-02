@@ -18,16 +18,13 @@ export interface Product {
   volume: string;
   unitsPerCase: number;
   casePrice: number;
+  unitPrice: number;
   stockUnits: number;
   lowStockThreshold: number;
   image: string;
   description: string;
   origin: string;
   published?: boolean;
-}
-
-export function unitPrice(product: Pick<Product, "casePrice" | "unitsPerCase">): number {
-  return Math.round(product.casePrice / product.unitsPerCase);
 }
 
 export interface CartItem {

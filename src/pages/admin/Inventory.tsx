@@ -14,7 +14,7 @@ import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
 import { formatCurrency } from "../../lib/format";
 import { Category, Product, Subtype } from "../../types";
-import { bottlePrice, hasCaseOption, isCaseStocked } from "../../lib/productRules";
+import { bottlePrice, isCaseStocked } from "../../lib/productRules";
 
 // Resizes/compresses an image file client-side before it's sent to the
 // server, so a raw multi-megabyte phone photo doesn't blow up the DB row
@@ -67,7 +67,8 @@ interface ProductDraft {
   unitsPerCase: string;
   origin: string;
   description: string;
-  price: string;
+  piecePrice: string;
+  casePrice: string;
   stock: string;
   lowStockThreshold: string;
   image: string;
@@ -85,7 +86,8 @@ function draftFromProduct(p: Product): ProductDraft {
     unitsPerCase: String(p.unitsPerCase),
     origin: p.origin,
     description: p.description,
-    price: String(caseOnly ? p.casePrice : bottlePrice(p)),
+    piecePrice: String(p.unitPrice),
+    casePrice: String(p.casePrice),
     stock: String(caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits),
     lowStockThreshold: String(caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold),
     image: p.image
@@ -102,7 +104,8 @@ const BLANK_DRAFT: ProductDraft = {
   unitsPerCase: "12",
   origin: "",
   description: "",
-  price: "",
+  piecePrice: "",
+  casePrice: "",
   stock: "",
   lowStockThreshold: "",
   image: ""
@@ -111,14 +114,8 @@ const BLANK_DRAFT: ProductDraft = {
 function draftToFields(draft: ProductDraft) {
   const unitsPerCase = parseInt(draft.unitsPerCase, 10) || 1;
   const caseOnly = isCaseStocked(draft.category);
-  const enteredPrice = parseFloat(draft.price) || 0;
   const enteredStock = parseInt(draft.stock, 10) || 0;
   const enteredThreshold = parseInt(draft.lowStockThreshold, 10) || 0;
-  const casePrice = caseOnly ?
-  enteredPrice :
-  hasCaseOption(draft.category) ?
-  Math.round(enteredPrice * unitsPerCase) :
-  enteredPrice;
   return {
     name: draft.name.trim(),
     brand: draft.brand.trim(),
@@ -129,7 +126,8 @@ function draftToFields(draft: ProductDraft) {
     unitsPerCase,
     origin: draft.origin.trim(),
     description: draft.description.trim(),
-    casePrice,
+    unitPrice: parseFloat(draft.piecePrice) || 0,
+    casePrice: parseFloat(draft.casePrice) || 0,
     stockUnits: caseOnly ? enteredStock * unitsPerCase : enteredStock,
     lowStockThreshold: caseOnly ? enteredThreshold * unitsPerCase : enteredThreshold,
     image: draft.image
@@ -150,7 +148,7 @@ function ProductFormModal({
 }: {mode: "create" | "edit";draft: ProductDraft;setDraft: React.Dispatch<React.SetStateAction<ProductDraft>>;saving: boolean;error: string | null;onSave: () => void;onClose: () => void;}) {
   const subtypes = SUBTYPE_OPTIONS[draft.category];
   const caseOnly = isCaseStocked(draft.category);
-  const priceUnit = caseOnly ? "case" : "bottle";
+  const stockUnit = caseOnly ? "case" : "bottle";
   const field = (key: keyof ProductDraft, value: string) => setDraft((d) => ({ ...d, [key]: value }));
 
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -246,18 +244,23 @@ function ProductFormModal({
             <textarea rows={3} value={draft.description} onChange={(e) => field("description", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-ink/60">Price / {priceUnit} (RWF)</label>
-            <input value={draft.price} onChange={(e) => field("price", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+            <label className="mb-1 block text-xs font-medium text-ink/60">Price / piece (RWF)</label>
+            <input value={draft.piecePrice} onChange={(e) => field("piecePrice", e.target.value)} placeholder="For individual buyers" className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-ink/60">Stock ({priceUnit}s)</label>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Price / case ({draft.unitsPerCase || "?"} pcs, RWF)</label>
+            <input value={draft.casePrice} onChange={(e) => field("casePrice", e.target.value)} placeholder="For business buyers" className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Stock ({stockUnit}s)</label>
             <input value={draft.stock} onChange={(e) => field("stock", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-ink/60">Low stock at ({priceUnit}s)</label>
+            <label className="mb-1 block text-xs font-medium text-ink/60">Low stock at ({stockUnit}s)</label>
             <input value={draft.lowStockThreshold} onChange={(e) => field("lowStockThreshold", e.target.value)} className="w-full rounded-lg border border-burgundy-200 px-3 py-2 text-sm outline-none focus:border-burgundy-500" />
           </div>
         </div>
+        <p className="mt-2 text-xs text-ink/40">Piece price applies to individual-account checkout; case price applies to business-account checkout. They don&apos;t have to be a flat multiple of each other.</p>
 
         <div className="mt-5 flex gap-2">
           <button onClick={onSave} disabled={saving} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-burgundy-800 px-4 py-2.5 text-sm font-semibold text-cream hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:opacity-60">
@@ -438,7 +441,7 @@ export function Inventory() {
             {products.length} products · stock value {formatCurrency(totalStockValue)}
           </p>
           <p className="mt-1 text-xs text-ink/40">
-            Wine &amp; spirits are priced and stocked per bottle · Beer is priced and stocked per case. Hover a product photo to replace it — changes show on the storefront immediately.
+            Every product has an independent piece price (individual accounts) and case price (business accounts) · Beer is stocked and restocked by the case, everything else by the piece. Hover a product photo to replace it — changes show on the storefront immediately.
           </p>
         </div>
         <button
@@ -552,7 +555,6 @@ export function Inventory() {
                 const unitLabel = caseOnly ? "case" : "bottle";
                 const low = p.stockUnits <= p.lowStockThreshold;
                 const out = p.stockUnits === 0;
-                const displayPrice = caseOnly ? p.casePrice : bottlePrice(p);
                 const displayStock = caseOnly ? Math.floor(p.stockUnits / p.unitsPerCase) : p.stockUnits;
                 const displayThreshold = caseOnly ? Math.floor(p.lowStockThreshold / p.unitsPerCase) : p.lowStockThreshold;
                 const unpublished = p.published === false;
@@ -584,8 +586,8 @@ export function Inventory() {
                     </td>
                     <td className="px-5 py-4 text-ink/70">{p.category}{p.subtype ? ` · ${p.subtype}` : ""}</td>
                     <td className="px-5 py-4">
-                      <span className="font-medium">{formatCurrency(displayPrice)}</span>
-                      <span className="ml-1 text-xs text-ink/40">/{unitLabel}</span>
+                      <p><span className="font-medium">{formatCurrency(bottlePrice(p))}</span><span className="ml-1 text-xs text-ink/40">/piece</span></p>
+                      <p className="mt-0.5"><span className="font-medium">{formatCurrency(p.casePrice)}</span><span className="ml-1 text-xs text-ink/40">/case</span></p>
                     </td>
                     <td className="px-5 py-4">
                       <span className="font-medium">{displayStock}</span>

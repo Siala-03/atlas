@@ -24,7 +24,7 @@ const DELIVERY_FEE = 1500;
 const CART_KEY = "atlas.cart.v2";
 const MODE_KEY = "atlas.shoppingMode.v1";
 
-export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitsPerCase" | "category">, item: CartItem): number {
+export function lineUnitTotal(product: Pick<Product, "casePrice" | "unitPrice">, item: CartItem): number {
   const isBusiness = item.mode === "business";
   return isBusiness ? caseTotalPrice(product) * item.quantity : bottlePrice(product) * item.quantity;
 }
@@ -85,7 +85,7 @@ interface StoreContextValue {
     Pick<
       Product,
       "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
-      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>)
+      "casePrice" | "unitPrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>)
   => Promise<void>;
   createProduct: (data: Omit<Product, "id">) => Promise<void>;
   restockProduct: (id: string, units: number) => Promise<void>;
@@ -262,7 +262,7 @@ export function StoreProvider({ children }: {children: ReactNode;}) {
     Pick<
       Product,
       "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
-      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>) =>
+      "casePrice" | "unitPrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>) =>
   {
     const product = await api.updateProduct(id, patch);
     setProducts((previous) => previous.map((item) => item.id === id ? product : item));

@@ -33,6 +33,7 @@ interface ProductPatch {
   origin?: string;
   description?: string;
   casePrice?: number;
+  unitPrice?: number;
   unitsPerCase?: number;
   stockUnits?: number;
   lowStockThreshold?: number;
@@ -60,6 +61,7 @@ interface ProductCreate {
   origin: string;
   description: string;
   casePrice: number;
+  unitPrice: number;
   unitsPerCase: number;
   stockUnits: number;
   lowStockThreshold: number;

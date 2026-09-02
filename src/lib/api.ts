@@ -60,7 +60,7 @@ export const api = {
     Pick<
       Product,
       "name" | "brand" | "category" | "subtype" | "abv" | "volume" | "origin" | "description" |
-      "casePrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>)
+      "casePrice" | "unitPrice" | "unitsPerCase" | "stockUnits" | "lowStockThreshold" | "image" | "published">>)
   : Promise<Product> =>
   request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
 

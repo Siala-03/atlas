@@ -83,8 +83,8 @@ export function AdminLayout({ children }: {children: React.ReactNode;}) {
     <div className="flex min-h-screen w-full bg-cream">
       {/* Sidebar desktop */}
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-burgundy-950 py-6 lg:flex print:hidden">
-        <div className="mx-4 mb-8 flex items-center justify-center rounded-xl bg-cream p-3">
-          <Logo className="h-20" />
+        <div className="mx-4 mb-8 flex items-center justify-center rounded-xl bg-cream p-2">
+          <Logo className="h-24" />
         </div>
         {nav}
         <div className="mt-auto space-y-1 px-3">

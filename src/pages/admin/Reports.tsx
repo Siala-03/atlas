@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, DownloadIcon, PrinterIcon } from "lucide-react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { useStore } from "../../store/StoreContext";
-import { formatCurrency } from "../../lib/format";
+import { formatCurrency, formatDate, orderCategory } from "../../lib/format";
 
-type PeriodType = "day" | "week" | "month" | "year";
+type PeriodType = "day" | "week" | "month" | "year" | "custom";
 
 function startOfWeek(date: Date): Date {
   const d = new Date(date);
@@ -15,7 +15,24 @@ function startOfWeek(date: Date): Date {
   return d;
 }
 
-function periodRange(type: PeriodType, anchor: Date): {start: Date;end: Date;label: string;} {
+function toDateInputValue(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function fromDateInputValue(value: string): Date {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function periodRange(
+type: PeriodType,
+anchor: Date,
+customStart: Date,
+customEnd: Date)
+: {start: Date;end: Date;label: string;} {
   if (type === "day") {
     const start = new Date(anchor);
     start.setHours(0, 0, 0, 0);
@@ -39,16 +56,20 @@ function periodRange(type: PeriodType, anchor: Date): {start: Date;end: Date;lab
     const end = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 1);
     return { start, end, label: start.toLocaleDateString("en-GB", { month: "long", year: "numeric" }) };
   }
+  if (type === "custom") {
+    const start = new Date(customStart);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(customEnd);
+    end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 1);
+    return {
+      start, end,
+      label: `${start.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })} – ${customEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}`
+    };
+  }
   const start = new Date(anchor.getFullYear(), 0, 1);
   const end = new Date(anchor.getFullYear() + 1, 0, 1);
   return { start, end, label: String(anchor.getFullYear()) };
-}
-
-function toDateInputValue(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
 }
 
 function shiftAnchor(type: PeriodType, anchor: Date, direction: 1 | -1): Date {
@@ -64,15 +85,38 @@ const PERIOD_OPTIONS: {value: PeriodType;label: string;}[] = [
 { value: "day", label: "Day" },
 { value: "week", label: "Week" },
 { value: "month", label: "Month" },
-{ value: "year", label: "Year" }];
+{ value: "year", label: "Year" },
+{ value: "custom", label: "Custom" }];
 
+
+function downloadFile(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function csvCell(value: string | number): string {
+  const str = String(value);
+  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+}
 
 export function Reports() {
   const { orders } = useStore();
   const [periodType, setPeriodType] = useState<PeriodType>("month");
   const [anchor, setAnchor] = useState(new Date());
+  const [customStart, setCustomStart] = useState(new Date());
+  const [customEnd, setCustomEnd] = useState(new Date());
 
-  const { start, end, label } = useMemo(() => periodRange(periodType, anchor), [periodType, anchor]);
+  const { start, end, label } = useMemo(
+    () => periodRange(periodType, anchor, customStart, customEnd),
+    [periodType, anchor, customStart, customEnd]
+  );
 
   const stats = useMemo(() => {
     const inRange = orders.filter((o) => {
@@ -94,20 +138,58 @@ export function Reports() {
     });
     const topProducts = [...productTotals.values()].sort((a, b) => b.units - a.units).slice(0, 5);
 
-    return { totalSales, orderCount, uniqueCustomers, avgOrderValue, topProducts };
+    return { inRange, totalSales, orderCount, uniqueCustomers, avgOrderValue, topProducts };
   }, [orders, start, end]);
+
+  const downloadCsv = () => {
+    const rows = [
+    ["Report period", label],
+    ["Total sales", String(stats.totalSales)],
+    ["Orders", String(stats.orderCount)],
+    ["Customers", String(stats.uniqueCustomers)],
+    ["Avg. order value", String(Math.round(stats.avgOrderValue))],
+    [],
+    ["Reference", "Date", "Customer", "Email", "Type", "Payment", "Status", "Total (RWF)"],
+    ...stats.inRange.map((o) => [
+    o.reference,
+    formatDate(o.createdAt),
+    o.contactName,
+    o.email,
+    orderCategory(o),
+    o.paymentMethod === "card" ? "Card" : "MTN MoMo",
+    o.status,
+    String(o.total)]
+    )];
+
+    const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+    downloadFile(`atlas-report-${toDateInputValue(start)}-to-${toDateInputValue(new Date(end.getTime() - 1))}.csv`, csv, "text/csv;charset=utf-8;");
+  };
 
   return (
     <AdminLayout>
-      <h1 className="font-serif text-4xl font-semibold text-ink">Reports</h1>
-      <p className="mt-1 text-ink/60">Sales, orders and customers for the selected period.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
+        <div>
+          <h1 className="font-serif text-4xl font-semibold text-ink">Reports</h1>
+          <p className="mt-1 text-ink/60">Sales, orders and customers for the selected period.</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={downloadCsv} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50">
+            <DownloadIcon className="h-4 w-4" /> Download CSV
+          </button>
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-4 py-2.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50">
+            <PrinterIcon className="h-4 w-4" /> Download PDF
+          </button>
+        </div>
+      </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="flex rounded-full border border-burgundy-200 bg-white p-1 text-sm font-semibold">
+      <p className="hidden font-serif text-2xl font-semibold text-ink print:block">Reports · {label}</p>
+
+      <div className="mt-6 flex flex-wrap items-center gap-3 print:hidden">
+        <div className="flex flex-wrap rounded-full border border-burgundy-200 bg-white p-1 text-sm font-semibold">
           {PERIOD_OPTIONS.map((opt) =>
           <button
             key={opt.value}
-            onClick={() => { setPeriodType(opt.value); setAnchor(new Date()); }}
+            onClick={() => { setPeriodType(opt.value); if (opt.value !== "custom") setAnchor(new Date()); }}
             className={`rounded-full px-4 py-1.5 transition-colors ${
             periodType === opt.value ? "bg-burgundy-800 text-cream" : "text-ink/60 hover:bg-burgundy-50"}`
             }>
@@ -117,33 +199,50 @@ export function Reports() {
           )}
         </div>
 
+        {periodType === "custom" ?
+        <div className="flex items-center gap-2 rounded-full border border-burgundy-200 bg-white px-3 py-1.5">
+            <CalendarIcon className="h-3.5 w-3.5 text-ink/40" />
+            <input
+            type="date"
+            value={toDateInputValue(customStart)}
+            max={toDateInputValue(customEnd)}
+            onChange={(e) => e.target.value && setCustomStart(fromDateInputValue(e.target.value))}
+            className="bg-transparent text-sm font-semibold text-ink outline-none [color-scheme:light]" />
+
+            <span className="text-ink/40">to</span>
+            <input
+            type="date"
+            value={toDateInputValue(customEnd)}
+            min={toDateInputValue(customStart)}
+            onChange={(e) => e.target.value && setCustomEnd(fromDateInputValue(e.target.value))}
+            className="bg-transparent text-sm font-semibold text-ink outline-none [color-scheme:light]" />
+
+          </div> :
+
         <div className="flex items-center gap-1.5 rounded-full border border-burgundy-200 bg-white px-2 py-1.5">
-          <button onClick={() => setAnchor((a) => shiftAnchor(periodType, a, -1))} aria-label="Previous period" className="rounded-full p-1.5 text-ink/60 hover:bg-burgundy-50">
-            <ChevronLeftIcon className="h-4 w-4" />
-          </button>
-          {periodType === "day" ?
+            <button onClick={() => setAnchor((a) => shiftAnchor(periodType, a, -1))} aria-label="Previous period" className="rounded-full p-1.5 text-ink/60 hover:bg-burgundy-50">
+              <ChevronLeftIcon className="h-4 w-4" />
+            </button>
+            {periodType === "day" ?
           <label className="flex min-w-[10rem] items-center justify-center gap-1.5 text-sm font-semibold text-ink">
-              <CalendarIcon className="h-3.5 w-3.5 text-ink/40" />
-              <input
+                <CalendarIcon className="h-3.5 w-3.5 text-ink/40" />
+                <input
               type="date"
               value={toDateInputValue(anchor)}
-              onChange={(e) => {
-                if (!e.target.value) return;
-                const [y, m, d] = e.target.value.split("-").map(Number);
-                setAnchor(new Date(y, m - 1, d));
-              }}
+              onChange={(e) => e.target.value && setAnchor(fromDateInputValue(e.target.value))}
               className="bg-transparent text-sm font-semibold text-ink outline-none [color-scheme:light]" />
 
-            </label> :
+              </label> :
 
           <span className="min-w-[10rem] text-center text-sm font-semibold text-ink">{label}</span>
           }
-          <button onClick={() => setAnchor((a) => shiftAnchor(periodType, a, 1))} aria-label="Next period" className="rounded-full p-1.5 text-ink/60 hover:bg-burgundy-50">
-            <ChevronRightIcon className="h-4 w-4" />
-          </button>
-        </div>
+            <button onClick={() => setAnchor((a) => shiftAnchor(periodType, a, 1))} aria-label="Next period" className="rounded-full p-1.5 text-ink/60 hover:bg-burgundy-50">
+              <ChevronRightIcon className="h-4 w-4" />
+            </button>
+          </div>
+        }
 
-        <button onClick={() => setAnchor(new Date())} className="rounded-full border border-burgundy-200 bg-white px-4 py-1.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50">
+        <button onClick={() => { setPeriodType("day"); setAnchor(new Date()); }} className="rounded-full border border-burgundy-200 bg-white px-4 py-1.5 text-sm font-semibold text-burgundy-800 hover:bg-burgundy-50">
           Today
         </button>
       </div>
