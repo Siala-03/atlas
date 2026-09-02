@@ -18,6 +18,7 @@ model Product {
   volume            String
   unitsPerCase      Int
   casePrice         Int
+  unitPrice         Int         @default(0)
   stockUnits        Int
   lowStockThreshold Int
   image             String
