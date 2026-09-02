@@ -46,8 +46,8 @@ export function PortalLogin() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-burgundy-950 px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="rounded-2xl bg-cream p-4 shadow-2xl shadow-black/20">
-          <Logo className="h-11" />
+        <div className="flex items-center justify-center rounded-2xl bg-cream p-5 shadow-2xl shadow-black/20">
+          <Logo className="h-24" />
         </div>
 
         <section className="mt-5 rounded-3xl border border-cream/10 bg-white p-7 shadow-2xl shadow-black/20 sm:p-9">
