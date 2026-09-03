@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CheckCircleIcon, ArrowRightIcon, ClipboardListIcon, CreditCardIcon, TruckIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckCircleIcon, ArrowRightIcon, ClipboardListIcon, CreditCardIcon, RotateCcwIcon, TruckIcon } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { MomoPaymentCode } from "../components/MomoPaymentCode";
@@ -12,10 +12,33 @@ import { Order, Payment } from "../types";
 
 export function OrderConfirmation() {
   const { id } = useParams();
-  const { fetchOrder, getPaymentStatus } = useStore();
+  const location = useLocation();
+  const fromMyOrders = location.pathname.startsWith("/my-orders");
+  const { fetchOrder, getPaymentStatus, reorderMyOrder, openCart } = useStore();
   const [order, setOrder] = useState<Order | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [payment, setPayment] = useState<Payment | null>(null);
+  const [reordering, setReordering] = useState(false);
+  const [reorderNote, setReorderNote] = useState("");
+
+  const reorder = async () => {
+    if (!order) return;
+    setReordering(true);
+    setReorderNote("");
+    try {
+      const result = await reorderMyOrder(order.id);
+      setReorderNote(
+        result.unavailable.length > 0 ?
+        `Added what's still in stock. Not available: ${result.unavailable.join(", ")}.` :
+        `Added ${result.addedUnits} item${result.addedUnits === 1 ? "" : "s"} to your cart.`
+      );
+      openCart();
+    } catch (err) {
+      setReorderNote(err instanceof Error ? err.message : "Could not reorder this order.");
+    } finally {
+      setReordering(false);
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -133,17 +156,35 @@ export function OrderConfirmation() {
           </p>
         </div>
 
+        {reorderNote && <p className="mt-6 text-center text-sm font-medium text-burgundy-800">{reorderNote}</p>}
+
         <div className="mt-8 flex flex-wrap justify-center gap-3">
+          {fromMyOrders ?
+          <Link
+            to="/account"
+            className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 px-6 py-3 font-semibold text-burgundy-800 hover:bg-burgundy-50">
+
+              <ArrowLeftIcon className="h-4 w-4" /> Back to my orders
+            </Link> :
+
           <Link
             to={`/my-orders/${order.id}`}
             className="inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-6 py-3 font-semibold text-cream hover:bg-burgundy-900">
-            
-            <ClipboardListIcon className="h-4 w-4" /> Track this order
-          </Link>
+
+              <ClipboardListIcon className="h-4 w-4" /> Track this order
+            </Link>
+          }
+          <button
+            onClick={reorder}
+            disabled={reordering}
+            className="inline-flex items-center gap-2 rounded-full bg-burgundy-800 px-6 py-3 font-semibold text-cream hover:bg-burgundy-900 disabled:cursor-not-allowed disabled:opacity-60">
+
+            <RotateCcwIcon className="h-4 w-4" /> {reordering ? "Adding…" : "Reorder"}
+          </button>
           <Link
             to="/shop"
             className="inline-flex items-center gap-2 rounded-full border border-burgundy-200 px-6 py-3 font-semibold text-burgundy-800 hover:bg-burgundy-50">
-            
+
             Continue shopping <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
